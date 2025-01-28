@@ -1,12 +1,25 @@
-import { useState } from 'react'
-import './App.css'
+// Infrastructure
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import axios from 'axios'
+
+// Styles Sass
+import './sass/main.sass'
+
+// Pages
+import './pages/User/UserRegister'
+import UserRegister from './pages/User/UserRegister'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <h1>Teste</h1>
+    <>      
+      <BrowserRouter>        
+          <Routes>            
+            <Route path="/user/register" element={<UserRegister />} />            
+            {/* 404 */}
+            {/* <Route path="*" element={<NotFound />} /> */}
+          </Routes>        
+      </BrowserRouter>
     </>
   )
 }
