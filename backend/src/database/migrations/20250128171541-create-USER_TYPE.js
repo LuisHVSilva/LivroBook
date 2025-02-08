@@ -1,0 +1,25 @@
+'use strict';
+const { DataTypes } = require('sequelize');
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('USER_TYPE', {
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+      },
+      userType: { type: DataTypes.INTEGER, allowNull: false },
+      description: { type: DataTypes.STRING, allowNull: false },
+      createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: Sequelize.NOW },
+      chagedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: Sequelize.NOW },
+      active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+
+    })
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('USER_TYPE');
+  }
+}
