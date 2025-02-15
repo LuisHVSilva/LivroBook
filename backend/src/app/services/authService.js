@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require('uuid');
 
-const UserSession = require("../models/UserSession");
+const UserSession = require("../../models/UserSession");
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config/.env' });
@@ -25,21 +25,12 @@ class AuthService {
             await this.saveRefreshToken(user.user_id, userAgent, ip, refreshToken, transaction);
 
             return { accessToken, refreshToken };
-        } catch (error) {
-            console.error('Erro ao criar sessão:', error);
-            throw new Error('Erro ao autenticar usuário');
+        } catch (error) {            
+            throw new Error('Erro ao criar sessão:', error);
         }
     }
 
-    static async updateUserSession(field, value, condition, conditionValue) {
-        if (typeof field !== 'string' || typeof condition !== 'string') {
-            throw new Error('Os parâmetros "field" e "condition" devem ser strings');
-        }
-
-        if (conditionValue === undefined || conditionValue === null) {
-            throw new Error('conditionValue não pode ser indefinido ou nulo');
-        }
-
+    static async updateUserSession(field, value, condition, conditionValue) {        
         await UserSession.update(
             { [field]: value },
             { where: { [condition]: conditionValue } }

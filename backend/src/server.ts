@@ -1,12 +1,14 @@
-const express = require('express');
+import { Request, Response, NextFunction } from 'express';
+import express from 'express';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import helmet from 'helmet';
+import { sequelize } from './config/db';
+
 const cors = require('cors');
 const morgan = require('morgan');
-const helmet = require('helmet');
-const dotenv = require('dotenv');
-const db = require('./config/db'); // Importa a conexão com o banco de dados
-const routes = require('./routes'); // Importa o index das rotas
 
-dotenv.config({ path: './config/.env' }); // Carrega variáveis de ambiente do arquivo .env
+dotenv.config({ path: path.resolve(__dirname, './config/.env') });
 
 const app = express();
 
@@ -18,20 +20,20 @@ app.use(express.json()); // Lê requisições JSON
 app.use(express.urlencoded({ extended: true })); // Lê requisições URL-encoded
 
 // Teste de conexão com o banco de dados
-db.authenticate()
+sequelize.authenticate()
   .then(() => console.log('Banco de dados conectado com sucesso!'))
-  .catch((error) => console.error('Erro ao conectar ao banco de dados:', error));
+  .catch((error: Error) => console.error('Erro ao conectar ao banco de dados:', error));
 
 // Rotas principais
-app.use('/api', routes); // Todas as rotas iniciam com /api
+// app.use('/api', routes); // Todas as rotas iniciam com /api
 
 // Rota básica para teste
-app.get('/', (req, res) => {
-  res.send('API funcionando! 🚀');
+app.get('/api/runtest', (req: Request, res: Response) => {
+  res.json([{ message: 'API funcionando! 🚀' }]);
 });
 
 // Tratamento de erros (middleware)
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Ocorreu um erro no servidor' });
 });

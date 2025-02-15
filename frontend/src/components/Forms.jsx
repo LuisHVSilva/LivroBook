@@ -1,38 +1,31 @@
-import React, { useState } from 'react';
+import useFormHandler from "../hooks/useFormHandler";
 
-const Forms = ({ fields, buttonTitle }) => {  
-  const [formData, setFormData] = useState({});
+const Forms = ({ urlPath, fields, buttonTitle }) => {
+    const { formData, handleChange, handleSubmit, loading, error } = useFormHandler(urlPath);
+    
+    return (
+        <form onSubmit={handleSubmit}>
+            {fields.map((field) => (
+                <div key={field.id}>
+                    <label htmlFor={field.id}>{field.label}</label>
+                    <input
+                        type={field.type}
+                        id={field.id}
+                        name={field.id}
+                        value={formData[field.id] || ""}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            ))}
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
-  };
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Dados enviados:', formData);
-  };
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-  return (
-    <form onSubmit={handleSubmit}>
-      {fields.map((field) => (
-        <div key={field.id}>
-          <label htmlFor={field.id}>{field.label}</label>
-          <br />
-          <input
-            id={field.id}
-            type={field.type}
-            value={formData[field.id] || ''}
-            onChange={handleChange}
-          />
-        </div>
-      ))}
-      <button type="submit">{buttonTitle}</button>
-    </form>
-  );
-}
+            <button type="submit" disabled={loading}>
+                {loading ? "Enviando..." : buttonTitle}
+            </button>
+        </form>
+    );
+};
 
-export default Forms
+export default Forms;

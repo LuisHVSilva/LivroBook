@@ -1,19 +1,24 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sequelize = require('../config/db');
+const sequelize = require('../../config/db');
 const dotenv = require('dotenv');
+const { StatusCodes } = require('http-status-codes');
 
-const User = require('../models/User');
-const UserSession = require('../models/UserSession');
-const AuthService = require('../services/authService');
+const User = require('../../models/User');
+const AuthService = require('./authService');
+const Log = require('../../utils/log');
+const MESSAGES = require('../../utils/messages');
 
 dotenv.config({ path: './config/.env' });
 
+const LOG = new Log();
+
 class AccountService {
     async registerAccount(accountData, userAgent, ip) {
+        const method = 'registerAccount';
         try {
             if (!accountData.password) {
-                throw new Error('Senha é obrigatória');
+                throw new Error(MESSAGES.ERRORS.PASSWORD_REQUIRED);
             }
 
             const t = await sequelize.transaction()
@@ -30,25 +35,26 @@ class AccountService {
 
             return tokens;
         } catch (error) {
-            console.error('Erro ao registrar conta:', error);
-            throw new Error('Erro ao registrar conta');
+            LOG.logError(method, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+            throw new Error(MESSAGES.ERRORS.USER_CREATED);
         }
     }
 
     async authenticate(username, password, userAgent, ip) {
+        const method = 'authenticate';
         try {            
             const user = await User.findOne({ where: { username } });
             if (!user) {
-                throw new Error('Usuário não encontrado');
+                throw new Error(MESSAGES.ERRORS.USER_NOT_FOUND);
             }
 
             if(!user.active) {
-                throw new Error('Usuário inativo. Favor verificar usuário')
+                throw new Error(MESSAGES.ERRORS.USER_INACTIVE);
             }
 
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
-                throw new Error('Senha incorreta');
+                throw new Error(MESSAGES.ERRORS.PASSWORD_INCORRECT);
             }
 
             const userId = user.user_id;
@@ -71,7 +77,9 @@ class AccountService {
 
             return token;
         } catch(error) {            
-            const errorMessage = error.message || 'Falha ao validar usuário';
+            const errorMessage = error.message || MESSAGES.ERRORS.INVALID_CREDENTIALS;
+            LOG.logError(method, StatusCodes.INTERNAL_SERVER_ERROR, errorMessage);
+
             throw new Error(errorMessage);
         }
         
@@ -84,7 +92,7 @@ class AccountService {
 
             return { salt: salt, hashPassword: hashPassword }
         } catch (error) {
-            throw new Error("Erro ao criptografar senha.");
+            throw new Error(error.message);
         }
     };
 
