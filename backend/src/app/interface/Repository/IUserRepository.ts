@@ -1,8 +1,22 @@
 import { User } from "../../../models/User";
 
 
-export interface UserRepository {
+export interface IUserRepository {
+    /**
+     * Busca todos os registros de usuários.
+     * @returns Uma promessa que resolve para uma lista de Usuários ou um erro.
+     */
     getAllUsers(): Promise<User[] | Error>;
+    
+    /**
+     * Busca um usuário com base de uma query de critério.
+     * @returns Uma promessa que resolve para um Usuários ou um erro.
+     */
     getUserByCriteria(searchCreteria: object): Promise<User | null>;
-    createUser(userData: User): Promise<User |Error>;        
- }
+
+    /**
+     * Cria um registros de usuários.
+     * @returns Uma promessa que resolve para uma lista de Usuários ou um erro.
+     */
+    createUser(userData: User): Promise<User | Error>;
+}

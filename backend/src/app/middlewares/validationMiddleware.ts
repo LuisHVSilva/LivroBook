@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 
 const UserService = require('../services/userService')
 import { MESSAGES } from '../../utils/messages';
-import { Log } from '../../utils/log';
+import { Log } from '../../utils/logger';
 const { MODELS_FIELDS_ENUM } = require('../utils/enum');
 
 // Constants
@@ -28,7 +28,7 @@ class Validations {
         catch (error) {
             const minPart = min ? `no minimo ${min}.` : '';
             const maxPart = max ? `no máximo ${max}.` : '';
-            LOG.logError("validatePasswordStrength", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("validatePasswordStrength", INVALID_HTTP_METHOD_VALIDATION, error as Error);
             throw new Error(`O texto deve ter no mínimo ${minPart}${max}`);
         }
 
@@ -39,7 +39,7 @@ class Validations {
             !value || value.trim() !== '';
             return true;
         } catch (error) {
-            LOG.logError("isRequired", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("isRequired", INVALID_HTTP_METHOD_VALIDATION, error as Error);
             throw new Error(`O campo ${fieldName} é obrigatório.`);
         }
     }
@@ -50,7 +50,7 @@ class Validations {
             emailRegex.test(email);
             return true;
         } catch (error) {
-            LOG.logError("isValidEmail", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("isValidEmail", INVALID_HTTP_METHOD_VALIDATION, error as Error);
             throw new Error(`Email inválido.`);
         }
 
@@ -62,7 +62,7 @@ class Validations {
             this.containsSpecialCharacter(password);
             return true;
         } catch (error) {
-            LOG.logError("validatePasswordStrength", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("validatePasswordStrength", INVALID_HTTP_METHOD_VALIDATION, error as Error);
 
             throw error;
         }
@@ -73,7 +73,7 @@ class Validations {
             firstField !== secondField;
             return true
         } catch (error) {
-            LOG.logError("validateFieldEquality", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("validateFieldEquality", INVALID_HTTP_METHOD_VALIDATION, error as Error);
 
             throw new Error(`Os campos de ${fieldName} devem ser iguais.`);
         }
@@ -85,7 +85,7 @@ class Validations {
             PHONE_REGEX.test(phone);
             return true;
         } catch (error) {
-            LOG.logError("isValidEmail", INVALID_HTTP_METHOD_VALIDATION, error);
+            LOG.logError("isValidEmail", INVALID_HTTP_METHOD_VALIDATION, error as Error);
             throw new Error(`Telefone inválido.`);
         }
     }

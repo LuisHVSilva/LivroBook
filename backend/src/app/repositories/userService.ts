@@ -2,14 +2,14 @@
 import { StatusCodes } from 'http-status-codes';
 import { WhereOptions } from 'sequelize';
 import { User } from '../../models/User';
-import { Log } from '../../utils/log';
-import { UserRepository } from '../interface/Repository/IUserRepository';
+import { Logger } from '../../utils/logger';
+import { IUserRepository } from '../interface/Repository/IUserRepository';
 
-class UserService implements UserRepository {
-    private log: Log
+class UserRepository implements IUserRepository {
+    private log: Logger
 
     constructor() {
-        this.log = new Log();
+        this.log = new Logger();
     }
 
     async getAllUsers(): Promise<User[] | Error> {
@@ -45,4 +45,4 @@ class UserService implements UserRepository {
 
 
 
-export { UserService };
+export { UserRepository };

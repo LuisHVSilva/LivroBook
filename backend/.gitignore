@@ -3,3 +3,4 @@ node_modules
 logs.txt
 migrations
 seeders
+/tests/coverage

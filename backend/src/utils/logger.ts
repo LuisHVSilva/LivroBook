@@ -1,6 +1,7 @@
 import fs from 'fs';
 import * as path from 'path';
 import { StatusCodes } from 'http-status-codes';
+import { ILogger } from '../app/interface/utils/ILogger';
 
 //constants
 const logFilePath = path.join(__dirname, '../../LOGS/logs.txt');
@@ -9,7 +10,7 @@ const ERRO_DESCRIPTION = "ERRO";
 const WAR_DESCRIPTION = "ATENÇÃO";
 const SUCCESS_DESCRIPTION = "SUCESSO";
 
-class Log {
+class Logger implements ILogger {
     constructor() {
 
     }
@@ -50,4 +51,4 @@ class Log {
 }
 
 
-export { Log };
+export { Logger };

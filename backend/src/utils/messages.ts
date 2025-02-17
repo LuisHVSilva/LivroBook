@@ -13,6 +13,9 @@ export const MESSAGES = {
         USER_NOT_FOUND: 'Usuário não encontrado',
         USER_INACTIVE: 'Usuário inativo. Favor verificar usuário',
         PASSWORD_INCORRECT: 'Senha incorreta',
+        STATUS_REPOSITORY: {
+            GET_ALL_STATUS: 'Erro ao buscar todos os status',
+        }
     },
     SUCCESS: {
         USER_CREATED: "Usuário cadastrado com sucesso!",
