@@ -1,7 +1,7 @@
 export interface UserTypeEntity {
-    id: bigint;
+    id: number;
     description: string;
-    status: bigint;
+    status: number;
     createdAt: Date;
     updatedAt: Date;
 }

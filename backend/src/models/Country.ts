@@ -9,7 +9,7 @@ class Country extends Model<CountryEntity> implements CountryEntity {
     id!: bigint;
     description!: string;
     phoneCode!: number;
-    status!: bigint;
+    status!: number;
     createdAt!: Date;
     updatedAt!: Date;
 }
@@ -31,7 +31,7 @@ Country.init(
             allowNull: false
         },
         status: {
-            type: DataType.BIGINT,
+            type: DataType.INTEGER,
             allowNull: false
         },
         createdAt: {

@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import helmet from 'helmet';
 import { sequelize } from './config/db';
+import { routes } from './app/routes';
 
 const cors = require('cors');
 const morgan = require('morgan');
@@ -25,7 +26,7 @@ sequelize.authenticate()
   .catch((error: Error) => console.error('Erro ao conectar ao banco de dados:', error));
 
 // Rotas principais
-// app.use('/api', routes); // Todas as rotas iniciam com /api
+app.use('/api', routes); // Todas as rotas iniciam com /api
 
 // Rota básica para teste
 app.get('/api/runtest', (req: Request, res: Response) => {

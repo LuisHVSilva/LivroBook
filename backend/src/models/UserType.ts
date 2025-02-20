@@ -5,9 +5,9 @@ import { User } from "./User";
 import { Status } from "./Status";
 
 class UserType extends Model<UserTypeEntity> implements UserTypeEntity {
-    id!: bigint;
+    id!: number;
     description!: string;
-    status!: bigint;
+    status!: number;
     createdAt!: Date;
     updatedAt!: Date;
 }
@@ -15,7 +15,7 @@ class UserType extends Model<UserTypeEntity> implements UserTypeEntity {
 UserType.init(
     {
         id: {
-            type: DataType.BIGINT,
+            type: DataType.INTEGER,
             allowNull: false,
             primaryKey: true,
             autoIncrement: true
@@ -25,7 +25,7 @@ UserType.init(
             allowNull: false
         },
         status: {
-            type: DataType.BOOLEAN,
+            type: DataType.INTEGER,
             allowNull: false,
             defaultValue: false
         },

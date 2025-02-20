@@ -1,6 +1,6 @@
 export interface UserEntity {
     id: bigint;
-    userTypeId: bigint;
+    userTypeId: number;
     name: string;
     phoneDDD: bigint
     phoneCountryCode: bigint;
@@ -11,7 +11,7 @@ export interface UserEntity {
     username: string;
     password: string;
     loginCount: bigint;
-    status: bigint;
+    status: number;
     createdAt: Date;
     updatedAt: Date;
 }

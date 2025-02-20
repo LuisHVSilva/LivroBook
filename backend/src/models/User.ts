@@ -1,7 +1,6 @@
 import { DataType, Model } from 'sequelize-typescript';
 import { sequelize } from '../config/db';
 import { UserEntity } from '../app/interface/Entities/IUserEntity';
-import { UserType } from './UserType';
 import { Status } from './Status';
 import { PhoneCode } from './PhoneCode';
 import { Country } from './Country';
@@ -9,7 +8,7 @@ import { LoginAttempts } from './LoginAttempts';
 
 class User extends Model<UserEntity> implements UserEntity {
     id!: bigint;
-    userTypeId!: bigint;
+    userTypeId!: number;
     name!: string;
     phoneDDD!: bigint
     phoneCountryCode!: bigint;
@@ -20,7 +19,7 @@ class User extends Model<UserEntity> implements UserEntity {
     username!: string;
     password!: string;
     loginCount!: bigint;
-    status!: bigint
+    status!: number
     createdAt!: Date;
     updatedAt!: Date;
 }
@@ -81,7 +80,7 @@ User.init(
             allowNull: false
         },
         status: {
-            type: DataType.BOOLEAN,
+            type: DataType.INTEGER,
             allowNull: false,
             defaultValue: false
         },
@@ -106,7 +105,7 @@ User.init(
 );
 
 
-User.belongsTo(UserType, { foreignKey: 'userTypeId', as: 'userTypeId', onDelete: 'SET NULL', onUpdate: "CASCADE" });
+// User.belongsTo(UserType, { foreignKey: 'userTypeId', as: 'userTypeId', onDelete: 'SET NULL', onUpdate: "CASCADE" });
 User.belongsTo(Status, { foreignKey: 'status', as: 'userId', onDelete: 'SET NULL', onUpdate: "CASCADE" });
 User.belongsTo(PhoneCode, { foreignKey: 'phoneDDD', as: 'phoneId', onDelete: 'SET NULL', onUpdate: "CASCADE" });
 User.belongsTo(Country, { foreignKey: 'phoneCountryCode', as: 'phoneCountryCode', onDelete: 'SET NULL', onUpdate: "CASCADE" });

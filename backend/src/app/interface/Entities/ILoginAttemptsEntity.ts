@@ -4,7 +4,7 @@ export interface LoginAttemptsEntity {
     ipAddress: string;
     userAgent: string;
     reason: string;
-    status: bigint;
+    status: number;
     createdAt: Date;
     updatedAt: Date;    
 }

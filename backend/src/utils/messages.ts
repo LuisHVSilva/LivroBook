@@ -1,27 +1,32 @@
+import { IStatusEntity } from "../app/interface/Entities/IStatusEntity";
+
 export const MESSAGES = {
     ERRORS: {
-        REQUIRED_FIELD: (field: string) => `${field} é obrigatório.`,
-        UNIQUE_FIELD: (field: string) => `${field} já cadastrado. Favor usar outro.`,
-        INVALID_EMAIL: "E-mail inválido.",
-        INVALID_TOKEN: "Token inválido.",
-        USER_ALREADY_EXISTS: "Usuário já cadastrado. Escolha outro.",
-        INVALID_CREDENTIALS: "Credenciais inválidas.",
-        UNAUTHORIZED: "Acesso não autorizado.",
-        SERVER_ERROR: "Erro interno do servidor.",
-        PASSWORD_REQUIRED: "Senha é obrigatória",
-        USER_CREATED: "Erro ao registrar conta",
-        USER_NOT_FOUND: 'Usuário não encontrado',
-        USER_INACTIVE: 'Usuário inativo. Favor verificar usuário',
-        PASSWORD_INCORRECT: 'Senha incorreta',
         STATUS_REPOSITORY: {
-            GET_ALL_STATUS: 'Erro ao buscar todos os status',
-        }
+            CREATE: 'Erro ao criar status.',
+            GET: 'Erro ao buscar status.',
+            GET_BY_ID: 'Erro ao buscar status por id.',
+            GET_BY_ID_NOT_FOUND: 'Status nao encontrado pelo id.',
+            GET_ALL_STATUS: 'Erro ao buscar todos os status.',
+            DELETE: 'Erro ao deletar status.',
+            DELETE_BY_ID_NOT_FOUND: 'Status nao encontrado para deletar.'
+        },
+        STATUS_SERVICE: {
+            CREATE_STATUS_NULL_FIELD: 'Sem dados para criar o status. Favor informar o corpo da requisição.\n Campo de descrição obrigatório',
+            CREATE_STATUS: 'Erro ao criar status.'
+        },
+        STATUS_CONTROLLER: {
+            NECESSARY_FIELD: (field: string) => `Favor informar os campos: ${field}.`,
+            CREATE_STATUS_GENERIC_ERROR: 'Não foi possível criar o status',
+            GET_STATUS_GENERIC_ERROR: (id: string) => `Não foi possível buscar o status de id ${id}`,
+        },
+        GENERIC_MESSAGE: 'Houve um erro inesperado.'
     },
     SUCCESS: {
-        USER_CREATED: "Usuário cadastrado com sucesso!",
-        LOGIN_SUCCESS: "Login realizado com sucesso!",
-        DATA_UPDATED: "Dados atualizados com sucesso!",
-        ACCOUNT_VALIDATION: "Conta validada com sucesso",
-        ACCOUNT_LOGIN_VALIDATION: "Login validado com sucesso",
+        STATUS_SERVICE: {
+            CREATE: (field: IStatusEntity) => `${field} criado com sucesso.`,
+            GET_BY_ID: (data: IStatusEntity) => `Objeto encontrado com sucess: ${data}`,
+            DELETE: (id: number): string => `Status deletado com sucesso: ${id}`,
+        }
     }
 };

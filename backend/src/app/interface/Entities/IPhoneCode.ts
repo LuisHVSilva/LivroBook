@@ -3,7 +3,7 @@ export interface PhoneCodeEntity {
     country: bigint;
     regionDescription: string;
     phoneDDD: number;
-    status: bigint;
+    status: number;
     createdAt: Date;
     updatedAt: Date;
 }

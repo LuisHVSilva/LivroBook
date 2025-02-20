@@ -5,14 +5,15 @@ module.exports = {
     "^.+.tsx?$": ["ts-jest",{}],
   },
   moduleFileExtensions: ['js', 'ts'],
-  
+  testTimeout: 30000, 
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
-  // collectCoverage: true,            
-  // collectCoverageFrom: [            
-  //   "src/**/*.{js,ts}",             
-  //   "!src/**/*.d.ts"                
-  // ],
-  // coverageDirectory: "./tests/coverage",  
-  // // coverageReporters: ["text", "lcov", "json"],
-  // coverageReporters: ["lcov"],
+  
+   collectCoverage: true,
+   collectCoverageFrom: [
+     "src/**/*.{js,ts}",
+     "!src/!**/!*.d.ts"
+  ],
+  coverageDirectory: "./tests/coverage",
+  // coverageReporters: ["text", "lcov", "json"],
+  coverageReporters: ["lcov"],
 };

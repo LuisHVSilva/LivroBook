@@ -1,6 +1,7 @@
-export interface StatusEntity {
+export interface IStatusEntity {
     id: bigint;
     description: string;    
-    createdAt: Date;
-    updatedAt: Date;
+    active?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

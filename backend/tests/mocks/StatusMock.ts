@@ -1,30 +1,54 @@
-import { StatusEntity } from "../../src/app/interface/Entities/IStatusEntity";
+import { IStatusEntity } from "../../src/app/interface/Entities/IStatusEntity";
 
 class StatusMock {
-    private statusMockDataList: Array<StatusEntity> = [
+    private statusMockDataList: Array<IStatusEntity> = [
         {
             id: BigInt(1),
             description: "Active",
+            active: true,
             createdAt: new Date("2023-01-01"),
             updatedAt: new Date("2023-01-02"),
         },
         {
             id: BigInt(2),
             description: "Inactive",
+            active: true,
             createdAt: new Date("2023-01-03"),
             updatedAt: new Date("2023-01-04"),
         },
     ];
 
+    private statusMockData: IStatusEntity = {
+        id: BigInt(1),
+        description: "Active",
+        active: true,
+        createdAt: new Date("2023-01-01"),
+        updatedAt: new Date("2023-01-02"),
+    }
+
     public getStatusMockDataList() {
         return this.statusMockDataList;
+    }
+
+    public getStatusMockData() {
+        return this.statusMockData;
     }
 
     /**
      * Método auxiliar que verifica se todos os campos da consulta correspondem ao item.
      */
-    private matchesQuery(item: StatusEntity, query: Partial<StatusEntity>): boolean {
-        return Object.keys(query).every((key) => item[key as keyof StatusEntity] === query[key as keyof StatusEntity]);
+    private matchesQuery(item: IStatusEntity, query: Partial<IStatusEntity>): boolean {
+        return Object.keys(query).every((key) => item[key as keyof IStatusEntity] === query[key as keyof IStatusEntity]);
+    }
+
+    /**
+     * Mock do método `create` que cria um novo registro com ID gerado.
+     */
+    public mockCreate() {
+        return jest.fn().mockImplementation((data: Partial<IStatusEntity>) => {
+            const newId = BigInt(this.statusMockDataList.length + 1);
+            return Promise.resolve({ ...data, id: newId });
+        });
     }
 
     /**
@@ -38,7 +62,7 @@ class StatusMock {
      * Mock do método `findOne` que busca um registro que corresponde à consulta.
      */
     public mockFindOne() {
-        return jest.fn().mockImplementation((query: { where: Partial<StatusEntity> }) => {
+        return jest.fn().mockImplementation((query: { where: Partial<IStatusEntity> }) => {
             if (!query.where) return Promise.resolve(null);
 
             const result = this.statusMockDataList.find((item) =>
@@ -50,27 +74,15 @@ class StatusMock {
     }
 
     /**
-     * Mock do método `create` que cria um novo registro com ID gerado.
+     * Mock do método `findByPk` que busca um registro com base na primary key.
      */
-    public mockCreate() {
-        return jest.fn().mockImplementation((data: Partial<StatusEntity>) => {
-            const newId = BigInt(this.statusMockDataList.length + 1);
-            return Promise.resolve({ ...data, id: newId });
-        });
-    }
+    public mockFindByPk() {
+        return jest.fn().mockImplementation((id: bigint) => {
+            // Aqui você pode simular a busca pelo ID (ou qualquer outra chave primária)
+            const result = this.statusMockDataList.find(status => status.id === id);
 
-    public mockDelete() {
-        return jest.fn().mockImplementation((query: any) => {
-            const index = this.statusMockDataList.findIndex((item) =>
-                this.matchesQuery(item, query.where)
-            );
-
-            if (index !== -1) {
-                this.statusMockDataList.splice(index, 1); 
-                return Promise.resolve({ rowsAffected: 1 }); 
-            }
-
-            return Promise.resolve({ rowsAffected: 0 });
+            // Se encontrar, resolve com o status, caso contrário, resolve com null
+            return result ? Promise.resolve(result) : Promise.resolve(null);
         });
     }
 }

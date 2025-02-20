@@ -11,7 +11,7 @@ class PhoneCode extends Model<PhoneCodeEntity> implements PhoneCodeEntity {
     country!: bigint;
     regionDescription!: string;
     phoneDDD!: number;
-    status!: bigint;
+    status!: number;
     createdAt!: Date;
     updatedAt!: Date;
 }
@@ -37,7 +37,7 @@ PhoneCode.init(
             allowNull: false
         },
         status: {
-            type: DataType.BIGINT,
+            type: DataType.INTEGER,
             allowNull: false
         },
         createdAt: {

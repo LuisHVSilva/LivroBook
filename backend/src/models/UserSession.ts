@@ -7,7 +7,7 @@ class UserSession extends Model<UserSessionEntity> implements UserSessionEntity 
     userId!: bigint;    
     ipAddress!: string; 
     refreshToken!: string;    
-    status!: bigint;
+    status!: number;
     expiresAt!: Date;
     lastUsedAt!: Date;
     createdAt!: Date;
@@ -35,7 +35,7 @@ UserSession.init(
             allowNull: false
         },
         status: {
-            type: DataType.BIGINT,
+            type: DataType.INTEGER,
             allowNull: false
         },
         lastUsedAt: {

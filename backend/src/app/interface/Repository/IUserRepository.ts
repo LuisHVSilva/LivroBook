@@ -1,5 +1,5 @@
 import { User } from "../../../models/User";
-
+import { CreateUserDTO } from "../DTO/UserDTO";
 
 export interface IUserRepository {
     /**
@@ -18,5 +18,5 @@ export interface IUserRepository {
      * Cria um registros de usuários.
      * @returns Uma promessa que resolve para uma lista de Usuários ou um erro.
      */
-    createUser(userData: User): Promise<User | Error>;
+    createUser(userData: CreateUserDTO): Promise<User | Error>;
 }

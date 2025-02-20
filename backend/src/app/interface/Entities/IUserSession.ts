@@ -3,7 +3,7 @@ export interface UserSessionEntity {
     userId: bigint;
     ipAddress: string;
     refreshToken: string;     
-    status: bigint;    
+    status: number;    
     lastUsedAt: Date;
     expiresAt: Date;
     createdAt: Date;

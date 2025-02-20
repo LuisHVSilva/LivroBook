@@ -2,7 +2,7 @@ export interface CountryEntity {
     id: bigint;
     description: string;
     phoneCode: number;
-    status: bigint;
+    status: number;
     createdAt: Date;
     updatedAt: Date;
 }

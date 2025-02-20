@@ -10,7 +10,7 @@ class LoginAttempts extends Model<LoginAttemptsEntity> implements LoginAttemptsE
     ipAddress!: string;
     userAgent!: string;
     reason!: string;
-    status!: bigint;
+    status!: number;
     createdAt!: Date;
     updatedAt!: Date; 
 }
@@ -40,7 +40,7 @@ LoginAttempts.init(
             allowNull: false
         },
         status: {
-            type: DataType.BIGINT,
+            type: DataType.INTEGER,
             allowNull: false
         },
         createdAt: {
