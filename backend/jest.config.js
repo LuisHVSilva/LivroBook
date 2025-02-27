@@ -8,12 +8,12 @@ module.exports = {
   testTimeout: 30000, 
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   
-   collectCoverage: true,
+   /*collectCoverage: true,
    collectCoverageFrom: [
-     "src/**/*.{js,ts}",
-     "!src/!**/!*.d.ts"
+     "src/!**!/!*.{js,ts}",
+     "!src/!**!/!*.d.ts"
   ],
   coverageDirectory: "./tests/coverage",
   // coverageReporters: ["text", "lcov", "json"],
-  coverageReporters: ["lcov"],
+  coverageReporters: ["lcov"],*/
 };

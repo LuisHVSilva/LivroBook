@@ -4,3 +4,4 @@ logs.txt
 migrations
 seeders
 /tests/coverage
+*.zip
