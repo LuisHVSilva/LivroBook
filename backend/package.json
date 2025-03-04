@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "node dist/server.js",
-    "dev": "nodemon --exec ts-node src/server.ts"
+    "dev": "nodemon --exec ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +16,11 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pg": "^8.13.3",
+    "reflect-metadata": "^0.2.2",
+    "sequelize-typescript": "^2.1.6",
+    "tsyringe": "^4.8.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
