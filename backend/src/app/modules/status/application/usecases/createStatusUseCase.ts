@@ -1,46 +1,43 @@
-import {IUseCase} from "../../../../../core/shared/interfaces/usecases";
+import "reflect-metadata";
+import {inject, injectable} from "tsyringe";
 import {IStatusRepository} from "../ports/IStatusRepository";
 import {Status} from "../../domain/status";
-import {Messages} from "../../../../../core/shared/constants/messages";
-import {ILogger} from "../../../../../core/shared/logs/ILogger";
-import {inject, injectable} from "tsyringe";
-
-export type CreateStatusInput = {
-    description: string;
-};
-
-export type CreateStatusOutput = {
-    description: string;
-};
-
-export class StatusCreationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'StatusCreationError';
-    }
-}
+import {ICreateStatusUseCase, CreateStatusInput, CreateStatusOutput} from "../ports/ICreateStatusUseCase";
+import {IStatusValidator} from "../../domain/validators/IStatusValidator";
+import {Messages} from "@coreShared/constants/messages";
+import {ILogger} from "@coreShared/logs/ILogger";
+import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 @injectable()
-export class CreateStatusUseCase implements IUseCase<CreateStatusInput, CreateStatusOutput> {
+export class CreateStatusUseCase implements ICreateStatusUseCase {
     private readonly method: string = 'CreateStatusUseCase';
 
     constructor(
         @inject("IStatusRepository") private readonly statusRepository: IStatusRepository,
         @inject("ILogger") private readonly logger: ILogger,
+        @inject("IStatusValidator") private readonly statusValidator: IStatusValidator
     ) {
     }
 
     public async execute(input: CreateStatusInput): Promise<CreateStatusOutput> {
         try {
+            await this.statusValidator.validateUniqueDescription(input.description);
+
             const status = Status.create(input.description);
             const savedStatus = await this.statusRepository.save(status);
 
             return {
+                id: savedStatus.getId(),
                 description: savedStatus.getDescription(),
             };
         } catch (error) {
-            this.logger.logError(this.method, error as Error, undefined, input);
-            throw new StatusCreationError(Messages.Status.Error.CREATED_FAILED); // Lançar erro customizado
+
+            if (error instanceof Error) {
+                this.logger.logError(this.method, error, undefined, input);
+                throw new UseCaseError(this.method, error.message);
+            }
+
+            throw new UseCaseError(this.method, Messages.Status.Error.CREATED_FAILED);
         }
     }
 }

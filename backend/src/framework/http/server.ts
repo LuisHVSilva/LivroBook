@@ -3,18 +3,22 @@ import express, { Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import {routes} from "./routes";
-// import { errorHandler } from "../shared/middlewares/errorHandler";
+import {router} from "@frameworkHttp/router";
+import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
 
 class Server {
-    private app: Application;
+    private readonly app: Application;
     private readonly PORT: number = Number(process.env.PORT) || 3000;
 
     constructor() {
         this.app = express();
         this.middlewares();
-        this.routes();
-        // this.errorHandling();
+        this.router();
+        this.errorHandling();
+    }
+
+    public get appInstance(): Application {
+        return this.app;
     }
 
     private middlewares(): void {
@@ -25,13 +29,13 @@ class Server {
         this.app.use(express.urlencoded({ extended: true }));
     }
 
-    private routes(): void {
-        this.app.use("/api", routes); // Prefixo das rotas
+    private router(): void {
+        this.app.use("/api", router);
     }
 
-    // private errorHandling(): void {
-    //     this.app.use(errorHandler); // Middleware para tratamento global de erros
-    // }
+    private errorHandling(): void {
+        this.app.use(ErrorHandler.handleError);
+    }
 
     public start(): void {
         this.app.listen(this.PORT, () => {

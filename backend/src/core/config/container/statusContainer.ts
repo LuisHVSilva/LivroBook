@@ -1,15 +1,20 @@
 import { container } from "tsyringe";
-import {IStatusRepository} from "../../../app/modules/status/application/ports/IStatusRepository";
-import {StatusRepository} from "../../../app/modules/status/infrastructure/repositories/StatusRepository";
-import {CreateStatusUseCase} from "../../../app/modules/status/application/usecases/createStatusUseCase";
-import {StatusController} from "../../../app/modules/status/adapters/controllers/statusController";
-import {ILogger} from "../../shared/logs/ILogger";
-import {Logger} from "../../shared/logs/logger";
+import {IStatusRepository} from "@status/application/ports/IStatusRepository";
+import {StatusRepository} from "@status/infrastructure/repositories/StatusRepository";
+import {CreateStatusUseCase} from "@status/application/usecases/createStatusUseCase";
+import {StatusController} from "@status/adapters/controllers/statusController";
+import {ILogger} from "@coreShared/logs/ILogger";
+import {Logger} from "@coreShared/logs/logger";
+import {ICreateStatusUseCase} from "@status/application/ports/ICreateStatusUseCase";
+import {StatusValidator} from "@status/domain/validators/StatusValidator";
+import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
+import {IStatusController} from "@status/adapters/controllers/IStatusController";
 
 
 container.register<IStatusRepository>("IStatusRepository", { useClass: StatusRepository });
 container.register<ILogger>("ILogger", {useClass: Logger});
-container.register("CreateStatusUseCase", { useClass: CreateStatusUseCase });
-container.register("StatusController", { useClass: StatusController });
+container.register<IStatusValidator>("IStatusValidator", { useClass: StatusValidator });
+container.register<ICreateStatusUseCase>("ICreateStatusUseCase", { useClass: CreateStatusUseCase });
+container.register<IStatusController>("IStatusController", { useClass: StatusController });
 
 export { container };

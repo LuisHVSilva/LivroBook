@@ -1,6 +1,6 @@
-import {container} from "../../../../../core/config/container"
-import {StatusController} from "../controllers/statusController";
+import {container} from "@coreConfig/container"
+import {IStatusController} from "@status/adapters/controllers/IStatusController";
 
-export const makeStatusController = (): StatusController => {
-    return container.resolve<StatusController>("StatusController");
+export const makeStatusController = (): IStatusController => {
+    return container.resolve<IStatusController>("IStatusController");
 };

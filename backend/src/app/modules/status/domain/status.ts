@@ -1,12 +1,12 @@
-import {StateEnum} from "../../../../core/shared/enums/StateEnum";
-import {Messages} from "../../../../core/shared/constants/messages";
+import {StateEnum} from "@coreShared/enums/StateEnum";
+import {Messages} from "@coreShared/constants/messages";
 
 class Status {
     private readonly id?: number;
     private readonly description: string;
     private readonly active: StateEnum;
 
-    private constructor(id: number | undefined, description: string, active: StateEnum) {
+    private constructor(description: string, active: StateEnum, id?: number) {
         this.validateDescriptionLength(description);
         this.id = id;
         this.description = description;
@@ -39,31 +39,31 @@ class Status {
 
     // Factory Method
     public static create(description: string): Status {
-        return new Status(undefined, description, StateEnum.INACTIVE);
+        return new Status(description, StateEnum.INACTIVE, undefined);
     }
 
     public updateDescription(newDescription: string): Status {
-        return new Status(this.id, newDescription, this.active);
+        return new Status(newDescription, this.active, this.id);
     }
 
     public activate(): Status {
-        return new Status(this.id, this.description, StateEnum.ACTIVE);
+        return new Status(this.description, StateEnum.ACTIVE, this.id);
     }
 
     public deactivate(): Status {
-        return new Status(this.id, this.description, StateEnum.INACTIVE);
+        return new Status(this.description, StateEnum.INACTIVE, this.id);
     }
 
     public toJSON(): Record<string, unknown> {
         return {
-            id: this.id,
             description: this.description,
-            active: this.active
+            active: this.active,
+            id: this.id
         };
     }
 
-    public static restore(data: { id: number; description: string; active: StateEnum }): Status {
-        return new Status(data.id, data.description, data.active);
+    public static restore(data: { description: string; active: StateEnum, id: number }): Status {
+        return new Status(data.description, data.active, data.id);
     }
 }
 

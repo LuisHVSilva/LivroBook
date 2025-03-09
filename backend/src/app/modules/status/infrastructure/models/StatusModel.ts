@@ -12,7 +12,7 @@ import {
 } from "sequelize-typescript";
 
 import {CreationOptional, InferAttributes, InferCreationAttributes} from "sequelize";
-import {Database} from "../../../../../core/config/database";
+import {Database} from "@coreConfig/database";
 import {IStatusEntity} from "../interface/IStatusEntity";
 
 const sequelize = Database.getInstance();

@@ -2,10 +2,10 @@ import { Router } from "express";
 import {statusRoutes} from "../../app/modules/status/adapters/route/statusRoute";
 
 
-const routes = Router();
+const router: Router = Router();
 
 // ADMIN URLS
-routes.use('admin', statusRoutes);
+router.use('/admin', statusRoutes);
 
-export { routes };
+export { router };
 
