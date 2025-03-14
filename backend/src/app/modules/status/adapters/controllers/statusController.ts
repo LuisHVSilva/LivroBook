@@ -5,49 +5,80 @@ import {StatusCodes} from "http-status-codes";
 import {CreateStatusOutput, ICreateStatusUseCase} from "../../application/ports/ICreateStatusUseCase";
 import {CreateStatusResponseDTO} from "../dtos/CreateStatusDTO";
 import {Messages} from "@coreShared/constants/messages";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
+import {ControllerError} from "@coreShared/errors/ControllerError";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {IStatusController} from "@status/adapters/controllers/IStatusController";
+import {GetStatusOutput, IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
+import {GetStatusDTO} from "@status/adapters/dtos/GetStatusDTO";
 
 
 @injectable()
 export class StatusController implements IStatusController {
-    constructor(@inject("ICreateStatusUseCase") private createStatusUseCase: ICreateStatusUseCase,
-                @inject("ILogger") private logger: ILogger) {
+    private readonly className: string = "StatusController";
+
+    constructor(
+        @inject("ILogger") private logger: ILogger,
+        @inject("ICreateStatusUseCase") private createStatusUseCase: ICreateStatusUseCase,
+        @inject("IGetStatusUseCase") private getStatusUseCase: IGetStatusUseCase,
+    ) {
     }
 
     async createStatus(req: Request, res: Response): Promise<Response> {
         const method: string = "createStatus";
 
         try {
+            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+
             const {description} = req.body;
+            this.logger.logInfo(this.className, method, `Recebendo request - description: ${description}`);
+
             const result: CreateStatusOutput = await this.createStatusUseCase.execute({description});
 
-            const message: string = Messages.Status.Success.CREATED_SUCCESS(description)
+            const message: string = Messages.Status.Success.CREATED(description);
+            this.logger.logInfo(this.className, method, `Status criado com sucesso - id: ${result.id}`);
+
             const responseDTO: CreateStatusResponseDTO = {
-                id: result.id,
+                id: result.id?.toString(),
                 description: result.description,
+                message: message
+            };
+
+            return res.status(StatusCodes.CREATED).json({success: true, data: responseDTO});
+        } catch (error) {
+            return await ControllerError.handleError(this.logger, this.className, method,
+                error, res, StatusCodes.CONFLICT);
+        }
+    }
+
+
+    async getStatusById(req: Request, res: Response): Promise<Response> {
+        const method: string = "getStatusById";
+
+        try {
+            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+
+            const {id} = req.params;
+
+            const result: GetStatusOutput | null = await this.getStatusUseCase.execute({id});
+
+            if(!result) {
+                this.logger.logWarn(this.className, method, Messages.Status.Error.NOT_FOUND, undefined, `ID: ${id}`);
+                return res.status(StatusCodes.NOT_FOUND).json({success: true, data: null});
+            }
+
+            const message: string = Messages.Status.Success.FOUND(result.description);
+
+            const respondeDTO: GetStatusDTO = {
+                id: result.id.toString(),
+                description: result.description,
+                state: !!result.active,
                 message: message
             }
 
-            this.logger.logSuccess(method, StatusCodes.CREATED, message)
-            return res.status(StatusCodes.CREATED).json({success: true, data: responseDTO});
-        } catch (error) {
-            if (error instanceof UseCaseError) {
-                this.logger.logError(method, error, StatusCodes.CONFLICT, null);
-                return res.status(StatusCodes.CONFLICT).json({success: false, message: error.message});
-            }
-
-            if (error instanceof Error) {
-                this.logger.logError(method, error, StatusCodes.BAD_REQUEST, null);
-                return res.status(StatusCodes.BAD_REQUEST).json({success: false, message: error.message});
-            }
-
-            this.logger.logError(method, error as Error, StatusCodes.INTERNAL_SERVER_ERROR, null);
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: Messages.Generic.Error
-            });
+            return res.status(StatusCodes.OK).json({success: true, data: respondeDTO});
+        } catch(error) {
+            return await ControllerError.handleError(this.logger, this.className, method,
+                error, res, StatusCodes.NOT_FOUND);
         }
-    }
+    };
 }

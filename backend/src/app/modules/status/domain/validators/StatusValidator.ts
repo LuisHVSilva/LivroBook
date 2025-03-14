@@ -24,7 +24,7 @@ export class StatusValidator implements IStatusValidator {
         const existingStatus: Status | null = await this.statusRepository.findByDescription(descriptionFormatted);
 
         if (existingStatus) {
-            throw new StatusValidationError(Messages.Status.Error.DESCRIPTION_DUPLICATED);
+            throw new StatusValidationError(Messages.Status.Error.DUPLICATE_DESCRIPTION);
         }
-    }
+    };
 }

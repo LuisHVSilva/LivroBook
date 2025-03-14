@@ -1,6 +1,6 @@
 export class UseCaseError extends Error {
-    constructor(method:string, message: string) {
+    constructor(className:string, message: string) {
         super(message);
-        this.name = `UseCase - ${method}`;
+        this.name = `UseCase - ${className}`;
     }
 }

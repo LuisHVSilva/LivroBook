@@ -1,5 +1,5 @@
 export type CreateStatusResponseDTO = {
-    id?: number;
+    id?: string;
     description: string;
     message: string;
 };

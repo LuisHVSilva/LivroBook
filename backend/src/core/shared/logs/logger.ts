@@ -1,18 +1,19 @@
-import fs from 'fs';
-import * as path from 'path';
-import {StatusCodes} from 'http-status-codes';
-import {ILogger} from './ILogger';
+import fs from "fs";
+import * as path from "path";
+import {StatusCodes} from "http-status-codes";
+import {ILogger} from "./ILogger";
 import {Messages} from "@coreShared/constants/messages";
 
 // Constants
-const ERRO_DESCRIPTION = "ERRO";
-const WAR_DESCRIPTION = "ATENÇÃO";
-const SUCCESS_DESCRIPTION = "SUCESSO";
+const ERROR_DESCRIPTION = "ERROR";
+const WARN_DESCRIPTION = "WARNING";
 const INFO_DESCRIPTION = "INFO";
 
 class Logger implements ILogger {
     constructor() {
-        this.ensureLogDirectoryExists().then(() => console.log("Diretório de logs pronto."));
+        this.ensureLogDirectoryExists()
+            .then(() => console.log("📂 Log directory is ready."))
+            .catch((err) => console.error(Messages.Logger.Error.ENSURE_LOG_DIRECTORY, err));
     }
 
     private getCurrentTimestamp(): string {
@@ -20,22 +21,30 @@ class Logger implements ILogger {
     }
 
     private getLogFilePath(): string {
-        const date = this.getCurrentTimestamp().split(",")[0].replaceAll("/","")
-        const fileName: string = `${date}.txt`;
-        console.log(fileName)
-        return path.join(__dirname, `../../../LOGS/${fileName}`);
+        const date = new Date().toISOString().split("T")[0].replace(/-/g, "");
+        const fileName = `${date}.log`;
+        return path.join(__dirname, "../../../../LOGS/", fileName);
     }
 
-    private createLogMessage(messageType: string, method: string, httpStatus?: StatusCodes, message?: string): string {
-        const statusPart = httpStatus ? `StatusHttp: ${httpStatus.toString()} - ` : '';
-        return `[${this.getCurrentTimestamp()}] ${messageType} - Method: ${method} - ${statusPart}Message: ${message}\n`;
+    private createLogMessage(
+        level: string,
+        className: string,
+        method: string,
+        message: string,
+        httpStatus?: StatusCodes,
+        info?: any
+    ): string {
+        const timestamp = this.getCurrentTimestamp();
+        const statusPart = httpStatus ? `Status: ${httpStatus} - ` : "";
+        const infoPart = info ? `Info: ${JSON.stringify(info)} - ` : "";
+        return `[${timestamp}] ${level} | Class: ${className} | Method: ${method} | ${statusPart}${infoPart}Message: ${message}\n`;
     }
 
     private async saveLog(logMessage: string): Promise<void> {
         try {
             await fs.promises.appendFile(this.getLogFilePath(), logMessage);
         } catch (err) {
-            console.error(Messages.Logger.Error.NOT_REGISTER, err);
+            console.error(Messages.Logger.Error.LOG_WRITE_FAILED, err);
         }
     }
 
@@ -44,31 +53,23 @@ class Logger implements ILogger {
         try {
             await fs.promises.mkdir(logDir, {recursive: true});
         } catch (err) {
-            console.error(Messages.Logger.Error.PATH_NOT_CREATED + ":", err);
+            console.error(Messages.Logger.Error.DIRECTORY_CREATION_FAILED, err);
         }
     }
 
-    async logError(method: string, error: Error, httpStatus?: StatusCodes, info?: any): Promise<void> {
-        const messagePart = info ? `Informação adicional: ${info} -` : '';
-        const message = messagePart + ' ' + error;
-        const logMessage = this.createLogMessage(ERRO_DESCRIPTION, method, httpStatus, message);
+    async logError(className: string, method: string, error: Error, httpStatus?: StatusCodes, info?: any): Promise<void> {
+        const message = `Error: ${error.message}\nStack: ${error.stack}`;
+        const logMessage = this.createLogMessage(ERROR_DESCRIPTION, className, method, message, httpStatus, info);
         await this.saveLog(logMessage);
     }
 
-    async logWarn(method: string, httpStatus?: StatusCodes, info?: string, message?: string): Promise<void> {
-        message = message || Messages.Generic.MessageNotRegistered;
-        const logMessage = this.createLogMessage(WAR_DESCRIPTION, method, httpStatus, message);
+    async logWarn(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void> {
+        const logMessage = this.createLogMessage(WARN_DESCRIPTION, className, method, message, httpStatus, info);
         await this.saveLog(logMessage);
     }
 
-    async logSuccess(method: string, httpStatus: StatusCodes, message: string): Promise<void> {
-        const logMessage = this.createLogMessage(SUCCESS_DESCRIPTION, method, httpStatus, message);
-        await this.saveLog(logMessage);
-    }
-
-    async logInfo(message: string, className: string | null, method: string): Promise<void> {
-        const classNamePart = className ? `Class: ${className} - ` : '';
-        const logMessage = this.createLogMessage(INFO_DESCRIPTION, method, undefined, `${classNamePart}${message}`);
+    async logInfo(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void> {
+        const logMessage = this.createLogMessage(INFO_DESCRIPTION, className, method, message, httpStatus, info);
         await this.saveLog(logMessage);
     }
 }

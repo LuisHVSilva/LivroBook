@@ -7,24 +7,26 @@ module.exports = {
     },
     moduleFileExtensions: ["js", "ts"],
     testTimeout: 30000,
-    testPathIgnorePatterns: ["/node_modules/", "/dist/"],
+    testPathIgnorePatterns: ["/node_modules/", "/dist/", "/src/core/config/", "/src/framework/"],
+
     moduleNameMapper: {
         "^@status/(.*)$": "<rootDir>/src/app/modules/status/$1",
         "^@coreConfig/(.*)$": "<rootDir>/src/core/config/$1",
         "^@coreShared/(.*)$": "<rootDir>/src/core/shared/$1",
         "^@frameworkHttp/(.*)$": "<rootDir>/src/framework/http/$1",
-        "^@payloads/(.*)$": "<rootDir>/tests/payloads/$1",
+        "^@payloads/(.*)$": "<rootDir>/tests/__payloads__/$1",
         "^@testHelpers/(.*)$": "<rootDir>/tests/helpers/$1",
+        "^@mocks/(.*)$": "<rootDir>/tests/__mocks__/$1",
     },
 
     clearMocks: true,
     resetMocks: true,
     restoreMocks: true,
 
-    collectCoverage: false,
+    collectCoverage: true,
     collectCoverageFrom: [
-        "src/**/*.ts",  // Agora ele vai coletar cobertura de todos os arquivos .ts dentro de src
-        "!src/**/*.d.ts" // Exclui os arquivos de definição de tipos (.d.ts)
+        "src/**/*.ts",
+        "!src/**/*.d.ts"
     ],
     coverageDirectory: "./tests/coverage",
     coverageReporters: ["lcov"],

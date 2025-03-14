@@ -1,6 +1,6 @@
 node_modules
-.env
-logs.txt
+src/core/config/.env
+/LOGS
 migrations
 seeders
 /tests/coverage

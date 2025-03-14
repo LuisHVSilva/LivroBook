@@ -6,6 +6,6 @@ export class ErrorHandler {
         console.error('Erro capturado:', err.message);
         console.error(err.stack);
 
-        res.status(500).json({ message: Messages.ErrorHandler.handleError });
+        res.status(500).json({ message: Messages.ErrorHandler.UNEXPECTED_ERROR });
     }
 }

@@ -31,8 +31,9 @@
       "@coreConfig/*": ["src/core/config/*"],
       "@coreShared/*": ["src/core/shared/*"],
       "@frameworkHttp/*": ["src/framework/http/*"],
-      "@payloads/*": ["tests/payloads/*"],
+      "@payloads/*": ["tests/__payloads__/*"],
       "@testHelpers/*": ["tests/helpers/*"],
+      "@mocks/*": ["tests/__mocks__/*"]
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

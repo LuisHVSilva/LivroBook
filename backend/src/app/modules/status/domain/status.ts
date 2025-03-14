@@ -1,7 +1,7 @@
 import {StateEnum} from "@coreShared/enums/StateEnum";
 import {Messages} from "@coreShared/constants/messages";
 
-class Status {
+export class Status {
     private readonly id?: number;
     private readonly description: string;
     private readonly active: StateEnum;
@@ -66,5 +66,3 @@ class Status {
         return new Status(data.description, data.active, data.id);
     }
 }
-
-export {Status};

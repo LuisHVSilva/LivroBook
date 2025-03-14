@@ -10,7 +10,7 @@ import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 @injectable()
 export class CreateStatusUseCase implements ICreateStatusUseCase {
-    private readonly method: string = 'CreateStatusUseCase';
+    private readonly className: string = 'CreateStatusUseCase';
 
     constructor(
         @inject("IStatusRepository") private readonly statusRepository: IStatusRepository,
@@ -20,7 +20,10 @@ export class CreateStatusUseCase implements ICreateStatusUseCase {
     }
 
     public async execute(input: CreateStatusInput): Promise<CreateStatusOutput> {
+        const method = "execute";
         try {
+            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+
             await this.statusValidator.validateUniqueDescription(input.description);
 
             const status = Status.create(input.description);
@@ -33,11 +36,11 @@ export class CreateStatusUseCase implements ICreateStatusUseCase {
         } catch (error) {
 
             if (error instanceof Error) {
-                this.logger.logError(this.method, error, undefined, input);
-                throw new UseCaseError(this.method, error.message);
+                this.logger.logError(this.className, method, error);
+                throw new UseCaseError(this.className, error.message);
             }
 
-            throw new UseCaseError(this.method, Messages.Status.Error.CREATED_FAILED);
+            throw new UseCaseError(this.className, Messages.Status.Error.CREATION_FAILED);
         }
-    }
+    };
 }
