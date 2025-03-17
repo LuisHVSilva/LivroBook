@@ -23,7 +23,7 @@ module.exports = {
     resetMocks: true,
     restoreMocks: true,
 
-    collectCoverage: true,
+    collectCoverage: false,
     collectCoverageFrom: [
         "src/**/*.ts",
         "!src/**/*.d.ts"

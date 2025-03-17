@@ -1,6 +1,12 @@
+import {StateEnum} from "@coreShared/enums/StateEnum";
+
 export type GetStatusDTO = {
     id: string;
-    description: string;
-    state: boolean;
+};
+
+export type GetStatusResponseDTO = {
     message: string;
-}
+    id: number;
+    description: string;
+    active: StateEnum;
+};

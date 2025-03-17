@@ -8,9 +8,6 @@ dotenv.config({path: path.resolve(__dirname, './.env')});
 export class Database {
     private static instance: Sequelize;
 
-    private constructor() {
-    }
-
     public static getInstance(): Sequelize {
         if (!Database.instance) {
             Database.instance = new Sequelize({
@@ -35,4 +32,3 @@ export class Database {
         }
     }
 }
-

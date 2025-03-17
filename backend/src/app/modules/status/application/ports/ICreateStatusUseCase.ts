@@ -1,12 +1,5 @@
 import { IUseCase } from "@coreShared/interfaces/usecases";
+import {Result} from "@coreShared/types/Result";
+import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
 
-export type CreateStatusInput = {
-    description: string;
-};
-
-export type CreateStatusOutput = {
-    id?: number;
-    description: string;
-};
-
-export interface ICreateStatusUseCase extends IUseCase<CreateStatusInput, CreateStatusOutput> { }
+export interface ICreateStatusUseCase extends IUseCase<CreateStatusDTO, Result<CreateStatusResponseDTO>> { }

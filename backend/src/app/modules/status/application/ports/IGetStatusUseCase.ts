@@ -1,16 +1,6 @@
 import {IUseCase} from "@coreShared/interfaces/usecases";
-import {StateEnum} from "@coreShared/enums/StateEnum";
+import {Result} from "@coreShared/types/Result";
+import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 
-export type GetStatusInput = {
-    id: string;
-    active?: StateEnum;
-};
-
-export type GetStatusOutput = {
-    id: number;
-    description: string;
-    active: StateEnum;
-};
-
-export interface IGetStatusUseCase extends IUseCase<GetStatusInput, GetStatusOutput | null> {
+export interface IGetStatusUseCase extends IUseCase<GetStatusDTO, Result<GetStatusResponseDTO>> {
 }

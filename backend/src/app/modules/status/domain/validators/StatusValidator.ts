@@ -5,6 +5,7 @@ import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "../status";
 import {IStatusValidator} from "./IStatusValidator";
 import {Messages} from "@coreShared/constants/messages";
+import {Result} from "@coreShared/types/Result";
 
 class StatusValidationError extends Error {
     constructor(message: string) {
@@ -21,9 +22,9 @@ export class StatusValidator implements IStatusValidator {
 
     public async validateUniqueDescription(description: string): Promise<void> {
         const descriptionFormatted: string = StringUtils.transformCapitalLetterWithoutAccent(description);
-        const existingStatus: Status | null = await this.statusRepository.findByDescription(descriptionFormatted);
+        const existingStatus: Result<Status> = await this.statusRepository.findByDescription(descriptionFormatted);
 
-        if (existingStatus) {
+        if (existingStatus.isSuccessful()) {
             throw new StatusValidationError(Messages.Status.Error.DUPLICATE_DESCRIPTION);
         }
     };

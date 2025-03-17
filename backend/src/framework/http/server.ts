@@ -5,6 +5,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import {router} from "../http/router";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
+import {Database} from "@coreConfig/database";
 
 class Server {
     private readonly app: Application;
@@ -33,10 +34,15 @@ class Server {
         this.app.use(ErrorHandler.handleError);
     };
 
-    public start(): void {
-        this.app.listen(this.PORT, () => {
-            console.log(`🔥 Server running on http://localhost:${this.PORT}`);
-        });
+    public async start(): Promise<void> {
+        try {
+            await Database.connect();
+            this.app.listen(this.PORT, () => {
+                console.log(`🔥 Server running on http://localhost:${this.PORT}`);
+            });
+        } catch (error) {
+
+        }
     };
 }
 

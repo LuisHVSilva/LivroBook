@@ -1,6 +1,6 @@
 import {GetStatusUseCase} from "@status/application/usecases/getStatusUseCase";
 import {LoggerMock} from "@mocks/loggerMock";
-import {StatusRepositoryMock} from "@mocks/statusRepositoryMock";
+import {StatusRepositoryMock} from "@mocks/Status/statusRepositoryMock";
 import {StatusPayload} from "@payloads/statusPayload";
 import {Messages} from "@coreShared/constants/messages";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";

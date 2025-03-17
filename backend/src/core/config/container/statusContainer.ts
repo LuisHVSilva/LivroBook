@@ -11,6 +11,8 @@ import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
 import {IStatusController} from "@status/adapters/controllers/IStatusController";
 import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
 import {GetStatusUseCase} from "@status/application/usecases/getStatusUseCase";
+import {UpdateDescriptionUseCase} from "@status/application/usecases/updateDescriptionUseCase";
+import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
 
 
 container.register<IStatusRepository>("IStatusRepository", {useClass: StatusRepository});
@@ -18,6 +20,7 @@ container.register<ILogger>("ILogger", {useClass: Logger});
 container.register<IStatusValidator>("IStatusValidator", {useClass: StatusValidator});
 container.register<ICreateStatusUseCase>("ICreateStatusUseCase", {useClass: CreateStatusUseCase});
 container.register<IGetStatusUseCase>("IGetStatusUseCase", {useClass: GetStatusUseCase});
+container.register<IUpdateDescriptionUseCase>("IUpdateDescriptionUseCase", {useClass: UpdateDescriptionUseCase});
 container.register<IStatusController>("IStatusController", {useClass: StatusController});
 
 export {container};
