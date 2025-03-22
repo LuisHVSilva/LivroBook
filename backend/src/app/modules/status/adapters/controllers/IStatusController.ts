@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 
 export interface IStatusController {
     /**
-     * Register a new Status.
+     * Register a new status.
      *
      * @param req - Request object containing new status data.
      * @param res - Response object used to return the creation result.
@@ -12,7 +12,7 @@ export interface IStatusController {
     createStatus(req: Request, res: Response): Promise<Response>;
 
     /**
-     * Get a new Status.
+     * Get a new status.
      *
      * @param req - Request object containing the status id data.
      * @param res - Response object used to return the founded status result.
@@ -22,7 +22,7 @@ export interface IStatusController {
     getStatusById(req: Request, res: Response): Promise<Response>;
 
     /**
-     * Get a new Status.
+     * Get a new status.
      *
      * @param req - Request object containing new status description data.
      * @param res - Response object used to return the updated result.

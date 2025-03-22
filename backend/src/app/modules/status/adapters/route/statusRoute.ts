@@ -13,4 +13,7 @@ router.post("/status", asyncHandler((req: Request, res: Response): Promise<Respo
 router.get("/status/:id", asyncHandler((req: Request, res: Response): Promise<Response> =>
     statusController.getStatusById(req, res)));
 
+router.patch("/status", asyncHandler((req: Request, res: Response): Promise<Response> =>
+    statusController.updateDescription(req, res)));
+
 export {router as statusRoutes};

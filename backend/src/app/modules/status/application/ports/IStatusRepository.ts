@@ -6,33 +6,33 @@ export interface IStatusRepository {
     startTransaction(): Promise<Transaction>;
 
     /**
-     * Saves a new Status.
+     * Saves a new status.
      *
-     * @param statusToSave - The new Status
-     * @returns The Status that was saved.
+     * @param statusToSave - The new status
+     * @returns The status that was saved.
      */
     save(statusToSave: Status): Promise<Result<Status>>;
 
     /**
-     * Search for a Status by its ID.
+     * Search for a status by its ID.
      *
-     * @param id - The Status ID to fetch.
-     * @returns A Status object if found.
+     * @param id - The status ID to fetch.
+     * @returns A status object if found.
      */
     findById(id: number): Promise<Result<Status>>;
 
     /**
-     * Search for a Status by its description.
+     * Search for a status by its description.
      *
-     * @param description - The description of the Status to be searched for.
-     * @returns A Status object if found.
+     * @param description - The description of the status to be searched for.
+     * @returns A status object if found.
      */
     findByDescription(description: string): Promise<Result<Status>>;
 
     /**
-     * Update Status description.
+     * Update status description.
      *
-     * @param updatedStatus - The description of the Status to be searched for.
+     * @param updatedStatus - The description of the status to be searched for.
      */
     updateDescription(updatedStatus: Status): Promise<void>;
 }

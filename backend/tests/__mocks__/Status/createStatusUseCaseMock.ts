@@ -1,5 +1,8 @@
-import {CreateStatusOutput, ICreateStatusUseCase} from "@status/application/ports/ICreateStatusUseCase";
+import {ICreateStatusUseCase} from "@status/application/ports/ICreateStatusUseCase";
 import {StatusPayload} from "@payloads/statusPayload";
+import {CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
+import {Result} from "@coreShared/types/Result";
+import {Messages} from "@coreShared/constants/messages";
 
 export class CreateStatusUseCaseMock {
     private readonly createStatusUseCaseMock: jest.Mocked<ICreateStatusUseCase>;
@@ -14,13 +17,13 @@ export class CreateStatusUseCaseMock {
         return this.createStatusUseCaseMock;
     };
 
-    public withExecute(id: number = StatusPayload.id,
-                       description: string = StatusPayload.validDescriptionFormatted): this {
+    public withExecute(): this {
 
-        const result: CreateStatusOutput = {
-            id: id,
-            description: description
-        }
+        const result: Result<CreateStatusResponseDTO> = Result.success<CreateStatusResponseDTO>({
+            message: Messages.Status.Success.CREATED(StatusPayload.validDescriptionFormatted),
+            id: StatusPayload.id.toString(),
+            description: StatusPayload.validDescriptionFormatted,
+        });
 
         this.createStatusUseCaseMock.execute.mockResolvedValueOnce(result);
         return this;

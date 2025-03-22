@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {inject} from 'tsyringe';
+import {inject, injectable} from 'tsyringe';
 import {Sequelize} from "sequelize-typescript";
 import {Transaction} from 'sequelize';
 import {IStatusRepository} from "../../application/ports/IStatusRepository";
@@ -11,7 +11,7 @@ import {Messages} from "@coreShared/constants/messages";
 import {Result} from "@coreShared/types/Result";
 import {RepositoryError} from "@coreShared/errors/RepositoryError";
 
-
+@injectable()
 export class StatusRepository implements IStatusRepository {
     private readonly className: string = "StatusRepository";
 
@@ -60,7 +60,7 @@ export class StatusRepository implements IStatusRepository {
         try {
             const foundStatus: StatusModel | null = await StatusModel.findByPk(id);
             if (!foundStatus) {
-                return Result.failure<Status>(Messages.Status.Error.ID_NOT_FOUND(id.toString()));
+                return Result.failure<Status>(Messages.Status.Error.INVALID_ID(id.toString()));
             }
 
             const status: Status = Status.restore({

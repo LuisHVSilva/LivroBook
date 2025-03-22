@@ -9,6 +9,7 @@ export class StatusControllerMock {
         this.statusControllerMock = {
             createStatus: jest.fn(),
             getStatusById: jest.fn(),
+            updateDescription: jest.fn(),
         }
     }
 

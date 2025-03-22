@@ -3,7 +3,7 @@ export type UpdateDescriptionDTO = {
     newDescription: string;
 }
 
-export type UpdateDescriptionResultDTO = {
+export type UpdateDescriptionResponseDTO = {
     message: string,
     newDescription: string
 }

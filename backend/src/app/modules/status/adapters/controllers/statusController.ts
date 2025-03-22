@@ -13,7 +13,7 @@ import {Result} from "@coreShared/types/Result";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
-import {UpdateDescriptionDTO, UpdateDescriptionResultDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
+import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 
 
 @injectable()
@@ -34,17 +34,10 @@ export class StatusController implements IStatusController {
         try {
             this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
 
-            const inputStatus: CreateStatusDTO = req.body.description;
+            const inputStatus: CreateStatusDTO = req.body;
             this.logger.logInfo(this.className, method, `Recebendo request - description: ${inputStatus.description}`);
 
             const result: Result<CreateStatusResponseDTO> = await this.createStatusUseCase.execute(inputStatus);
-
-            if (result.isFailure()) {
-                return res.status(StatusCodes.BAD_REQUEST).json({
-                    success: false,
-                    message: Messages.Status.Error.CREATION_FAILED
-                });
-            }
 
             this.logger.logInfo(this.className, method, `Status criado com sucesso - id: ${result.getValue().id}`);
 
@@ -96,17 +89,11 @@ export class StatusController implements IStatusController {
                 `Recebendo request - id: ${inputData.id} - description: ${inputData.newDescription}`
             );
 
-            const result: Result<UpdateDescriptionResultDTO> = await this.updateDescriptionUseCase.execute(inputData);
-
-            if (result.isFailure()) {
-                this.logger.logWarn(this.className, method, Messages.Status.Error.UPDATED_FAILED);
-                return res.status(StatusCodes.NOT_FOUND).json({success: true, data: null});
-            }
+            const result: Result<UpdateDescriptionResponseDTO> = await this.updateDescriptionUseCase.execute(inputData);
 
             return res.status(StatusCodes.OK).json({success: true, data: result.getValue()});
         } catch (error) {
-            return await ControllerError.handleError(this.logger, this.className, method,
-                error, res, StatusCodes.NOT_FOUND);
+            return await ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.NOT_FOUND);
         }
     };
 }

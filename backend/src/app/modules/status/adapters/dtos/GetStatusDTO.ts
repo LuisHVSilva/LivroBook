@@ -6,7 +6,7 @@ export type GetStatusDTO = {
 
 export type GetStatusResponseDTO = {
     message: string;
-    id: number;
+    id: string;
     description: string;
     active: StateEnum;
 };

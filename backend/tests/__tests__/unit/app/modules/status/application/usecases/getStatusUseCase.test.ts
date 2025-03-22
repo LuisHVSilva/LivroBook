@@ -3,6 +3,8 @@ import {LoggerMock} from "@mocks/loggerMock";
 import {StatusRepositoryMock} from "@mocks/Status/statusRepositoryMock";
 import {StatusPayload} from "@payloads/statusPayload";
 import {Messages} from "@coreShared/constants/messages";
+import {GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
+import {Result} from "@coreShared/types/Result";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 describe("getStatusUseCase", () => {
@@ -24,39 +26,38 @@ describe("getStatusUseCase", () => {
     it("should successfully return a status", async () => {
         statusRepositoryMock.withFindById();
 
-        const result = await getStatusUseCase.execute(input);
+        const result: Result<GetStatusResponseDTO> = await getStatusUseCase.execute(input);
 
         expect(loggerMock.logInfo).toHaveBeenCalled();
-        expect(result).toBeDefined();
-        expect(result).toStrictEqual(StatusPayload.statusLiteralObject())
+        expect(statusRepositoryMock.mock.findById).toHaveBeenCalledWith(1);
+        expect(result.isSuccessful()).toBe(true);
+        expect(result.getValue()).toStrictEqual({
+            message: Messages.Status.Success.FOUND_BY_ID,
+            id: input.id,
+            description: StatusPayload.validDescriptionFormatted,
+            active: StatusPayload.active,
+        });
     });
 
-    it("should return null for not found Status id", async () => {
-        statusRepositoryMock.withFindByIdNull();
+    it("should return null for not found status id", async () => {
+        statusRepositoryMock.withFindByIdNull(parseInt(input.id));
 
-        const result = await getStatusUseCase.execute(input);
-        expect(loggerMock.logInfo).toHaveBeenCalled();
-        expect(result).toBeNull();
+        const result: Result<GetStatusResponseDTO> = await getStatusUseCase.execute(input);
+        expect(result.isFailure()).toBe(true);
+        expect(result.getError()).toBe(Messages.Status.Error.INVALID_ID(input.id))
     });
 
-    it("should throw error when trying to find a status with invalid id", async () => {
-        const errorMessage = "Generic Error";
+    it("should throw error when failing to find status", async () => {
+        statusRepositoryMock.withFindByIdError(Messages.Status.Error.NOT_FOUND)
+        await expect(getStatusUseCase.execute(input)).rejects.toThrow(
+            new UseCaseError("GetStatusUseCase", Messages.Status.Error.NOT_FOUND)
+        );
 
-        statusRepositoryMock.withFindByIdError(errorMessage);
-
-        await expect(getStatusUseCase.execute(input)).rejects.toThrow(UseCaseError);
-        await expect(getStatusUseCase.execute(input)).rejects.toThrow(errorMessage);
-
-        expect(loggerMock.logError).toHaveBeenCalled();
+        expect(loggerMock.logError).toHaveBeenCalledTimes(1);
     });
 
-    it("should throw UseCaseError with NOT_FOUND message when error is not an instance of Error", async () => {
-        statusRepositoryMock.mock.findById.mockRejectedValue(Messages.Status.Error.NOT_FOUND);
-
-        await expect(getStatusUseCase.execute(input)).rejects.toThrow(UseCaseError);
+    it("should throw a generic message when error is not an instance of Error", async () => {
+        statusRepositoryMock.mock.findById.mockRejectedValueOnce(Messages.Status.Error.NOT_FOUND);
         await expect(getStatusUseCase.execute(input)).rejects.toThrow(Messages.Status.Error.NOT_FOUND);
-
-        expect(loggerMock.logError).toHaveBeenCalled();
     });
-
 });

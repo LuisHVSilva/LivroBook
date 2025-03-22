@@ -8,7 +8,8 @@ import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "@status/domain/status";
 import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
 import {Result} from "@coreShared/types/Result";
-import {UpdateDescriptionDTO, UpdateDescriptionResultDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
+import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
+import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 @injectable()
 export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
@@ -21,22 +22,18 @@ export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
     ) {
     }
 
-    public async execute(input: UpdateDescriptionDTO): Promise<Result<UpdateDescriptionResultDTO>> {
+    public async execute(input: UpdateDescriptionDTO): Promise<Result<UpdateDescriptionResponseDTO>> {
         const method: string = 'execute';
         const transaction = await this.statusRepository.startTransaction();
-
+        const id: string = input.id;
         try {
             this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
 
-            const numberId: number = parseInt(input.id)
+            const numberId: number = StringUtils.strToNumber(id, Messages.Status.Error.INVALID_ID(id))
             const formattedDescription: string = StringUtils.transformCapitalLetterWithoutAccent(input.newDescription);
-
             const existingStatus: Result<Status> = await this.statusRepository.findById(numberId);
 
-            if (!existingStatus.isSuccessful()) {
-                return Result.failure(Messages.Status.Error.DESCRIPTION_NOT_FOUND(formattedDescription));
-            }
-
+            await this.statusValidator.validateExistingStatus(numberId);
             await this.statusValidator.validateUniqueDescription(formattedDescription);
 
             const status: Status = Status.restore({
@@ -54,7 +51,7 @@ export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
 
             this.logger.logInfo(this.className, method, successMessage);
 
-            return Result.success<UpdateDescriptionResultDTO>({
+            return Result.success<UpdateDescriptionResponseDTO>({
                 message: successMessage,
                 newDescription: formattedDescription
             });
@@ -62,8 +59,8 @@ export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
             await transaction.rollback();
             this.logger.logError(this.className, method, error as Error);
 
-            const message = error instanceof Error ? error.message : Messages.Status.Error.CREATION_FAILED;
-            return Result.failure<UpdateDescriptionResultDTO>(message);
+            const message: string = error instanceof Error ? error.message : Messages.Status.Error.UPDATED_FAILED;
+            throw new UseCaseError(this.className, message);
         }
     };
 }

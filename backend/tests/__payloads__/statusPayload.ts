@@ -1,10 +1,14 @@
 import {StateEnum} from "@coreShared/enums/StateEnum"
 import {Status} from "@status/domain/status";
 import {StringUtils} from "@coreShared/utils/StringUtils";
+import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
+import {Messages} from "@coreShared/constants/messages";
+import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
+import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 
 export class StatusPayload {
     private static _id: number = 1;
-    private static _validDescription: string = "Status Valido";
+    private static _validDescription: string = "status Valido";
     private static _invalidDescription: string = "Abc";
     private static _active: StateEnum = StateEnum.ACTIVE;
     private static _inactive: StateEnum = StateEnum.INACTIVE;
@@ -66,5 +70,46 @@ export class StatusPayload {
         }
     }
 
+    public static createStatusInputDTO(): CreateStatusDTO {
+        return {
+            description: this.validDescriptionFormatted
+        };
+    };
 
+    public static createStatusResponseDTO(): CreateStatusResponseDTO {
+        return {
+            message: Messages.Status.Success.CREATED(this.validDescriptionFormatted),
+            id: this.id.toString(),
+            description: this.validDescriptionFormatted,
+        };
+    };
+
+    public static getStatusInputDTO(): GetStatusDTO {
+        return {
+            id: this.id.toString()
+        };
+    };
+
+    public static getStatusResponseDTO(): GetStatusResponseDTO {
+        return {
+            message: Messages.Status.Success.FOUND_BY_ID,
+            id: this.id.toString(),
+            description: this.validDescriptionFormatted,
+            active: this.active,
+        };
+    };
+
+    public static updateDescriptionDTO(newDescription: string): UpdateDescriptionDTO {
+        return {
+            id: this.id.toString(),
+            newDescription: newDescription
+        };
+    };
+
+    public static updateDescriptionResponseDTO(newDescription: string): UpdateDescriptionResponseDTO {
+        return {
+            message: Messages.Status.Success.UPDATED_TO(this.validDescriptionFormatted, newDescription),
+            newDescription: newDescription
+        }
+    }
 }

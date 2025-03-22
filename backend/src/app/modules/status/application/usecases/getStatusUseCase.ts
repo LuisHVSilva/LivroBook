@@ -7,6 +7,7 @@ import {Status} from "@status/domain/status";
 import {Messages} from "@coreShared/constants/messages";
 import {Result} from "@coreShared/types/Result";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
+import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 @injectable()
 export class GetStatusUseCase implements IGetStatusUseCase {
@@ -20,26 +21,27 @@ export class GetStatusUseCase implements IGetStatusUseCase {
 
     public async execute(input: GetStatusDTO): Promise<Result<GetStatusResponseDTO>> {
         const method = "execute";
-        const transaction = await this.statusRepository.startTransaction();
-
         try {
             this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
 
             const status: Result<Status> = await this.statusRepository.findById(parseInt(input.id));
-            await transaction.commit();
 
+            if (status.isFailure()) {
+                return Result.failure<GetStatusResponseDTO>(status.getError());
+            }
+
+            const statusValue: Status = status.getValue();
             return Result.success<GetStatusResponseDTO>({
                 message: Messages.Status.Success.FOUND_BY_ID,
-                id: status.getValue().getId()!,
-                description: status.getValue().getDescription(),
-                active: status.getValue().getActive(),
+                id: statusValue.getId()!.toString(),
+                description: statusValue.getDescription(),
+                active: statusValue.getActive(),
             });
         } catch (error) {
-            await transaction.rollback();
             this.logger.logError(this.className, method, error as Error);
 
-            const message = error instanceof Error ? error.message : Messages.Status.Error.NOT_FOUND;
-            return Result.failure<GetStatusResponseDTO>(message);
+            const message: string = error instanceof Error ? error.message : Messages.Status.Error.NOT_FOUND;
+            throw new UseCaseError(this.className, message);
         }
     };
 }
