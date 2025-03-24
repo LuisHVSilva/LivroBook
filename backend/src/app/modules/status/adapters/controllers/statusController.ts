@@ -14,6 +14,8 @@ import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/Cr
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
+import {UpdateActiveDTO, UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
+import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
 
 
 @injectable()
@@ -25,6 +27,7 @@ export class StatusController implements IStatusController {
         @inject("ICreateStatusUseCase") private createStatusUseCase: ICreateStatusUseCase,
         @inject("IGetStatusUseCase") private getStatusUseCase: IGetStatusUseCase,
         @inject("IUpdateDescriptionUseCase") private updateDescriptionUseCase: IUpdateDescriptionUseCase,
+        @inject("IUpdateActiveUseCase") private updateActiveUseCase: IUpdateActiveUseCase,
     ) {
     }
 
@@ -79,8 +82,8 @@ export class StatusController implements IStatusController {
             this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
 
             const inputData: UpdateDescriptionDTO = {
-                id: req.body.id,
-                newDescription: req.body.description,
+                id: req.params.id,
+                newDescription: req.body.newDescription,
             };
 
             this.logger.logInfo(
@@ -96,4 +99,30 @@ export class StatusController implements IStatusController {
             return await ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.NOT_FOUND);
         }
     };
+
+    async updateActive(req: Request, res: Response): Promise<Response> {
+        const method: string = "updateActive";
+
+        try {
+            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+
+            const inputData: UpdateActiveDTO = {
+                id: req.params.id,
+                active: req.body.active,
+            };
+
+            this.logger.logInfo(
+                this.className,
+                method,
+                `Recebendo request - id: ${inputData.id} - active: ${inputData.active}`
+            );
+
+            const result: Result<UpdateActiveResponseDTO> = await this.updateActiveUseCase.execute(inputData);
+
+            return res.status(StatusCodes.OK).json({success: true, data: result.getValue()});
+        } catch (error) {
+            return await ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.BAD_REQUEST);
+        }
+
+    }
 }

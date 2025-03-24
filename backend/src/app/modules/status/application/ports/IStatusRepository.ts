@@ -32,7 +32,14 @@ export interface IStatusRepository {
     /**
      * Update status description.
      *
-     * @param updatedStatus - The description of the status to be searched for.
+     * @param updatedStatus - The status to be updated.
      */
     updateDescription(updatedStatus: Status): Promise<void>;
+
+    /**
+     * Update status state.
+     *
+     * @param statusToSave - The status to be updated.
+     */
+    updateActive(statusToSave: Status): Promise<void>;
 }

@@ -12,9 +12,9 @@ import {UseCaseError} from "@coreShared/errors/UseCaseError";
 describe("updateDescriptionUseCase", () => {
     const ONE: number = 1;
     const TWO: number = 2;
-    const THREE: number = 3;
+    const statusPayloadMock: StatusPayload = StatusPayload.createMock();
     const input: UpdateDescriptionDTO = {
-        id: StatusPayload.id.toString(),
+        id: statusPayloadMock.id.toString(),
         newDescription: "NEW DESCRIPTION"
     };
 
@@ -41,10 +41,10 @@ describe("updateDescriptionUseCase", () => {
     })
 
     it("should update the status description", async () => {
-        jest.spyOn(StringUtils, "transformCapitalLetterWithoutAccent").mockReturnValue(StatusPayload.validDescriptionFormatted);
-        jest.spyOn(StringUtils, "strToNumber").mockReturnValue(StatusPayload.id);
+        const stringUtilsTCLWA = jest.spyOn(StringUtils, "transformCapitalLetterWithoutAccent");
+        const stringUtilsSTN = jest.spyOn(StringUtils, "strToNumber");
 
-        statusRepositoryMock.withFindById();
+        statusValidatorMock.withValidateExistingStatus();
         statusRepositoryMock.withUpdateDescription();
 
         const newStatus: Result<UpdateDescriptionResponseDTO> = await updateDescriptionUseCase.execute(input);
@@ -52,22 +52,22 @@ describe("updateDescriptionUseCase", () => {
 
         expect(statusRepositoryMock.mock.startTransaction).toHaveBeenCalledTimes(ONE);
         expect(loggerMock.logInfo).toHaveBeenCalledTimes(TWO);
-        expect(StringUtils.strToNumber).toHaveBeenCalledTimes(ONE);
-        expect(StringUtils.transformCapitalLetterWithoutAccent).toHaveBeenCalledTimes(THREE);
-        expect(statusRepositoryMock.mock.findById).toHaveBeenCalledTimes(ONE);
+        expect(stringUtilsSTN).toHaveBeenCalledTimes(ONE);
+        expect(stringUtilsTCLWA).toHaveBeenCalledTimes(TWO);
         expect(statusValidatorMock.mock.validateExistingStatus).toHaveBeenCalledTimes(ONE);
         expect(statusValidatorMock.mock.validateUniqueDescription).toHaveBeenCalledTimes(ONE);
         expect(statusRepositoryMock.mock.updateDescription).toHaveBeenCalledTimes(ONE);
         expect(statusRepositoryMock.commit).toHaveBeenCalledTimes(ONE);
 
         expect(newStatus.isSuccessful()).toBeTruthy();
-        expect(newStatusValue.newDescription).toEqual(StatusPayload.validDescriptionFormatted);
+        expect(newStatusValue.newDescription).toEqual(input.newDescription);
         expect(newStatusValue.message).toEqual(
-            Messages.Status.Success.UPDATED_TO(StatusPayload.validDescriptionFormatted, newStatus.getValue().newDescription)
+            Messages.Status.Success.UPDATED_TO(statusPayloadMock.description, newStatus.getValue().newDescription)
         );
     });
 
     it("should throw error when trying to update a status with invalid id", async () => {
+        statusValidatorMock.withValidateExistingStatus();
         statusRepositoryMock.withUpdateDescriptionError(Messages.Status.Error.UPDATED_FAILED);
 
         await expect(updateDescriptionUseCase.execute(input)).rejects.toThrow(
@@ -79,6 +79,7 @@ describe("updateDescriptionUseCase", () => {
     });
 
     it("should throw UseCaseError with UPDATED_FAILED message when error is not an instance of Error", async () => {
+        statusValidatorMock.withValidateExistingStatus();
         statusRepositoryMock.mock.updateDescription.mockRejectedValue(Messages.Status.Error.UPDATED_FAILED);
 
         await expect(updateDescriptionUseCase.execute(input)).rejects.toThrow(Messages.Status.Error.UPDATED_FAILED);

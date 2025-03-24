@@ -1,19 +1,19 @@
 import "reflect-metadata";
+import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
 import {inject, injectable} from "tsyringe";
 import {IStatusRepository} from "@status/application/ports/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
-import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
+import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
+import {UpdateActiveDTO, UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
+import {Result} from "@coreShared/types/Result";
 import {Messages} from "@coreShared/constants/messages";
+import {UseCaseError} from "@coreShared/errors/UseCaseError";
 import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "@status/domain/status";
-import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
-import {Result} from "@coreShared/types/Result";
-import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 @injectable()
-export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
-    private readonly className: string = "UpdateDescriptionUseCase";
+export class UpdateActiveUseCase implements IUpdateActiveUseCase {
+    private readonly className: string = "UpdateActiveUseCase";
 
     constructor(
         @inject("IStatusRepository") private readonly statusRepository: IStatusRepository,
@@ -22,10 +22,11 @@ export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
     ) {
     }
 
-    public async execute(input: UpdateDescriptionDTO): Promise<Result<UpdateDescriptionResponseDTO>> {
-        const method: string = 'execute';
+    public async execute(input: UpdateActiveDTO): Promise<Result<UpdateActiveResponseDTO>> {
+        const method: string = "execute";
         const transaction = await this.statusRepository.startTransaction();
         const id: string = input.id;
+        const newState: boolean = input.active;
 
         try {
             this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
@@ -33,27 +34,20 @@ export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
             const numberId: number = StringUtils.strToNumber(id, Messages.Status.Error.INVALID_ID(id))
             const existingStatus: Status = await this.statusValidator.validateExistingStatus(numberId);
 
-            const updatedDescriptionEntity: Status = existingStatus.updateDescription(input.newDescription);
-            await this.statusValidator.validateUniqueDescription(updatedDescriptionEntity.getDescription());
+            const updatedStatus: Status = newState ? existingStatus.activate() : existingStatus.deactivate();
+            const message: string = newState ? Messages.Status.Success.ACTIVATED : Messages.Status.Success.DEACTIVATED;
 
-            await this.statusRepository.updateDescription(updatedDescriptionEntity);
+            await this.statusRepository.updateActive(updatedStatus);
             await transaction.commit();
 
-            const successMessage: string = Messages.Status.Success
-                .UPDATED_TO(existingStatus.getDescription(), updatedDescriptionEntity.getDescription());
-
-            this.logger.logInfo(this.className, method, successMessage);
-
-            return Result.success<UpdateDescriptionResponseDTO>({
-                message: successMessage,
-                newDescription: updatedDescriptionEntity.getDescription()
+            return Result.success<UpdateActiveResponseDTO>({
+                message: message
             });
         } catch (error) {
-            await transaction.rollback();
             this.logger.logError(this.className, method, error as Error);
-
+            await transaction.rollback();
             const message: string = error instanceof Error ? error.message : Messages.Status.Error.UPDATED_FAILED;
             throw new UseCaseError(this.className, message);
         }
-    };
+    }
 }

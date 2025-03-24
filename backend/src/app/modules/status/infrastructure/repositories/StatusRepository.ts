@@ -101,9 +101,20 @@ export class StatusRepository implements IStatusRepository {
     public async updateDescription(updatedStatus: Status): Promise<void> {
         try {
             const id: number = updatedStatus.getId()!;
-            await StatusModel.update({description: updatedStatus.getDescription()}, {where: {id}});
-        } catch(error) {
+            const newDescription: string = updatedStatus.getDescription();
+            await StatusModel.update({description: newDescription}, {where: {id}});
+        } catch (error) {
             this.handleRepositoryError(error as Error);
         }
     };
+
+    public async updateActive(status: Status): Promise<void> {
+        try {
+            const id: number = status.getId()!;
+            const convertedState: boolean = this.convertStateEnumToBoolean(status.getActive())
+            await StatusModel.update({active: convertedState}, {where: {id}});
+        } catch (error) {
+            this.handleRepositoryError(error as Error);
+        }
+    }
 }

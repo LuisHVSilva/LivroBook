@@ -1,3 +1,5 @@
+import {Status} from "@status/domain/status";
+
 export interface IStatusValidator {
 
     /**
@@ -6,7 +8,7 @@ export interface IStatusValidator {
      * @param description - the description that should be checked.
      * @returns A Promise resolving to `void` if the description is unique or an error if it exists
      */
-    validateUniqueDescription(description: string): Promise<void | Error>;
+    validateUniqueDescription(description: string): Promise<void>;
 
-    validateExistingStatus(id: number): Promise<void | Error>;
+    validateExistingStatus(id: number): Promise<Status>;
 }

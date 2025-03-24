@@ -11,7 +11,8 @@ describe("getStatusUseCase", () => {
     let getStatusUseCase: GetStatusUseCase;
     let statusRepositoryMock: StatusRepositoryMock;
     let loggerMock: LoggerMock;
-    const input = {id: StatusPayload.id.toString()};
+    let statusPayloadMock: StatusPayload = StatusPayload.createMock();
+    const input = {id: statusPayloadMock.id.toString()};
 
     beforeEach(() => {
         statusRepositoryMock = new StatusRepositoryMock();
@@ -34,13 +35,13 @@ describe("getStatusUseCase", () => {
         expect(result.getValue()).toStrictEqual({
             message: Messages.Status.Success.FOUND_BY_ID,
             id: input.id,
-            description: StatusPayload.validDescriptionFormatted,
-            active: StatusPayload.active,
+            description: statusPayloadMock.description,
+            active: statusPayloadMock.active,
         });
     });
 
     it("should return null for not found status id", async () => {
-        statusRepositoryMock.withFindByIdNull(parseInt(input.id));
+        statusRepositoryMock.withFindByIdNull();
 
         const result: Result<GetStatusResponseDTO> = await getStatusUseCase.execute(input);
         expect(result.isFailure()).toBe(true);

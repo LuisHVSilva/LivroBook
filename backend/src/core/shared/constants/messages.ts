@@ -28,7 +28,6 @@ export const Messages = {
         Success: {
             CREATED: (description: string): string => `Status '${description}' criado com sucesso.`,
             FOUND: (description: string): string => `Status '${description}' encontrado com sucesso.`,
-            UPDATED: (description: string): string => `Status ${description} atualizado com sucesso.`,
             UPDATED_TO: (oldDescription: string, newDescription: string): string => `Status ${oldDescription} atualizado com sucesso para ${newDescription}.`,
             FOUND_BY_ID: "status encontrado com sucesso.",
             ACTIVATED: "status ativado com sucesso.",
@@ -38,6 +37,7 @@ export const Messages = {
             INVALID_ID: (id: string): string => `Status '${id}' não encontrado.`,
             DESCRIPTION_NOT_FOUND: (description: string): string => `Status '${description}' não encontrado.`,
             INVALID_DESCRIPTION: "A descrição deve ter pelo menos 3 caracteres.",
+            INVALID_ENUM: "State inválido para o Status",
             CREATION_FAILED: "Erro ao criar status. Tente novamente mais tarde.",
             DUPLICATE_DESCRIPTION: "Já existe um status com essa descrição.",
             NOT_FOUND: "status não encontrado.",

@@ -13,6 +13,8 @@ import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
 import {GetStatusUseCase} from "@status/application/usecases/getStatusUseCase";
 import {UpdateDescriptionUseCase} from "@status/application/usecases/updateDescriptionUseCase";
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
+import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
+import {UpdateActiveUseCase} from "@status/application/usecases/updateActiveUseCase";
 
 
 container.register<IStatusRepository>("IStatusRepository", {useClass: StatusRepository});
@@ -21,6 +23,7 @@ container.register<IStatusValidator>("IStatusValidator", {useClass: StatusValida
 container.register<ICreateStatusUseCase>("ICreateStatusUseCase", {useClass: CreateStatusUseCase});
 container.register<IGetStatusUseCase>("IGetStatusUseCase", {useClass: GetStatusUseCase});
 container.register<IUpdateDescriptionUseCase>("IUpdateDescriptionUseCase", {useClass: UpdateDescriptionUseCase});
+container.register<IUpdateActiveUseCase>("IUpdateActiveUseCase", {useClass: UpdateActiveUseCase});
 container.register<IStatusController>("IStatusController", {useClass: StatusController});
 
 export {container};

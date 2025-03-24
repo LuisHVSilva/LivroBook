@@ -18,8 +18,6 @@ export class UpdateDescriptionUseCaseMock {
     };
 
     public withExecute(newDescription: string, oldDescription: string): this {
-
-
         const result: Result<UpdateDescriptionResponseDTO> =  Result.success({
             message:  Messages.Status.Success.UPDATED_TO(oldDescription, newDescription),
             newDescription: newDescription
@@ -32,6 +30,5 @@ export class UpdateDescriptionUseCaseMock {
     public withExecuteError(error: UseCaseError): this {
         this.updateDescriptionUseCaseMock.execute.mockRejectedValueOnce(error);
         return this;
-    };
-
+    }
 }

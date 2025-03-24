@@ -6,6 +6,7 @@ import {Messages} from "@coreShared/constants/messages";
 
 export class CreateStatusUseCaseMock {
     private readonly createStatusUseCaseMock: jest.Mocked<ICreateStatusUseCase>;
+    private readonly statusPayloadMock: StatusPayload = StatusPayload.createMock();
 
     constructor() {
         this.createStatusUseCaseMock = {
@@ -18,11 +19,10 @@ export class CreateStatusUseCaseMock {
     };
 
     public withExecute(): this {
-
         const result: Result<CreateStatusResponseDTO> = Result.success<CreateStatusResponseDTO>({
-            message: Messages.Status.Success.CREATED(StatusPayload.validDescriptionFormatted),
-            id: StatusPayload.id.toString(),
-            description: StatusPayload.validDescriptionFormatted,
+            message: Messages.Status.Success.CREATED(this.statusPayloadMock.description),
+            id: this.statusPayloadMock.id.toString(),
+            description: this.statusPayloadMock.description,
         });
 
         this.createStatusUseCaseMock.execute.mockResolvedValueOnce(result);

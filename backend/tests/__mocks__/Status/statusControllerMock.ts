@@ -10,6 +10,7 @@ export class StatusControllerMock {
             createStatus: jest.fn(),
             getStatusById: jest.fn(),
             updateDescription: jest.fn(),
+            updateActive: jest.fn(),
         }
     }
 
@@ -17,7 +18,7 @@ export class StatusControllerMock {
         return this.statusControllerMock;
     }
 
-    public withCreateStatus(statusCode: StatusCodes, responseBody: any) {
+    public withCreateStatus(statusCode: StatusCodes, responseBody: any): void {
         this.statusControllerMock.createStatus.mockImplementation(
             async (req: Request, res: Response) => {
                 return res.status(statusCode).json(responseBody);
@@ -25,8 +26,24 @@ export class StatusControllerMock {
         )
     }
 
-    public withGetStatusById(statusCode: StatusCodes, responseBody: any) {
+    public withGetStatusById(statusCode: StatusCodes, responseBody: any): void {
         this.statusControllerMock.getStatusById.mockImplementation(
+            async (req: Request, res: Response) => {
+                return res.status(statusCode).json(responseBody);
+            }
+        )
+    }
+
+    public withUpdateDescription(statusCode: StatusCodes, responseBody: any): void {
+        this.statusControllerMock.updateDescription.mockImplementation(
+            async (req: Request, res: Response) => {
+                return res.status(statusCode).json(responseBody);
+            }
+        )
+    }
+
+    public withUpdateActive(statusCode: StatusCodes, responseBody: any): void {
+        this.statusControllerMock.updateActive.mockImplementation(
             async (req: Request, res: Response) => {
                 return res.status(statusCode).json(responseBody);
             }

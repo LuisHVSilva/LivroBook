@@ -1,12 +1,12 @@
 import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
 import {StatusPayload} from "@payloads/statusPayload";
-import {StateEnum} from "@coreShared/enums/StateEnum";
 import {GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {Result} from "@coreShared/types/Result";
 import {Messages} from "@coreShared/constants/messages";
 
 export class GetStatusUseCaseMock {
     private readonly getStatusUseCaseMock: jest.Mocked<IGetStatusUseCase>;
+    private readonly statusPayloadMock: StatusPayload = StatusPayload.createMock();
 
     constructor() {
         this.getStatusUseCaseMock = {
@@ -18,23 +18,21 @@ export class GetStatusUseCaseMock {
         return this.getStatusUseCaseMock;
     };
 
-    public withExecute(id: number = StatusPayload.id,
-                       description: string = StatusPayload.validDescriptionFormatted,
-                       active: StateEnum = StatusPayload.active): this {
-
+    public withExecute(): this {
         const result: Result<GetStatusResponseDTO> = Result.success<GetStatusResponseDTO>({
-            message: Messages.Status.Success.FOUND(StatusPayload.validDescriptionFormatted),
-            id: id.toString(),
-            description: description,
-            active: active
+            message: Messages.Status.Success.FOUND(this.statusPayloadMock.description),
+            id: this.statusPayloadMock.id.toString(),
+            description: this.statusPayloadMock.description,
+            active: this.statusPayloadMock.active
         });
 
         this.getStatusUseCaseMock.execute.mockResolvedValueOnce(result);
         return this;
     };
 
-    public withExecuteNullReturn(id: number): this {
-        this.getStatusUseCaseMock.execute.mockResolvedValueOnce(Result.failure(Messages.Status.Error.INVALID_ID(id.toString())));
+    public withExecuteNullReturn(): this {
+        const message: string =Messages.Status.Error.INVALID_ID(this.statusPayloadMock.id.toString());
+        this.getStatusUseCaseMock.execute.mockResolvedValueOnce(Result.failure(message));
         return this;
     };
 

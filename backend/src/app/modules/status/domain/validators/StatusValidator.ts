@@ -25,11 +25,14 @@ export class StatusValidator implements IStatusValidator {
         }
     };
 
-    public async validateExistingStatus(id: number): Promise<void> {
+    public async validateExistingStatus(id: number): Promise<Status> {
         const existingStatus: Result<Status> = await this.statusRepository.findById(id);
 
         if (existingStatus.isFailure()) {
-            throw new ValidateError(this.className, Messages.Status.Error.INVALID_ID(id.toString()));
+            console.log("entrou")
+            throw new ValidateError(this.className, existingStatus.getError());
         }
+
+        return existingStatus.getValue();
     };
 }

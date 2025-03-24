@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 
 export interface IStatusController {
     /**
@@ -6,28 +6,34 @@ export interface IStatusController {
      *
      * @param req - Request object containing new status data.
      * @param res - Response object used to return the creation result.
-     * @returns A Promise resolving to a Response object with the details of the created status
-     * or an appropriate error on failure.
+     * @returns A Promise that resolves when the operation completes.
      */
     createStatus(req: Request, res: Response): Promise<Response>;
 
     /**
-     * Get a new status.
+     * Retrieve a status based on its ID.
      *
-     * @param req - Request object containing the status id data.
-     * @param res - Response object used to return the founded status result.
-     * @returns A Promise resolving to a Response object with the details of the status
-     * or an appropriate error on failure.
+     * @param req - Request object containing the status ID.
+     * @param res - Response object used to return the found status.
+     * @returns A Promise that resolves when the operation completes.
      */
     getStatusById(req: Request, res: Response): Promise<Response>;
 
     /**
-     * Get a new status.
+     * Update the description of an existing status.
      *
-     * @param req - Request object containing new status description data.
+     * @param req - Request object containing the new status description.
      * @param res - Response object used to return the updated result.
-     * @returns A Promise resolving to a Response object with the details of the status
-     * or an appropriate error on failure.
+     * @returns A Promise that resolves when the operation completes.
      */
     updateDescription(req: Request, res: Response): Promise<Response>;
+
+    /**
+     * Update the active state of an existing status.
+     *
+     * @param req - Request object containing the new state data.
+     * @param res - Response object used to return the updated result.
+     * @returns A Promise that resolves when the operation completes.
+     */
+    updateActive(req: Request, res: Response): Promise<Response>;
 }
