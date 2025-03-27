@@ -1,9 +1,9 @@
-import {UpdateDescriptionUseCase} from "@status/application/usecases/updateDescriptionUseCase";
+import {UpdateDescriptionUseCase} from "@status/application/updateDescription/updateDescriptionUseCase";
 import {StatusRepositoryMock} from "@mocks/Status/statusRepositoryMock";
 import {LoggerMock} from "@mocks/loggerMock";
 import {StringUtils} from "@coreShared/utils/StringUtils";
 import {StatusPayload} from "@payloads/statusPayload";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {StatusValidatorMock} from "@mocks/Status/statusValidatorMock";
 import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 import {Result} from "@coreShared/types/Result";

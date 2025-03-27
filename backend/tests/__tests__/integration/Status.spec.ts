@@ -6,7 +6,7 @@ import {Sequelize} from "sequelize-typescript";
 import {StatusModel} from "@status/infrastructure/models/StatusModel";
 import {StatusCodes} from "http-status-codes";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {StateEnum} from "@coreShared/enums/StateEnum";
 import {UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";

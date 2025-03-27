@@ -1,24 +1,20 @@
 import {container} from "tsyringe";
-import {IStatusRepository} from "@status/application/ports/IStatusRepository";
+import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {StatusRepository} from "@status/infrastructure/repositories/StatusRepository";
-import {CreateStatusUseCase} from "@status/application/usecases/createStatusUseCase";
+import {CreateStatusUseCase} from "@status/application/createStatus/createStatusUseCase";
 import {StatusController} from "@status/adapters/controllers/statusController";
-import {ILogger} from "@coreShared/logs/ILogger";
-import {Logger} from "@coreShared/logs/logger";
 import {ICreateStatusUseCase} from "@status/application/ports/ICreateStatusUseCase";
 import {StatusValidator} from "@status/domain/validators/StatusValidator";
 import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
 import {IStatusController} from "@status/adapters/controllers/IStatusController";
 import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
-import {GetStatusUseCase} from "@status/application/usecases/getStatusUseCase";
-import {UpdateDescriptionUseCase} from "@status/application/usecases/updateDescriptionUseCase";
+import {GetStatusUseCase} from "@status/application/getStatus/getStatusUseCase";
+import {UpdateDescriptionUseCase} from "@status/application/updateDescription/updateDescriptionUseCase";
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
 import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
-import {UpdateActiveUseCase} from "@status/application/usecases/updateActiveUseCase";
-
+import {UpdateActiveUseCase} from "@status/application/updateActive/updateActiveUseCase";
 
 container.register<IStatusRepository>("IStatusRepository", {useClass: StatusRepository});
-container.register<ILogger>("ILogger", {useClass: Logger});
 container.register<IStatusValidator>("IStatusValidator", {useClass: StatusValidator});
 container.register<ICreateStatusUseCase>("ICreateStatusUseCase", {useClass: CreateStatusUseCase});
 container.register<IGetStatusUseCase>("IGetStatusUseCase", {useClass: GetStatusUseCase});

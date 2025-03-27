@@ -4,7 +4,7 @@ import {inject, injectable} from "tsyringe";
 import {StatusCodes} from "http-status-codes";
 import {ICreateStatusUseCase} from "../../application/ports/ICreateStatusUseCase";
 
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {ControllerError} from "@coreShared/errors/ControllerError";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {IStatusController} from "@status/adapters/controllers/IStatusController";

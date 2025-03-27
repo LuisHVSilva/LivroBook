@@ -1,5 +1,5 @@
 import {Result} from "@coreShared/types/Result";
-import { Messages } from "@coreShared/constants/messages";
+import { Messages } from "@coreShared/messages/messages";
 
 describe("Result", () => {
     it("deve criar um resultado de sucesso com um valor", () => {

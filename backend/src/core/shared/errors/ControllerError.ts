@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import {ILogger} from "@coreShared/logs/ILogger";
-import { Messages } from "@coreShared/constants/messages";
+import { Messages } from "@coreShared/messages/messages";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 export class ControllerError extends Error {

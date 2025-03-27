@@ -2,119 +2,166 @@ import "reflect-metadata";
 import {inject, injectable} from 'tsyringe';
 import {Sequelize} from "sequelize-typescript";
 import {Transaction} from 'sequelize';
-import {IStatusRepository} from "../../application/ports/IStatusRepository";
+import {IStatusRepository} from "./IStatusRepository";
 import {Status} from "../../domain/status"
 import {StatusModel} from "../models/StatusModel";
-import {StateEnum} from "@coreShared/enums/StateEnum";
 import {StringUtils} from "@coreShared/utils/StringUtils";
-import {Messages} from "@coreShared/constants/messages";
 import {Result} from "@coreShared/types/Result";
 import {RepositoryError} from "@coreShared/errors/RepositoryError";
+import {CacheManager} from "@coreConfig/cache/CacheManager";
+import {ILogger} from "@coreShared/logs/ILogger";
+import {StatusMessages} from "@coreShared/messages/statusMessages";
+import {DataConverter} from "@coreShared/utils/dataConverterUtils";
+import {StateEnum} from "@coreShared/enums/StateEnum";
 
 @injectable()
 export class StatusRepository implements IStatusRepository {
-    private readonly className: string = "StatusRepository";
+    //#region Properties
 
+    private readonly className: string = "StatusRepository";
+    private readonly CACHE_PREFIX: string = 'status';
+
+    //#endregion
+
+    //#region Constructor
     constructor(
-        @inject(Sequelize) private sequelize: Sequelize
+        @inject(Sequelize) private sequelize: Sequelize,
+        @inject("ILogger") private readonly logger: ILogger,
+        @inject('CacheManager') private cacheManager: CacheManager
     ) {
     }
+    //#endregion
 
-    private handleRepositoryError(error: Error): never {
-        const message: string = error.message ? error.message : Messages.Generic.INTERNAL_ERROR;
-        throw new RepositoryError(this.className, message);
-    };
+    //#region Private methods
 
-    private convertBooleanToStateEnum(active: boolean): StateEnum {
-        return active ? StateEnum.ACTIVE : StateEnum.INACTIVE;
-    };
+    private nullFoundReturn(message: string, method: string): Result<Status, RepositoryError> {
+        const error = new RepositoryError(this.className, method, message);
+        return Result.failure<Status, RepositoryError>(error);
+    }
 
-    private convertStateEnumToBoolean(state: StateEnum): boolean {
-        return state === StateEnum.ACTIVE;
-    };
+    //#endregion
+
+    //#region IBaseRepository
 
     public async startTransaction(): Promise<Transaction> {
         return this.sequelize.transaction();
     };
 
-    public async save(statusToSave: Status): Promise<Result<Status>> {
+    public async create(statusToSave: Status): Promise<Result<Status, RepositoryError>> {
+        const method = "create";
         try {
             const persistedStatus: StatusModel = await StatusModel.create({
                 description: statusToSave.getDescription(),
-                active: this.convertStateEnumToBoolean(statusToSave.getActive()),
+                active: DataConverter.convertStateEnumToBoolean(statusToSave.getActive()),
             });
 
             const restoredStatus: Status = Status.restore({
                 id: persistedStatus.id,
                 description: persistedStatus.description,
-                active: this.convertBooleanToStateEnum(persistedStatus.active),
+                active: DataConverter.convertBooleanToStateEnum(persistedStatus.active),
             });
 
-            return Result.success(restoredStatus);
-        } catch (error) {
-            this.handleRepositoryError(error as Error);
-        }
-    };
-
-    public async findById(id: number): Promise<Result<Status>> {
-        try {
-            const foundStatus: StatusModel | null = await StatusModel.findByPk(id);
-            if (!foundStatus) {
-                return Result.failure<Status>(Messages.Status.Error.INVALID_ID(id.toString()));
-            }
-
-            const status: Status = Status.restore({
-                id: foundStatus.id,
-                description: foundStatus.description,
-                active: this.convertBooleanToStateEnum(foundStatus.active),
-            });
-
-            return Result.success(status);
-        } catch (error) {
-            this.handleRepositoryError(error as Error);
-        }
-    };
-
-    public async findByDescription(description: string): Promise<Result<Status>> {
-        try {
-            const descriptionFormatted: string = StringUtils.transformCapitalLetterWithoutAccent(description);
-            const foundStatus: StatusModel | null = await StatusModel.findOne(
-                {where: {description: descriptionFormatted}}
+            await this.cacheManager.invalidateRelatedCaches(
+                this.CACHE_PREFIX, {description: statusToSave.getDescription()}, ['findByDescription']
             );
 
-            if (!foundStatus) {
-                return Result.failure<Status>(Messages.Status.Error.DESCRIPTION_NOT_FOUND(description));
-            }
-
-            const status: Status = Status.restore({
-                id: foundStatus.id,
-                description: foundStatus.description,
-                active: this.convertBooleanToStateEnum(foundStatus.active),
-            });
-
-            return Result.success(status);
-        } catch (error) {
-            this.handleRepositoryError(error as Error);
-        }
-    };
-
-    public async updateDescription(updatedStatus: Status): Promise<void> {
-        try {
-            const id: number = updatedStatus.getId()!;
-            const newDescription: string = updatedStatus.getDescription();
-            await StatusModel.update({description: newDescription}, {where: {id}});
-        } catch (error) {
-            this.handleRepositoryError(error as Error);
-        }
-    };
-
-    public async updateActive(status: Status): Promise<void> {
-        try {
-            const id: number = status.getId()!;
-            const convertedState: boolean = this.convertStateEnumToBoolean(status.getActive())
-            await StatusModel.update({active: convertedState}, {where: {id}});
-        } catch (error) {
-            this.handleRepositoryError(error as Error);
+            return Result.success(restoredStatus);
+        } catch (e) {
+            const error = new RepositoryError(this.className, e as Error);
+            this.logger.logError(this.className, method, error, error.toJSON());
+            return Result.failure<Status, RepositoryError>(error);
         }
     }
+
+    public async findById(id: number): Promise<Result<Status, RepositoryError>> {
+        const method = "findById";
+        try {
+            const cacheKey: string = this.cacheManager.generateCacheKey(this.CACHE_PREFIX, 'findById', {id: id});
+            return this.cacheManager.getOrSet(
+                cacheKey,
+                async (): Promise<Result<Status, RepositoryError>> => {
+                    const foundStatus: StatusModel | null = await StatusModel.findByPk(id);
+
+                    if (!foundStatus) {
+                        return this.nullFoundReturn(method, StatusMessages.Error.NotFound.INVALID_ID(id.toString()));
+                    }
+
+                    const status: Status = Status.restore({
+                        id: foundStatus.id,
+                        description: foundStatus.description,
+                        active: DataConverter.convertBooleanToStateEnum(foundStatus.active),
+                    });
+
+                    return Result.success(status);
+                }
+            );
+        } catch (e) {
+            const error = new RepositoryError(this.className, e as Error);
+            this.logger.logError(this.className, method, error, error.toJSON());
+            return Result.failure<Status, RepositoryError>(error);
+        }
+    };
+
+    //#endregion
+
+    //#region StatusRepository methods
+
+    public async findByDescription(description: string): Promise<Result<Status, RepositoryError>> {
+        const method: string = "findByDescription";
+
+        try {
+            const cacheKey: string = this.cacheManager.generateCacheKey(
+                this.CACHE_PREFIX, 'findByDescription', {description: description}
+            );
+
+            return this.cacheManager.getOrSet(
+                cacheKey,
+                async (): Promise<Result<Status, RepositoryError>> => {
+                    const descriptionFormatted: string = StringUtils.transformCapitalLetterWithoutAccent(description);
+                    const foundStatus: StatusModel | null = await StatusModel.findOne(
+                        {where: {description: descriptionFormatted}}
+                    );
+
+                    if (!foundStatus) {
+                        return this.nullFoundReturn(method, StatusMessages.Error.NotFound.DESCRIPTION_NOT_FOUND(description));
+                    }
+
+                    const status: Status = Status.restore({
+                        id: foundStatus.id,
+                        description: foundStatus.description,
+                        active: DataConverter.convertBooleanToStateEnum(foundStatus.active),
+                    });
+
+                    return Result.success(status);
+                }
+            )
+        } catch (e) {
+            const error = new RepositoryError(this.className, e as Error);
+            this.logger.logError(this.className, method, error, error.toJSON());
+            return Result.failure<Status, RepositoryError>(error);
+        }
+    };
+
+    public async updateDescription(id: number, newDescription: string): Promise<void> {
+        const method: string = "updateDescription";
+        try {
+            await StatusModel.update({description: newDescription}, {where: {id}});
+        } catch (e) {
+            const error = new RepositoryError(this.className, e as Error);
+            this.logger.logError(this.className, method, error, error.toJSON());
+        }
+    };
+
+    public async updateActive(id: number, newActive: StateEnum): Promise<void> {
+        const method: string = "updateActive";
+        try {
+            const convertedState: boolean = DataConverter.convertStateEnumToBoolean(newActive);
+            await StatusModel.update({active: convertedState}, {where: {id}});
+        } catch (e) {
+            const error = new RepositoryError(this.className, e as Error);
+            this.logger.logError(this.className, method, error, error.toJSON());
+        }
+    }
+
+    //#endregion
 }

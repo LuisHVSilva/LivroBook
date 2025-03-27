@@ -1,7 +1,7 @@
 import fs from 'fs';
 import {Logger} from "@coreShared/logs/logger";
 import {StatusCodes} from 'http-status-codes';
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import SpyInstance = jest.SpyInstance;
 
 jest.mock('fs', () => ({

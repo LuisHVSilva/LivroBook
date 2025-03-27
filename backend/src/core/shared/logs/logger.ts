@@ -2,7 +2,7 @@ import fs from "fs";
 import * as path from "path";
 import {StatusCodes} from "http-status-codes";
 import {ILogger} from "./ILogger";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 
 // Constants
 const ERROR_DESCRIPTION = "ERROR";
@@ -57,7 +57,7 @@ class Logger implements ILogger {
         }
     }
 
-    async logError(className: string, method: string, error: Error, httpStatus?: StatusCodes, info?: any): Promise<void> {
+    async logError(className: string, method: string, error: Error, info?: any, httpStatus?: StatusCodes): Promise<void> {
         const message = `Error: ${error.message}\nStack: ${error.stack}`;
         const logMessage = this.createLogMessage(ERROR_DESCRIPTION, className, method, message, httpStatus, info);
         await this.saveLog(logMessage);

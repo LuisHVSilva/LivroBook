@@ -1,7 +1,7 @@
 import request from "supertest";
 import express, { Request, Response, NextFunction } from "express";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
-import { Messages } from "@coreShared/constants/messages";
+import { Messages } from "@coreShared/messages/messages";
 
 describe("ErrorHandler Middleware", () => {
     let app: express.Express;

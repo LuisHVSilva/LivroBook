@@ -1,5 +1,5 @@
 node_modules
-src/core/config/.env
+.env
 /LOGS
 migrations
 seeders

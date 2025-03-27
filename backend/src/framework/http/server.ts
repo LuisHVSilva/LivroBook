@@ -7,7 +7,7 @@ import {router} from "../http/router";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
 import {Database} from "@coreConfig/database";
 import swaggerUi from "swagger-ui-express";
-import {swaggerDocs} from "@coreConfig/container/swagger";
+import {swaggerDocs} from "@coreConfig/swagger";
 
 class Server {
     private readonly app: Application;

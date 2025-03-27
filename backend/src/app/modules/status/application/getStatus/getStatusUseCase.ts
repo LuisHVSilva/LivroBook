@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import {inject, injectable} from "tsyringe";
 import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
-import {IStatusRepository} from "@status/application/ports/IStatusRepository";
+import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {Status} from "@status/domain/status";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {Result} from "@coreShared/types/Result";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";

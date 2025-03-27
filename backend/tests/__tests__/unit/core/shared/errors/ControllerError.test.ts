@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import {ControllerError} from "@coreShared/errors/ControllerError";
 import { ILogger } from "@coreShared/logs/ILogger";
 import { UseCaseError } from "@coreShared/errors/UseCaseError";
-import { Messages } from "@coreShared/constants/messages";
+import { Messages } from "@coreShared/messages/messages";
 
 describe("ControllerError.handleError", () => {
     let loggerMock: jest.Mocked<ILogger>;

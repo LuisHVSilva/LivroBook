@@ -1,7 +1,7 @@
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
 import {UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 import {Result} from "@coreShared/types/Result";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 export class UpdateDescriptionUseCaseMock {

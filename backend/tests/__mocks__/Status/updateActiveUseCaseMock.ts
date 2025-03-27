@@ -1,6 +1,6 @@
 import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
 import {Result} from "@coreShared/types/Result";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";
 

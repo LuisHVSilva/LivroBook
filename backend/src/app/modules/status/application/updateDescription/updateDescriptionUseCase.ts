@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import {inject, injectable} from "tsyringe";
-import {IStatusRepository} from "@status/application/ports/IStatusRepository";
+import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "@status/domain/status";
 import {IStatusValidator} from "@status/domain/validators/IStatusValidator";

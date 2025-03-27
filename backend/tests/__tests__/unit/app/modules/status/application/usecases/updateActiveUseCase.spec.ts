@@ -1,4 +1,4 @@
-import {UpdateActiveUseCase} from "@status/application/usecases/updateActiveUseCase";
+import {UpdateActiveUseCase} from "@status/application/updateActive/updateActiveUseCase";
 import {StatusRepositoryMock} from "@mocks/Status/statusRepositoryMock";
 import {StatusValidatorMock} from "@mocks/Status/statusValidatorMock";
 import {LoggerMock} from "@mocks/loggerMock";
@@ -6,7 +6,7 @@ import {StringUtils} from "@coreShared/utils/StringUtils";
 import {UpdateActiveDTO, UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
 import {Result} from "@coreShared/types/Result";
 import {StatusPayload} from "@payloads/statusPayload";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 import {UseCaseError} from "@coreShared/errors/UseCaseError";
 
 describe("updateActiveUseCase", () => {

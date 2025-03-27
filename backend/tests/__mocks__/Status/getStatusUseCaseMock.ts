@@ -2,7 +2,7 @@ import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
 import {StatusPayload} from "@payloads/statusPayload";
 import {GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {Result} from "@coreShared/types/Result";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 
 export class GetStatusUseCaseMock {
     private readonly getStatusUseCaseMock: jest.Mocked<IGetStatusUseCase>;

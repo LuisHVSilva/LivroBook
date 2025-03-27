@@ -13,7 +13,7 @@ import {
 
 import {CreationOptional, InferAttributes, InferCreationAttributes} from "sequelize";
 import {Database} from "@coreConfig/database";
-import {IStatusEntity} from "../interface/IStatusEntity";
+import {IStatusEntity} from "./IStatusEntity";
 
 const sequelize = Database.getInstance();
 

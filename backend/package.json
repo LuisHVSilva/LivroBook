@@ -6,7 +6,11 @@
   "scripts": {
     "test": "jest",
     "start": "node dist/server.js",
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts"
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "dev": "npm run docker:up && ts-node -r tsconfig-paths/register src/index.ts",
+    "dev:watch": "nodemon --exec ts-node --transpile-only -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,13 +22,15 @@
     "helmet": "^8.0.0",
     "morgan": "^1.10.0",
     "pg": "^8.13.3",
-    "reflect-metadata": "^0.2.2",
+    "redis": "^4.7.0",
+    "reflect-metadata": "^0.1.13",
     "sequelize-typescript": "^2.1.6",
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-typescript-api": "^13.0.25",
     "swagger-ui-express": "^5.0.1",
-    "tsyringe": "^4.8.0"
+    "tsyringe": "^4.8.0",
+    "typeorm": "^0.3.21"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

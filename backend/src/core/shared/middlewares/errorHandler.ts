@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import {Messages} from "@coreShared/constants/messages";
+import {Messages} from "@coreShared/messages/messages";
 
 export class ErrorHandler {
     public static handleError(err: Error, req: Request, res: Response, next: NextFunction): void {

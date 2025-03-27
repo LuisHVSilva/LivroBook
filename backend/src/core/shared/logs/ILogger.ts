@@ -10,7 +10,7 @@ export interface ILogger {
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logError(className: string, method: string, error: Error, httpStatus?: StatusCodes, info?: any): void;
+    logError(className: string, method: string, error: Error, info?: any, httpStatus?: StatusCodes): void;
 
     /**
      * Logs a warning message, useful for unexpected but non-critical events.
