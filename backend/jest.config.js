@@ -11,6 +11,7 @@ module.exports = {
 
     moduleNameMapper: {
         "^@status/(.*)$": "<rootDir>/src/app/modules/status/$1",
+        "^@userType/(.*)$": "<rootDir>/src/app/modules/userType/$1",
         "^@coreConfig/(.*)$": "<rootDir>/src/core/config/$1",
         "^@coreShared/(.*)$": "<rootDir>/src/core/shared/$1",
         "^@frameworkHttp/(.*)$": "<rootDir>/src/framework/http/$1",
@@ -26,7 +27,9 @@ module.exports = {
     collectCoverage: true,
     collectCoverageFrom: [
         "src/**/*.ts",
-        "!src/**/*.d.ts"
+        "!src/**/*.d.ts",
+        "!src/core/config/**",
+        "!src/framework/**"
     ],
     coverageDirectory: "./tests/coverage",
     coverageReporters: ["lcov"],

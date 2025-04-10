@@ -2,7 +2,7 @@ import fs from "fs";
 import * as path from "path";
 import {StatusCodes} from "http-status-codes";
 import {ILogger} from "./ILogger";
-import {Messages} from "@coreShared/messages/messages";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
 
 // Constants
 const ERROR_DESCRIPTION = "ERROR";
@@ -11,9 +11,13 @@ const INFO_DESCRIPTION = "INFO";
 
 class Logger implements ILogger {
     constructor() {
+        this.onStart();
+    }
+
+    private onStart(): void {
         this.ensureLogDirectoryExists()
             .then(() => console.log("📂 Log directory is ready."))
-            .catch((err) => console.error(Messages.Logger.Error.ENSURE_LOG_DIRECTORY, err));
+            .catch((err) => console.error(LoggerMessages.Error.ENSURE_LOG_DIRECTORY, err));
     }
 
     private getCurrentTimestamp(): string {
@@ -44,7 +48,7 @@ class Logger implements ILogger {
         try {
             await fs.promises.appendFile(this.getLogFilePath(), logMessage);
         } catch (err) {
-            console.error(Messages.Logger.Error.LOG_WRITE_FAILED, err);
+            console.error(LoggerMessages.Error.LOG_WRITE_FAILED, err);
         }
     }
 
@@ -53,7 +57,7 @@ class Logger implements ILogger {
         try {
             await fs.promises.mkdir(logDir, {recursive: true});
         } catch (err) {
-            console.error(Messages.Logger.Error.DIRECTORY_CREATION_FAILED, err);
+            console.error(LoggerMessages.Error.DIRECTORY_CREATION_FAILED, err);
         }
     }
 

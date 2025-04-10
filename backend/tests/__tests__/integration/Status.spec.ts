@@ -6,11 +6,22 @@ import {Sequelize} from "sequelize-typescript";
 import {StatusModel} from "@status/infrastructure/models/StatusModel";
 import {StatusCodes} from "http-status-codes";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
-import {Messages} from "@coreShared/messages/messages";
 import {GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {StateEnum} from "@coreShared/enums/StateEnum";
 import {UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 import {UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
+import {StatusMessages} from "@coreShared/messages/statusMessages";
+
+jest.mock("@coreConfig/database", () => ({
+    Database: {
+        getInstance: jest.fn(() => ({
+            addModels: jest.fn(),
+            sync: jest.fn(),
+            authenticate: jest.fn(),
+            close: jest.fn(),
+        })),
+    },
+}));
 
 describe("Integration tests - Status", () => {
     let app: Express;
@@ -31,7 +42,7 @@ describe("Integration tests - Status", () => {
         app = express();
         app.use(express.json());
 
-        const { statusRoutes } = require("@status/adapters/route/statusRoute");
+        const { statusRoutes } = require("@status/adapters/statusRoute");
         app.use("/api/admin", statusRoutes);
     });
 
@@ -50,7 +61,7 @@ describe("Integration tests - Status", () => {
             }
 
             const createStatusResponseDTO: CreateStatusResponseDTO = {
-                message: Messages.Status.Success.CREATED(statusPayloadMock.description),
+                message: StatusMessages.Success.Creation(statusPayloadMock.description),
                 id: statusPayloadMock.id.toString(),
                 description: statusPayloadMock.description.toString()
             }
@@ -76,7 +87,7 @@ describe("Integration tests - Status", () => {
             });
 
             const getStatusResponseDTO: GetStatusResponseDTO = {
-                message: Messages.Status.Success.FOUND_BY_ID,
+                message: StatusMessages.Success.Retrieval.FOUND_BY_ID,
                 id: statusCreated.id.toString(),
                 description: statusPayloadMock.description,
                 active: StateEnum.ACTIVE,
@@ -103,7 +114,7 @@ describe("Integration tests - Status", () => {
             });
 
             const updateDescriptionResponseDTO: UpdateDescriptionResponseDTO = {
-                message: Messages.Status.Success.UPDATED_TO(statusPayloadMock.description, newDescription),
+                message: StatusMessages.Success.Update(statusPayloadMock.description, newDescription),
                 newDescription: newDescription,
             }
 
@@ -130,7 +141,7 @@ describe("Integration tests - Status", () => {
             });
 
             const updateActiveResponseDTO: UpdateActiveResponseDTO = {
-                message: Messages.Status.Success.ACTIVATED,
+                message: StatusMessages.Success.Activation.DEACTIVATED,
             }
 
             const expectedResponse = {

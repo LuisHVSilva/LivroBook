@@ -18,6 +18,7 @@ export class Status {
         this.validate();
     }
 
+
     //#region Getters
     public getId(): number | null {
         return this.id;
@@ -53,12 +54,15 @@ export class Status {
     //#region Factory Method
 
     public static async create(description: string, statusDomainService: IStatusDomainService): Promise<Status> {
-        await statusDomainService.ensureDescriptionIsUnique(description);
-        return new Status(null, description, StateEnum.INACTIVE);
+        const newStatus: Status = new Status(null, description, StateEnum.INACTIVE);
+        await statusDomainService.ensureDescriptionIsUnique(newStatus.description);
+        return newStatus;
     }
 
-    public updateDescription(newDescription: string, statusDomainService: IStatusDomainService): Status {
-        return new Status(this.id, newDescription, this.active);
+    public async updateDescription(newDescription: string, statusDomainService: IStatusDomainService): Promise<Status> {
+        const updatedStatus: Status = new Status(this.id, newDescription, this.active);
+        await statusDomainService.ensureDescriptionIsUnique(updatedStatus.description);
+        return updatedStatus;
     }
 
     public activate(): Status {

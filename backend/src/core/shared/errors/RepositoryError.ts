@@ -26,14 +26,14 @@ export class RepositoryError extends Error {
         }
     }
 
-    public toJSON(): object {
-        return {
-            name: this.name,
-            message: this.message,
-            className: this.className,
-            timestamp: this.timestamp.toISOString(),
-            code: this.code,
-            stack: this.stack,
-        };
-    }
+    // public toJSON(): object {
+    //     return {
+    //         name: this.name,
+    //         message: this.message,
+    //         className: this.className,
+    //         timestamp: this.timestamp.toISOString(),
+    //         code: this.code,
+    //         stack: this.stack,
+    //     };
+    // }
 }

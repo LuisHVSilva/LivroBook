@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:unit": "jest backend/tests/__tests__/unit",
+    "test:integration": "jest backend/tests/__tests__/integration",
     "start": "node dist/server.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",

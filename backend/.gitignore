@@ -5,4 +5,3 @@ migrations
 seeders
 /tests/coverage
 *.zip
-/testes-antigos

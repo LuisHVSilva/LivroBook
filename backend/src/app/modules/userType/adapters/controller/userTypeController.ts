@@ -6,10 +6,9 @@ import {ILogger} from "@coreShared/logs/ILogger";
 import {ICreateUserTypeUseCase} from "@userType/application/createUserType/ICreateUserTypeUseCase";
 import {ControllerError} from "@coreShared/errors/ControllerError";
 import {StatusCodes} from "http-status-codes";
-
-import {Messages} from "@coreShared/messages/messages";
 import {CreateUserTypeInputDTO, CreateUserTypeOutputDTO} from "@userType/adapters/dtos/createUserTypeDTO";
 import {Result} from "@coreShared/types/Result";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
 
 
 @injectable()
@@ -26,16 +25,15 @@ export class UserTypeController implements IUserTypeController {
         const method: string = "create";
 
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
 
             const input: CreateUserTypeInputDTO = req.body;
 
-            this.logger.logInfo(this.className, method, `Recebendo request - input: ${input}`);
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.RECEIVE_REQUEST(JSON.stringify(input)));
 
             const result: Result<CreateUserTypeOutputDTO> = await this.createUserTypeUseCase.execute(input);
 
-            this.logger.logInfo(this.className, method,
-                `Status criado com sucesso - id: ${result.getValue().id} - description: ${result.getValue()}`);
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
 
             return res.status(StatusCodes.CREATED).json({success: true, data: result});
         } catch (error) {

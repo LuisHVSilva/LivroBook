@@ -1,8 +1,8 @@
 import fs from 'fs';
 import {Logger} from "@coreShared/logs/logger";
 import {StatusCodes} from 'http-status-codes';
-import {Messages} from "@coreShared/messages/messages";
 import SpyInstance = jest.SpyInstance;
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
 
 jest.mock('fs', () => ({
     promises: {
@@ -40,7 +40,7 @@ describe('Logger', () => {
 
             await logger[SAVE_LOG](TEST_MESSAGE);
 
-            expect(consoleSpy).toHaveBeenCalledWith(Messages.Logger.Error.LOG_WRITE_FAILED, erroSimulado);
+            expect(consoleSpy).toHaveBeenCalledWith(LoggerMessages.Error.LOG_WRITE_FAILED, erroSimulado);
 
             consoleSpy.mockRestore();
         });
@@ -53,7 +53,7 @@ describe('Logger', () => {
 
             await logger["ensureLogDirectoryExists"]();
 
-            expect(consoleSpy).toHaveBeenCalledWith(Messages.Logger.Error.DIRECTORY_CREATION_FAILED, erroSimulado);
+            expect(consoleSpy).toHaveBeenCalledWith(LoggerMessages.Error.DIRECTORY_CREATION_FAILED, erroSimulado);
             consoleSpy.mockRestore();
         });
 
@@ -93,8 +93,8 @@ describe('Logger', () => {
                 CLASS_NAME,
                 TEST_METHOD,
                 new Error(ERRO_SIMULADO),
+                "info",
                 StatusCodes.INTERNAL_SERVER_ERROR,
-                "info"
             );
 
             expect(spy).toHaveBeenCalled();

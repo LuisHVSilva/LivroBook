@@ -2,58 +2,57 @@ import "reflect-metadata";
 import {inject, injectable} from "tsyringe";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
-import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
-import {Messages} from "@coreShared/messages/messages";
+import {IUpdateDescriptionUseCase} from "@status/application/updateDescription/IUpdateDescriptionUseCase";
 import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "@status/domain/status";
-import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
 import {Result} from "@coreShared/types/Result";
 import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
+import {UseCaseError} from "@coreShared/errors/useCaseError";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
+import {StatusMessages} from "@coreShared/messages/statusMessages";
+import {IStatusDomainService} from "@status/domain/service/IStatusDomainService";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 @injectable()
 export class UpdateDescriptionUseCase implements IUpdateDescriptionUseCase {
     private readonly className: string = "UpdateDescriptionUseCase";
 
     constructor(
+        @inject("IStatusDomainService") private readonly statusDomainService: IStatusDomainService,
         @inject("IStatusRepository") private readonly statusRepository: IStatusRepository,
-        @inject("IStatusValidator") private readonly statusValidator: IStatusValidator,
         @inject("ILogger") private readonly logger: ILogger,
     ) {
     }
 
     public async execute(input: UpdateDescriptionDTO): Promise<Result<UpdateDescriptionResponseDTO>> {
-        const method: string = 'execute';
+        const method: string = "execute";
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
+
         const transaction = await this.statusRepository.startTransaction();
-        const id: string = input.id;
-
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            const id: number = StringUtils.strToNumber(input.id, StatusMessages.Error.Validation.ID_TYPE)
+            const newDescription: string = input.newDescription
+            const existingStatus: Status = await this.statusDomainService.ensureStatusExists(id);
+            const newStatus: Status = await existingStatus.updateDescription(newDescription, this.statusDomainService);
 
-            const numberId: number = StringUtils.strToNumber(id, Messages.Status.Error.INVALID_ID(id))
-            const existingStatus: Status = await this.statusValidator.validateExistingStatus(numberId);
-
-            const updatedDescriptionEntity: Status = existingStatus.updateDescription(input.newDescription);
-            await this.statusValidator.validateUniqueDescription(updatedDescriptionEntity.getDescription());
-
-            await this.statusRepository.updateDescription(updatedDescriptionEntity);
+            await this.statusRepository.updateDescription(id, newDescription);
             await transaction.commit();
 
-            const successMessage: string = Messages.Status.Success
-                .UPDATED_TO(existingStatus.getDescription(), updatedDescriptionEntity.getDescription());
+            const successMessage: string = StatusMessages
+                .Success.Update(existingStatus.getDescription(), newStatus.getDescription());
 
-            this.logger.logInfo(this.className, method, successMessage);
+            await this.logger.logInfo(this.className, method, successMessage);
 
             return Result.success<UpdateDescriptionResponseDTO>({
                 message: successMessage,
-                newDescription: updatedDescriptionEntity.getDescription()
+                newDescription: newStatus.getDescription()
             });
-        } catch (error) {
+        } catch (e) {
             await transaction.rollback();
-            this.logger.logError(this.className, method, error as Error);
-
-            const message: string = error instanceof Error ? error.message : Messages.Status.Error.UPDATED_FAILED;
-            throw new UseCaseError(this.className, message);
+            const message: string = e instanceof Error ? e.message : ErrorMessages.Internal.INTERNAL_ERROR;
+            const error = new UseCaseError(this.className, message);
+            await this.logger.logError(this.className, method, error);
+            return Result.failure(error)
         }
     };
 }

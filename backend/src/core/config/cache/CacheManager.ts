@@ -1,13 +1,14 @@
 import { injectable, inject } from 'tsyringe';
 import { ICache } from './ICache';
 import { ILogger } from "@coreShared/logs/ILogger";
+import {ICacheManager} from "@coreConfig/cache/ICacheManager";
 
 @injectable()
-export class CacheManager {
+export class CacheManager<T> implements ICacheManager<T>{
     private readonly className = 'CacheManager';
 
     constructor(
-        @inject('ICache') private cache: ICache,
+        @inject('ICache') private readonly cache: ICache,
         @inject('ILogger') private readonly logger: ILogger
     ) {}
 
@@ -59,27 +60,22 @@ export class CacheManager {
         await this.invalidatePattern(`${cachePrefix}:findAll*`);
     }
 
-
     public async getOrSet<T>(key: string,factory: () => Promise<T>,ttlSeconds?: number): Promise<T> {
         try {
-            // Verifica se o valor está em cache
             const cached = await this.cache.get(key);
             if (cached) {
-                this.logger.logInfo(this.className, 'Cache Hit', `Key: ${key}`);
+                await this.logger.logInfo(this.className, 'Cache Hit', `Key: ${key}`);
                 return JSON.parse(cached);
             }
 
-            this.logger.logInfo(this.className, 'Cache Miss', `Key: ${key}`);
-            // Se não estiver no cache, usa a factory para obter o valor
+            await this.logger.logInfo(this.className, 'Cache Miss', `Key: ${key}`);
             const value = await factory();
 
-            // Armazena o valor no cache
             await this.cache.set(key, JSON.stringify(value), ttlSeconds);
             return value;
         } catch (error) {
-            // Log de erro e fallback para a factory
-            this.logger.logError(this.className, 'GetOrSet Error', error as Error);
-            return await factory(); // Fallback em caso de erro
+            await this.logger.logError(this.className, 'GetOrSet Error', error as Error);
+            return await factory();
         }
     }
 }

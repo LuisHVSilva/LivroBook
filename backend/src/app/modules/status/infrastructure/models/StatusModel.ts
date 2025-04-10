@@ -8,14 +8,16 @@ import {
     Table,
     Default,
     CreatedAt,
-    UpdatedAt
+    UpdatedAt,
+    Unique,
+    Sequelize
 } from "sequelize-typescript";
 
 import {CreationOptional, InferAttributes, InferCreationAttributes} from "sequelize";
 import {Database} from "@coreConfig/database";
 import {IStatusEntity} from "./IStatusEntity";
 
-const sequelize = Database.getInstance();
+const sequelize: Sequelize = Database.getInstance();
 
 @Table({tableName: "STATUS", timestamps: true})
 class StatusModel extends Model<InferAttributes<StatusModel>, InferCreationAttributes<StatusModel>> implements IStatusEntity {
@@ -26,6 +28,7 @@ class StatusModel extends Model<InferAttributes<StatusModel>, InferCreationAttri
     declare id: CreationOptional<number>;
 
     @AllowNull(false)
+    @Unique
     @Column(DataType.STRING)
     declare description: string;
 

@@ -10,7 +10,7 @@ export interface ILogger {
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logError(className: string, method: string, error: Error, info?: any, httpStatus?: StatusCodes): void;
+    logError(className: string, method: string, error: Error, info?: any, httpStatus?: StatusCodes): Promise<void>;
 
     /**
      * Logs a warning message, useful for unexpected but non-critical events.
@@ -21,7 +21,7 @@ export interface ILogger {
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logWarn(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): void;
+    logWarn(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
 
     /**
      * Logs an informational message, including success logs.
@@ -32,5 +32,5 @@ export interface ILogger {
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logInfo(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): void;
+    logInfo(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
 }

@@ -1,8 +1,9 @@
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import {ILogger} from "@coreShared/logs/ILogger";
-import { Messages } from "@coreShared/messages/messages";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
+
+import {UseCaseError} from "@coreShared/errors/useCaseError";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 export class ControllerError extends Error {
     static async handleError(
@@ -20,11 +21,11 @@ export class ControllerError extends Error {
             errorMessage = error.message;
         } else {
             statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
-            errorMessage = Messages.Generic.INTERNAL_ERROR;
+            errorMessage = ErrorMessages.Internal.INTERNAL_ERROR;
         }
 
         try {
-            logger.logError(className, method, error as Error, statusCode, extraInfo);
+            await logger.logError(className, method, error as Error, statusCode, extraInfo);
         } catch (logError) {
             console.error("Erro ao registrar log:", logError);
         }

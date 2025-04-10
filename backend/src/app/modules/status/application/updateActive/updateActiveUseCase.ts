@@ -1,53 +1,53 @@
 import "reflect-metadata";
-import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
+import {IUpdateActiveUseCase} from "@status/application/updateActive/IUpdateActiveUseCase";
 import {inject, injectable} from "tsyringe";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
-import {IStatusValidator} from "@status/domain/validators/IStatusValidator";
 import {UpdateActiveDTO, UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
 import {Result} from "@coreShared/types/Result";
-import {Messages} from "@coreShared/messages/messages";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
+import {UseCaseError} from "@coreShared/errors/useCaseError";
 import {StringUtils} from "@coreShared/utils/StringUtils";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
+import {StatusMessages} from "@coreShared/messages/statusMessages";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {Status} from "@status/domain/status";
+import {IStatusDomainService} from "@status/domain/service/IStatusDomainService";
 
 @injectable()
 export class UpdateActiveUseCase implements IUpdateActiveUseCase {
     private readonly className: string = "UpdateActiveUseCase";
 
     constructor(
+        @inject("IStatusDomainService") private readonly statusDomainService: IStatusDomainService,
         @inject("IStatusRepository") private readonly statusRepository: IStatusRepository,
-        @inject("IStatusValidator") private readonly statusValidator: IStatusValidator,
         @inject("ILogger") private readonly logger: ILogger,
     ) {
     }
 
     public async execute(input: UpdateActiveDTO): Promise<Result<UpdateActiveResponseDTO>> {
         const method: string = "execute";
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
+
         const transaction = await this.statusRepository.startTransaction();
-        const id: string = input.id;
-        const newState: boolean = input.active;
-
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            const id: number = StringUtils.strToNumber(input.id, StatusMessages.Error.Validation.ID_TYPE)
+            const newActive: boolean = input.active;
 
-            const numberId: number = StringUtils.strToNumber(id, Messages.Status.Error.INVALID_ID(id))
-            const existingStatus: Status = await this.statusValidator.validateExistingStatus(numberId);
+            const existingStatus: Status = await this.statusDomainService.ensureStatusExists(id);
+            const updatedStatus: Status = newActive ? existingStatus.activate() : existingStatus.deactivate();
+            await this.statusRepository.updateActive(updatedStatus.getId()!, updatedStatus.getActive());
 
-            const updatedStatus: Status = newState ? existingStatus.activate() : existingStatus.deactivate();
-            const message: string = newState ? Messages.Status.Success.ACTIVATED : Messages.Status.Success.DEACTIVATED;
-
-            await this.statusRepository.updateActive(updatedStatus);
             await transaction.commit();
-
             return Result.success<UpdateActiveResponseDTO>({
-                message: message
+                message: newActive
+                    ? StatusMessages.Success.Activation.ACTIVATED : StatusMessages.Success.Activation.DEACTIVATED
             });
-        } catch (error) {
-            this.logger.logError(this.className, method, error as Error);
+        } catch (e) {
             await transaction.rollback();
-            const message: string = error instanceof Error ? error.message : Messages.Status.Error.UPDATED_FAILED;
-            throw new UseCaseError(this.className, message);
+            const message: string = e instanceof Error ? e.message : ErrorMessages.Internal.INTERNAL_ERROR;
+            const error = new UseCaseError(this.className, message);
+            await this.logger.logError(this.className, method, error);
+            return Result.failure(error)
         }
     }
 }

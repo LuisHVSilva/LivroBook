@@ -1,13 +1,17 @@
 import "reflect-metadata";
 import {inject, injectable} from "tsyringe";
-import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
+import {IGetStatusUseCase} from "@status/application/getStatus/IGetStatusUseCase";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {Status} from "@status/domain/status";
-import {Messages} from "@coreShared/messages/messages";
 import {Result} from "@coreShared/types/Result";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
-import {UseCaseError} from "@coreShared/errors/UseCaseError";
+import {UseCaseError} from "@coreShared/errors/useCaseError";
+import {RepositoryError} from "@coreShared/errors/RepositoryError";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
+import {StatusMessages} from "@coreShared/messages/statusMessages";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
+import {StringUtils} from "@coreShared/utils/StringUtils";
 
 @injectable()
 export class GetStatusUseCase implements IGetStatusUseCase {
@@ -21,27 +25,37 @@ export class GetStatusUseCase implements IGetStatusUseCase {
 
     public async execute(input: GetStatusDTO): Promise<Result<GetStatusResponseDTO>> {
         const method = "execute";
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
+
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            const id: number = StringUtils.strToNumber(input.id, StatusMessages.Error.Validation.ID_TYPE)
+            const statusResult: Result<Status,RepositoryError> = await this.statusRepository.findById(id);
 
-            const status: Result<Status> = await this.statusRepository.findById(parseInt(input.id));
-
-            if (status.isFailure()) {
-                return Result.failure<GetStatusResponseDTO>(status.getError());
+            if (statusResult.isFailure() || statusResult.isNone()) {
+                return Result.failure(new UseCaseError(this.className, StatusMessages.Error.Retrieval.ID_NOT_FOUND(id)));
             }
 
-            const statusValue: Status = status.getValue();
-            return Result.success<GetStatusResponseDTO>({
-                message: Messages.Status.Success.FOUND_BY_ID,
-                id: statusValue.getId()!.toString(),
-                description: statusValue.getDescription(),
-                active: statusValue.getActive(),
-            });
-        } catch (error) {
-            this.logger.logError(this.className, method, error as Error);
+            const status = statusResult.unwrapOrThrow(Status.restore);
 
-            const message: string = error instanceof Error ? error.message : Messages.Status.Error.NOT_FOUND;
-            throw new UseCaseError(this.className, message);
+            const response: GetStatusResponseDTO = {
+                message: StatusMessages.Success.Retrieval.FOUND_BY_ID,
+                id: status.getId()!.toString(),
+                description: status.getDescription(),
+                active: status.getActive(),
+            };
+
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
+            return Result.success(response);
+        } catch (error) {
+            let message: string = ErrorMessages.Internal.INTERNAL_ERROR;
+
+            if(error instanceof Error) {
+                await this.logger.logError(this.className, method, error);
+                message = error.message;
+            }
+
+            return Result.failure(new UseCaseError(this.className, message));
         }
-    };
+    }
+
 }

@@ -1,6 +1,7 @@
 import {StateEnum} from "@coreShared/enums/StateEnum"
 import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Status} from "@status/domain/status";
+import {StatusModel} from "@status/infrastructure/models/StatusModel";
 
 export class StatusPayload {
     private readonly _id: number = 1;
@@ -41,5 +42,9 @@ export class StatusPayload {
                 active: this.active,
             }
         );
+    }
+
+    public model(): StatusModel {
+        return { id: this.id, description: this.description, active: true } as StatusModel;
     }
 }

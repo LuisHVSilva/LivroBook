@@ -2,49 +2,49 @@ import "reflect-metadata"
 import {Request, Response} from "express";
 import {inject, injectable} from "tsyringe";
 import {StatusCodes} from "http-status-codes";
-import {ICreateStatusUseCase} from "../../application/ports/ICreateStatusUseCase";
+import {ICreateStatusUseCase} from "../../application/createStatus/ICreateStatusUseCase";
 
-import {Messages} from "@coreShared/messages/messages";
 import {ControllerError} from "@coreShared/errors/ControllerError";
 import {ILogger} from "@coreShared/logs/ILogger";
 import {IStatusController} from "@status/adapters/controllers/IStatusController";
-import {IGetStatusUseCase} from "@status/application/ports/IGetStatusUseCase";
+import {IGetStatusUseCase} from "@status/application/getStatus/IGetStatusUseCase";
 import {Result} from "@coreShared/types/Result";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/CreateStatusDTO";
-import {IUpdateDescriptionUseCase} from "@status/application/ports/IUpdateDescriptionUseCase";
+import {IUpdateDescriptionUseCase} from "@status/application/updateDescription/IUpdateDescriptionUseCase";
 import {GetStatusDTO, GetStatusResponseDTO} from "@status/adapters/dtos/GetStatusDTO";
 import {UpdateDescriptionDTO, UpdateDescriptionResponseDTO} from "@status/adapters/dtos/UpdateDescriptionDTO";
 import {UpdateActiveDTO, UpdateActiveResponseDTO} from "@status/adapters/dtos/UpdateActiveDTO";
-import {IUpdateActiveUseCase} from "@status/application/ports/IUpdateActiveUseCase";
+import {IUpdateActiveUseCase} from "@status/application/updateActive/IUpdateActiveUseCase";
+import {LoggerMessages} from "@coreShared/messages/loggerMessages";
 
 
 @injectable()
 export class StatusController implements IStatusController {
     private readonly className: string = "StatusController";
+    private readonly REQUEST_RECEIVED: string = "Recebendo request - input: ";
 
     constructor(
-        @inject("ILogger") private logger: ILogger,
-        @inject("ICreateStatusUseCase") private createStatusUseCase: ICreateStatusUseCase,
-        @inject("IGetStatusUseCase") private getStatusUseCase: IGetStatusUseCase,
-        @inject("IUpdateDescriptionUseCase") private updateDescriptionUseCase: IUpdateDescriptionUseCase,
-        @inject("IUpdateActiveUseCase") private updateActiveUseCase: IUpdateActiveUseCase,
+        @inject("ILogger") private readonly logger: ILogger,
+        @inject("ICreateStatusUseCase") private readonly createStatusUseCase: ICreateStatusUseCase,
+        @inject("IGetStatusUseCase") private readonly getStatusUseCase: IGetStatusUseCase,
+        @inject("IUpdateDescriptionUseCase") private readonly updateDescriptionUseCase: IUpdateDescriptionUseCase,
+        @inject("IUpdateActiveUseCase") private readonly updateActiveUseCase: IUpdateActiveUseCase,
     ) {
     }
 
     async createStatus(req: Request, res: Response): Promise<Response> {
         const method: string = "createStatus";
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
 
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            const input: CreateStatusDTO = req.body;
+            await this.logger.logInfo(this.className, method, this.REQUEST_RECEIVED, undefined, JSON.stringify(input));
 
-            const inputStatus: CreateStatusDTO = req.body;
-            this.logger.logInfo(this.className, method, `Recebendo request - description: ${inputStatus.description}`);
+            const result: CreateStatusResponseDTO = (await this.createStatusUseCase.execute(input)).unwrapOrThrow();
 
-            const result: Result<CreateStatusResponseDTO> = await this.createStatusUseCase.execute(inputStatus);
+            await  this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
 
-            this.logger.logInfo(this.className, method, `Status criado com sucesso - id: ${result.getValue().id}`);
-
-            return res.status(StatusCodes.CREATED).json({success: true, data: result.getValue()});
+            return res.status(StatusCodes.CREATED).json({success: true, data: result});
         } catch (error) {
             return await ControllerError.handleError(this.logger, this.className, method,
                 error, res, StatusCodes.CONFLICT);
@@ -52,49 +52,44 @@ export class StatusController implements IStatusController {
     };
 
     async getStatusById(req: Request, res: Response): Promise<Response> {
-        const method: string = "getStatusById";
+        const method = "getStatusById";
+        const id: string = req.params.id;
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
 
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+            const input: GetStatusDTO = {id};
+            await this.logger.logInfo(this.className, method, this.REQUEST_RECEIVED, undefined, JSON.stringify(input));
 
-            const inputId: GetStatusDTO = {
-                id: req.params.id,
-            };
+            const result: Result<GetStatusResponseDTO | null> = await this.getStatusUseCase.execute(input);
 
-            this.logger.logInfo(this.className, method, `Recebendo request - id: ${inputId.id}`);
-            const result: Result<GetStatusResponseDTO> = await this.getStatusUseCase.execute(inputId);
-
-            if (result.isFailure()) {
-                this.logger.logWarn(this.className, method, Messages.Status.Error.NOT_FOUND, undefined, `ID: ${inputId.id}`);
+            if (result.isNone()) {
                 return res.status(StatusCodes.NOT_FOUND).json({success: true, data: null});
             }
 
-            return res.status(StatusCodes.OK).json({success: true, data: result.getValue()});
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
+
+            return res.status(StatusCodes.OK).json({success: true, data: result.unwrapOrThrow()});
         } catch (error) {
-            return await ControllerError.handleError(this.logger, this.className, method,
-                error, res, StatusCodes.NOT_FOUND);
+            return ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
     async updateDescription(req: Request, res: Response): Promise<Response> {
         const method: string = "updateDescription";
-        try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
 
-            const inputData: UpdateDescriptionDTO = {
+        try {
+            const input: UpdateDescriptionDTO = {
                 id: req.params.id,
                 newDescription: req.body.newDescription,
             };
 
-            this.logger.logInfo(
-                this.className,
-                method,
-                `Recebendo request - id: ${inputData.id} - description: ${inputData.newDescription}`
-            );
+            await this.logger.logInfo(this.className, method, this.REQUEST_RECEIVED, undefined, JSON.stringify(input));
 
-            const result: Result<UpdateDescriptionResponseDTO> = await this.updateDescriptionUseCase.execute(inputData);
+            const result: Result<UpdateDescriptionResponseDTO> = await this.updateDescriptionUseCase.execute(input);
 
-            return res.status(StatusCodes.OK).json({success: true, data: result.getValue()});
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
+            return res.status(StatusCodes.OK).json({success: true, data: result.unwrapOrThrow()});
         } catch (error) {
             return await ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.NOT_FOUND);
         }
@@ -102,24 +97,21 @@ export class StatusController implements IStatusController {
 
     async updateActive(req: Request, res: Response): Promise<Response> {
         const method: string = "updateActive";
+        await this.logger.logInfo(this.className, method, LoggerMessages.Info.START_EXECUTION);
 
         try {
-            this.logger.logInfo(this.className, method, Messages.Logger.Info.START_EXECUTION);
-
-            const inputData: UpdateActiveDTO = {
+            const input: UpdateActiveDTO = {
                 id: req.params.id,
                 active: req.body.active,
             };
 
-            this.logger.logInfo(
-                this.className,
-                method,
-                `Recebendo request - id: ${inputData.id} - active: ${inputData.active}`
-            );
+            await this.logger.logInfo(this.className, method, this.REQUEST_RECEIVED, undefined, JSON.stringify(input));
 
-            const result: Result<UpdateActiveResponseDTO> = await this.updateActiveUseCase.execute(inputData);
+            const result: Result<UpdateActiveResponseDTO> = await this.updateActiveUseCase.execute(input);
 
-            return res.status(StatusCodes.OK).json({success: true, data: result.getValue()});
+            await this.logger.logInfo(this.className, method, LoggerMessages.Info.EXECUTION_SUCCESS);
+
+            return res.status(StatusCodes.OK).json({success: true, data: result.unwrapOrThrow()});
         } catch (error) {
             return await ControllerError.handleError(this.logger, this.className, method, error, res, StatusCodes.BAD_REQUEST);
         }

@@ -1,7 +1,7 @@
 import request from "supertest";
 import express, { Request, Response, NextFunction } from "express";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
-import { Messages } from "@coreShared/messages/messages";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 describe("ErrorHandler Middleware", () => {
     let app: express.Express;
@@ -20,6 +20,6 @@ describe("ErrorHandler Middleware", () => {
         const response = await request(app).get("/error");
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ message: Messages.ErrorHandler.UNEXPECTED_ERROR });
+        expect(response.body).toEqual({ message: ErrorMessages.Internal.UNEXPECTED_ERROR });
     });
 });

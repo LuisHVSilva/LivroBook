@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {statusRoutes} from "../../app/modules/status/adapters/route/statusRoute";
+import {statusRoutes} from "@status/adapters/statusRoute";
 import {userTypeRouter} from "@userType/adapters/userTypeRouter";
 
 

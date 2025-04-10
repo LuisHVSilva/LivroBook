@@ -5,14 +5,11 @@ import {Transaction} from 'sequelize';
 import {IStatusRepository} from "./IStatusRepository";
 import {Status} from "../../domain/status"
 import {StatusModel} from "../models/StatusModel";
-import {StringUtils} from "@coreShared/utils/StringUtils";
 import {Result} from "@coreShared/types/Result";
 import {RepositoryError} from "@coreShared/errors/RepositoryError";
-import {CacheManager} from "@coreConfig/cache/CacheManager";
-import {ILogger} from "@coreShared/logs/ILogger";
-import {StatusMessages} from "@coreShared/messages/statusMessages";
 import {DataConverter} from "@coreShared/utils/dataConverterUtils";
 import {StateEnum} from "@coreShared/enums/StateEnum";
+import {ICacheManager} from "@coreConfig/cache/ICacheManager";
 
 @injectable()
 export class StatusRepository implements IStatusRepository {
@@ -25,18 +22,9 @@ export class StatusRepository implements IStatusRepository {
 
     //#region Constructor
     constructor(
-        @inject(Sequelize) private sequelize: Sequelize,
-        @inject("ILogger") private readonly logger: ILogger,
-        @inject('CacheManager') private cacheManager: CacheManager
+        @inject(Sequelize) private readonly sequelize: Sequelize,
+        @inject('ICacheManager') private readonly cacheManager: ICacheManager<Result<Status, RepositoryError>>
     ) {
-    }
-    //#endregion
-
-    //#region Private methods
-
-    private nullFoundReturn(message: string, method: string): Result<Status, RepositoryError> {
-        const error = new RepositoryError(this.className, method, message);
-        return Result.failure<Status, RepositoryError>(error);
     }
 
     //#endregion
@@ -48,7 +36,6 @@ export class StatusRepository implements IStatusRepository {
     };
 
     public async create(statusToSave: Status): Promise<Result<Status, RepositoryError>> {
-        const method = "create";
         try {
             const persistedStatus: StatusModel = await StatusModel.create({
                 description: statusToSave.getDescription(),
@@ -67,23 +54,21 @@ export class StatusRepository implements IStatusRepository {
 
             return Result.success(restoredStatus);
         } catch (e) {
-            const error = new RepositoryError(this.className, e as Error);
-            this.logger.logError(this.className, method, error, error.toJSON());
-            return Result.failure<Status, RepositoryError>(error);
+            throw new RepositoryError(this.className, e as Error);
         }
     }
 
     public async findById(id: number): Promise<Result<Status, RepositoryError>> {
-        const method = "findById";
-        try {
-            const cacheKey: string = this.cacheManager.generateCacheKey(this.CACHE_PREFIX, 'findById', {id: id});
-            return this.cacheManager.getOrSet(
-                cacheKey,
-                async (): Promise<Result<Status, RepositoryError>> => {
+        const cacheKey: string = this.cacheManager.generateCacheKey(this.CACHE_PREFIX, 'findById', { id });
+
+        const rawResult = await this.cacheManager.getOrSet(
+            cacheKey,
+            async (): Promise<Result<Status, RepositoryError>> => {
+                try {
                     const foundStatus: StatusModel | null = await StatusModel.findByPk(id);
 
                     if (!foundStatus) {
-                        return this.nullFoundReturn(method, StatusMessages.Error.NotFound.INVALID_ID(id.toString()));
+                        return Result.none();
                     }
 
                     const status: Status = Status.restore({
@@ -93,37 +78,35 @@ export class StatusRepository implements IStatusRepository {
                     });
 
                     return Result.success(status);
+                } catch (e) {
+                    return Result.failure(new RepositoryError(this.className, e as Error));
                 }
-            );
-        } catch (e) {
-            const error = new RepositoryError(this.className, e as Error);
-            this.logger.logError(this.className, method, error, error.toJSON());
-            return Result.failure<Status, RepositoryError>(error);
-        }
-    };
+            }
+        );
+
+        return Result.fromObject<Status, RepositoryError>(rawResult);
+    }
 
     //#endregion
 
     //#region StatusRepository methods
 
     public async findByDescription(description: string): Promise<Result<Status, RepositoryError>> {
-        const method: string = "findByDescription";
 
-        try {
-            const cacheKey: string = this.cacheManager.generateCacheKey(
-                this.CACHE_PREFIX, 'findByDescription', {description: description}
-            );
+        const cacheKey: string = this.cacheManager.generateCacheKey(
+            this.CACHE_PREFIX, 'findByDescription', {description: description}
+        );
 
-            return this.cacheManager.getOrSet(
-                cacheKey,
-                async (): Promise<Result<Status, RepositoryError>> => {
-                    const descriptionFormatted: string = StringUtils.transformCapitalLetterWithoutAccent(description);
+        const rawResult = await this.cacheManager.getOrSet(
+            cacheKey,
+            async (): Promise<Result<Status, RepositoryError>> => {
+                try {
                     const foundStatus: StatusModel | null = await StatusModel.findOne(
-                        {where: {description: descriptionFormatted}}
+                        {where: {description: description}}
                     );
 
                     if (!foundStatus) {
-                        return this.nullFoundReturn(method, StatusMessages.Error.NotFound.DESCRIPTION_NOT_FOUND(description));
+                        return Result.none();
                     }
 
                     const status: Status = Status.restore({
@@ -133,33 +116,29 @@ export class StatusRepository implements IStatusRepository {
                     });
 
                     return Result.success(status);
+                } catch (e) {
+                    throw new RepositoryError(this.className, e as Error);
                 }
-            )
-        } catch (e) {
-            const error = new RepositoryError(this.className, e as Error);
-            this.logger.logError(this.className, method, error, error.toJSON());
-            return Result.failure<Status, RepositoryError>(error);
-        }
+            }
+        )
+
+        return Result.fromObject<Status, RepositoryError>(rawResult);
     };
 
     public async updateDescription(id: number, newDescription: string): Promise<void> {
-        const method: string = "updateDescription";
         try {
             await StatusModel.update({description: newDescription}, {where: {id}});
         } catch (e) {
-            const error = new RepositoryError(this.className, e as Error);
-            this.logger.logError(this.className, method, error, error.toJSON());
+            throw new RepositoryError(this.className, e as Error);
         }
     };
 
     public async updateActive(id: number, newActive: StateEnum): Promise<void> {
-        const method: string = "updateActive";
         try {
             const convertedState: boolean = DataConverter.convertStateEnumToBoolean(newActive);
             await StatusModel.update({active: convertedState}, {where: {id}});
         } catch (e) {
-            const error = new RepositoryError(this.className, e as Error);
-            this.logger.logError(this.className, method, error, error.toJSON());
+            throw new RepositoryError(this.className, e as Error);
         }
     }
 
