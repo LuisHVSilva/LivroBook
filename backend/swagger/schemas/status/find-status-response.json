@@ -1,0 +1,36 @@
+{
+  "$ref": "#/definitions/FindStatusesResponseDTO",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "FindStatusesResponseDTO": {
+      "additionalProperties": false,
+      "properties": {
+        "page": {
+          "type": "number",
+          "example": "2",
+          "description": "Page number for paginated results. Each page contains up to 20 items."
+        },
+        "limit": {
+          "type": "number",
+          "example": "20",
+          "description": "Number of items per page. Maximum is 20. Defaults to 20 if not specified."
+        },
+        "totalPages": {
+          "type": "number",
+          "example": "1",
+          "description": "Number of pages"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/components/schemas/status/StatusDTO"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    }
+  }
+}

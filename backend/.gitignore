@@ -1,0 +1,10 @@
+##FOLDERS
+/.idea
+/LOGS/
+/node_modules/
+/database/
+
+##FILES
+.env
+*.bkp
+*.draio

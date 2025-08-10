@@ -1,0 +1,30 @@
+{
+  "$ref": "#/definitions/UpdateStatusDTO",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "UpdateStatusDTO": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": "1",
+          "description": "Unique identifier of the status."
+        },
+        "newActive": {
+          "type": "boolean",
+          "example": "true",
+          "description": "Filter by status activity. Use 'true' or 'false' as string values."
+        },
+        "newDescription": {
+          "type": "string",
+          "example": "ativo",
+          "description": "Text description of the status. Used to identify the status meaning."
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    }
+  }
+}

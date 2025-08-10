@@ -1,0 +1,37 @@
+{
+  "$ref": "#/definitions/FindStatusesDTO",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "FindStatusesDTO": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "string",
+          "example": "true",
+          "description": "Filter by status activity. Use 'true' or 'false' as string values."
+        },
+        "description": {
+          "type": "string",
+          "example": "ativo",
+          "description": "Text description of the status. Used to identify the status meaning."
+        },
+        "id": {
+          "type": "string",
+          "example": "1",
+          "description": "Unique identifier of the status."
+        },
+        "limit": {
+          "type": "string",
+          "example": "20",
+          "description": "Number of items per page. Maximum is 20. Defaults to 20 if not specified."
+        },
+        "page": {
+          "type": "string",
+          "example": "2",
+          "description": "Page number for paginated results. Each page contains up to 20 items."
+        }
+      },
+      "type": "object"
+    }
+  }
+}
