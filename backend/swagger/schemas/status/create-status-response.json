@@ -1,0 +1,34 @@
+{
+  "$ref": "#/definitions/CreateStatusResponseDTO",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CreateStatusResponseDTO": {
+      "additionalProperties": false,
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": "true"
+        },
+        "id": {
+          "type": "string",
+          "example:" : 1,
+          "description": "Auto-incremented data."
+        },
+        "description": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean",
+          "example": "0",
+          "description": "By default, new statuses are inactive upon creation."
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "active"
+      ],
+      "type": "object"
+    }
+  }
+}

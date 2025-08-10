@@ -1,28 +1,43 @@
-import {Result} from "@coreShared/types/Result";
 import {Transaction} from "sequelize";
+import {ResultType} from "@coreShared/types/result.type";
+import {FindAllType} from "@coreShared/types/findAll.type";
 
-export interface IBaseRepository<T, E> {
-    startTransaction(): Promise<Transaction>;
-
+export interface IBaseRepository<TEntity, TModel, TFilter> {
     /**
      * Create a new register.
-     *
-     * @param entity - The T entity.
+     * @param entity - The T entity to create.
+     * @param transaction - Optional transaction for database operations.
      * @returns A T object created.
      */
-    create(entity: T): Promise<Result<T, E>>;
+    create(entity: TEntity, transaction?: Transaction): Promise<ResultType<TEntity>>;
 
     /**
-     * Search for a T by its ID.
-     *
-     * @param id - The T ID to fetch.
-     * @returns A T object if found.
+     * @param limit - The maximum number of statuses to return.
+     * @param offset - The number of statuses to skip before starting to collect the result set.
+     * @param filter - Optional filter criteria to apply when searching for entity.
+     * @return A ResultType containing an array of StatusEntity objects and the total count of matching statuses.
      */
-    findById(id: number): Promise<Result<T, E>>;
+    findMany(limit: number,offset: number,filter?: TFilter): Promise<ResultType<FindAllType<TEntity>>>;
 
-    // findAll(): Promise<Result<T[]>>;
-    // updateById(id: string, entity: Partial<T>): Promise<Result<T>>;
-    // deleteById(id: string): Promise<Result<void>>;
-    // countByDescription(description: string): Promise<Result<number>>;
-    // existsById(id: string): Promise<Result<boolean>>;
+    /**
+     * Finds a single entity by its ID.
+     * @param id - Entity identifier.
+     */
+    findById(id: string | number): Promise<ResultType<TEntity>>;
+
+    /**
+     * Finds a single entity by filter.
+     * @param filter - Filter criteria to apply when searching for entity.
+     */
+    findOneByFilter(filter: TFilter): Promise<ResultType<TEntity>>;
+
+    /**
+     * Update a status entity.
+     *
+     * @param entity - The StatusEntity to be updated.
+     * @param transaction - Optional transaction for database operations.
+     * @param model - Optional model for additional operations.
+     * @returns A ResultType containing the updated StatusEntity.
+     */
+    update(entity: TEntity, transaction?: Transaction, model?: TModel): Promise<ResultType<boolean>>;
 }

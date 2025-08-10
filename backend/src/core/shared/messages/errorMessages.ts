@@ -5,5 +5,9 @@ export const ErrorMessages = {
     },
     Validation: {
         MESSAGE_NOT_REGISTERED: "Mensagem não cadastrada.",
+        VALUE_NOT_FOUND: "Nenhum valor foi encontrado.",
+    },
+    failure: {
+        transactionCreation: 'Nenhum transaction foi criada',
     }
 } as const;

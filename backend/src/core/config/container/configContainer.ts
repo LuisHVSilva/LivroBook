@@ -1,17 +1,19 @@
-// core/config/container/configContainer.ts
-import { container } from "tsyringe";
-import { Database } from "../database";
-import { Sequelize } from "sequelize-typescript";
-import { ILogger } from "@coreShared/logs/ILogger";
-import { Logger } from "@coreShared/logs/logger";
-import { ICache } from "@coreConfig/cache/ICache";
-import { RedisCache } from "@coreConfig/cache/RedisCache";
-import { CacheManager } from "@coreConfig/cache/CacheManager";
+import {container} from "tsyringe";
+import {Database} from "@coreConfig/database.config";
+import {ILogger} from "@coreShared/logs/ILogger";
+import {Logger} from "@coreShared/logs/Logger";
+import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
+import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 
-// Registra instâncias
-container.registerInstance(Sequelize, Database.getInstance());
+container.registerInstance("SequelizeInstance", Database.getInstance());
 container.registerSingleton<ILogger>("ILogger", Logger);
-container.registerSingleton<ICache>("ICache", RedisCache);
-container.registerSingleton("CacheManager", CacheManager);
+container.register<EntityUniquenessValidatorFactory>("EntityUniquenessValidatorFactory", {
+    useFactory: () => {
+        return <TEntity, TModel, TFilter>(
+            repo: IBaseRepository<TEntity, TModel, TFilter>
+        ) => new EntityUniquenessValidator<TEntity, TModel, TFilter>(repo);
+    }
+});
 
 export {container}

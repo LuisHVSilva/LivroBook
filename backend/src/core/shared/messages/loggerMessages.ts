@@ -2,7 +2,7 @@ export const LoggerMessages = {
     Info: {
         START_EXECUTION: "Início da execução.",
         EXECUTION_SUCCESS: "Execução bem sucedida",
-        RECEIVE_REQUEST: (input: string): string => `Recebendo request - input: ${input}`,
+        // RECEIVE_REQUEST: (input: string): string => `Recebendo request - input: ${input}`,
     },
     Error: {
         DIRECTORY_CREATION_FAILED: "❌ Erro ao criar diretório de logs.",

@@ -1,0 +1,24 @@
+{
+  "$ref": "#/definitions/StatusDto",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "StatusDto": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "example": "true"
+        },
+        "description": {
+          "type": "string",
+          "example": "ativo"
+        },
+        "id": {
+          "type": "number",
+          "example": "1"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

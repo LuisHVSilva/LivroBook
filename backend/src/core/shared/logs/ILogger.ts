@@ -1,36 +1,45 @@
 import { StatusCodes } from "http-status-codes";
+import {LoggerContext} from "@coreShared/logs/LoggerContext";
 
 export interface ILogger {
     /**
      * Logs an error message.
      *
-     * @param className - Name of the class associated with the log.
-     * @param method - Name of the method where the error occurred.
-     * @param error - Captured error object.
+     * @param context - Name of the class associated with the log.
+     * @param message - Descriptive error message.
+     * @param stack - Stack trace of the error, if available.
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logError(className: string, method: string, error: Error, info?: any, httpStatus?: StatusCodes): Promise<void>;
+    logError(context: LoggerContext, message: string, stack?: string, info?: any, httpStatus?: StatusCodes): Promise<void>;
 
     /**
      * Logs a warning message, useful for unexpected but non-critical events.
      *
-     * @param className - Name of the class associated with the log.
-     * @param method - Name of the method where the warning occurred.
+     * @param context - Name of the class associated with the log.
      * @param message - Descriptive warning message.
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logWarn(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
+    logWarn(context: LoggerContext, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
 
     /**
      * Logs an informational message, including success logs.
      *
-     * @param className - Name of the class associated with the log.
-     * @param method - Name of the method where the event occurred.
+     * @param context - Name of the class associated with the log.
      * @param message - Informational or success message.
      * @param httpStatus - HTTP status code, if applicable.
      * @param info - Additional context information.
      */
-    logInfo(className: string, method: string, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
+    logInfo(context: LoggerContext, message: string, httpStatus?: StatusCodes, info?: any): Promise<void>;
+
+    /**
+     * Logs an exception, typically used for unhandled errors.
+     *
+     * @param context - Name of the class associated with the log.
+     * @param error - The error object to log.
+     * @param info - Additional context information.
+     * @param httpStatus - HTTP status code, if applicable.
+     */
+    logException(context: LoggerContext, error: Error, info?: any, httpStatus?: StatusCodes): Promise<void>;
 }

@@ -1,13 +1,10 @@
-import "reflect-metadata";
 import express, {Application} from "express";
 import cors from "cors";
 import helmet from "helmet";
+import {router} from "./router";
 import morgan from "morgan";
-import {router} from "../http/router";
+import {Database} from "@coreConfig/database.config";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
-import {Database} from "@coreConfig/database";
-import swaggerUi from "swagger-ui-express";
-import {swaggerDocs} from "@coreConfig/swagger";
 
 class Server {
     private readonly app: Application;
@@ -26,7 +23,6 @@ class Server {
         this.app.use(morgan("dev")); // Logger HTTP
         this.app.use(express.json()); // Suporte a JSON
         this.app.use(express.urlencoded({extended: true}));
-        this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs)); // Documentação Swagger
     };
 
     private router(): void {
@@ -44,7 +40,7 @@ class Server {
                 console.log(`🔥 Server running on http://localhost:${this.PORT}`);
             });
         } catch (error) {
-
+            console.log(error);
         }
     };
 }

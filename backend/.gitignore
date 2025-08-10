@@ -1,7 +1,10 @@
-node_modules
+##FOLDERS
+/.idea
+/LOGS/
+/node_modules/
+/database/
+
+##FILES
 .env
-/LOGS
-migrations
-seeders
-/tests/coverage
-*.zip
+*.bkp
+*.draio
