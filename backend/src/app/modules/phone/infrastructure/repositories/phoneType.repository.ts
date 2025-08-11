@@ -5,7 +5,7 @@ import { PhoneTypeEntity } from "@phone/domain/entities/phoneType.entity";
 import {Transaction, WhereOptions} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
-import {FindFilterPhoneTypeDTO, PhoneTypeDTO} from "@phone/adapters/dtos/phoneType.dto";
+import {PhoneTypeFilterDTO, PhoneTypeDTO} from "@phone/adapters/dtos/phoneType.dto";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
 
@@ -25,8 +25,8 @@ export class PhoneTypeRepository implements IPhoneTypeRepository {
         return ResultType.success(restored);
     }
 
-    async findMany(limit: number, offset: number, filters?: FindFilterPhoneTypeDTO): Promise<ResultType<FindAllType<PhoneTypeEntity>>> {
-        const builder = new SequelizeWhereBuilderUtil<FindFilterPhoneTypeDTO>(filters, {
+    async findMany(limit: number, offset: number, filters?: PhoneTypeFilterDTO): Promise<ResultType<FindAllType<PhoneTypeEntity>>> {
+        const builder = new SequelizeWhereBuilderUtil<PhoneTypeFilterDTO>(filters, {
             id: { in: true },
             description: { like: true },
             statusId: { in: true },
@@ -51,7 +51,7 @@ export class PhoneTypeRepository implements IPhoneTypeRepository {
         return ResultType.success({entities: entities, total: total});
     }
 
-    async findOneByFilter(filter?: FindFilterPhoneTypeDTO): Promise<ResultType<PhoneTypeEntity>> {
+    async findOneByFilter(filter?: PhoneTypeFilterDTO): Promise<ResultType<PhoneTypeEntity>> {
         const where = this.buildWhereClause(filter)
 
         const model: PhoneTypeModel | null = await PhoneTypeModel.findOne({
@@ -83,14 +83,14 @@ export class PhoneTypeRepository implements IPhoneTypeRepository {
         return ResultType.success(true);
     }
 
-    private buildWhereClause(filters?: FindFilterPhoneTypeDTO): Partial<Record<keyof PhoneTypeDTO, any>> {
+    private buildWhereClause(filters?: PhoneTypeFilterDTO): Partial<Record<keyof PhoneTypeDTO, any>> {
         const where: Partial<Record<keyof PhoneTypeDTO, any>> = {};
 
         if (filters == null) return where;
 
-        if (filters.id !== undefined) where.id = filters.id[0];
+        if (filters.id !== undefined) where.id = filters.id;
         if (filters.description !== undefined) where.description = filters.description[0];
-        if (filters.statusId !== undefined) where.statusId = filters.statusId[0];
+        if (filters.statusId !== undefined) where.statusId = filters.statusId;
 
         return where;
     }

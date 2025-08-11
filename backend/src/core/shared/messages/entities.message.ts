@@ -26,12 +26,11 @@ export const EntitiesMessage = {
             nullInput: "Informe ao menos uma propriedade.",
             numberPositive: "O número deve ser positivo.",
             boolType: "O campo deve ser do tipo true ou false.",
-            invalidLen: (field: string, minLen: number, maxLen: number): string =>
-                `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
-            invalidMinDescriptionLen: (len: number) =>
-                `A descrição deve ter pelo menos ${len} caracteres.`,
-            invalidMaxDescriptionLen: (len: number) =>
-                `A descrição deve ter até ${len} caracteres.`,
+            transactionRequired: "Transação é obrigatória.",
+            invalidLen: (field: string, minLen: number, maxLen: number): string => `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
+            invalidMinDescriptionLen: (len: number) => `A descrição deve ter pelo menos ${len} caracteres.`,
+            invalidMaxDescriptionLen: (len: number) => `A descrição deve ter até ${len} caracteres.`,
+
         },
     },
 } as const;

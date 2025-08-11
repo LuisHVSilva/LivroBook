@@ -4,6 +4,7 @@ import {locationRouter} from "@location/adapters/routes/location.route";
 import {swaggerSpec} from "../../../swagger/swagger.config";
 import swaggerUi from 'swagger-ui-express';
 import {documentTypeRouter} from "@document/adapters/rountes/documentType.route";
+import {phoneRoute} from "@phone/adapters/routes/phone.route";
 
 
 const router: Router = Router();
@@ -13,5 +14,6 @@ router.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 router.use('/admin/status', statusRoutes);
 router.use('/admin/location', locationRouter);
 router.use('/admin/documentType', documentTypeRouter);
+router.use('/admin/phone', phoneRoute)
 
 export {router};
