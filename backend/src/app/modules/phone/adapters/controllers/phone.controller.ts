@@ -15,6 +15,8 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTypes.useCase";
 import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePhoneType.useCase";
 import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
+import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
+import {CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO} from "@phone/adapters/dtos/phoneCode.dto";
 
 @injectable()
 export class PhoneController implements IPhoneController {
@@ -23,6 +25,7 @@ export class PhoneController implements IPhoneController {
         @inject("IFindPhoneTypesUseCase") private readonly findPhoneTypesUseCase: IFindPhoneTypesUseCase,
         @inject("IUpdatePhoneTypeUseCase") private readonly updatePhoneTypeUseCase: IUpdatePhoneTypeUseCase,
         @inject("IDeletePhoneTypesUseCase") private readonly deletePhoneTypesUseCase: IDeletePhoneTypesUseCase,
+        @inject("ICreatePhoneCodeUseCase") private readonly createPhoneCodeUseCase: ICreatePhoneCodeUseCase,
     ) {
     }
 
@@ -78,5 +81,19 @@ export class PhoneController implements IPhoneController {
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
+    //#endregion
+
+    //#region PHONE CODE
+    async createPhoneCode(req: Request, res: Response): Promise<Response> {
+        const input: CreatePhoneCodeDTO = req.body;
+        const result: ResultType<CreatePhoneCodeResponseDTO> = await this.createPhoneCodeUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<CreatePhoneCodeResponseDTO>(res, result.unwrap(), StatusCodes.CREATED);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
     //#endregion
 }

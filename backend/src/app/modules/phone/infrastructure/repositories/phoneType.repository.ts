@@ -62,11 +62,6 @@ export class PhoneTypeRepository implements IPhoneTypeRepository {
         return model ? ResultType.success(this.mapper.toEntity(model)) : ResultType.none();
     }
 
-    async findByDescription(description: string): Promise<ResultType<PhoneTypeEntity>> {
-        const model: PhoneTypeModel | null = await PhoneTypeModel.findOne({ where: { description } });
-        return model ? ResultType.success(this.mapper.toEntity(model)) : ResultType.none();
-    }
-
     async findById(id: number): Promise<ResultType<PhoneTypeEntity>> {
         const model: PhoneTypeModel | null = await PhoneTypeModel.findByPk(id);
         return model ? ResultType.success(this.mapper.toEntity(model)) : ResultType.none();

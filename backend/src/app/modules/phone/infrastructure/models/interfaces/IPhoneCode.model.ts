@@ -3,8 +3,8 @@ import {StatusModel} from "@status/infrastructure/models/status.model";
 
 export interface IPhoneCodeModel {
     id: number;
-    ddiCode: string;
-    dddCode: string;
+    ddiCode: number;
+    dddCode: number;
     stateId: number;
     statusId: number;
     state?: StateModel;

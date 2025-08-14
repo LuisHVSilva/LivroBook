@@ -19,9 +19,17 @@ import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePho
 import {UpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/updatePhoneType.useCase";
 import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
 import {DeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/deletePhoneTypes.useCase";
+import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
+import {PhoneCodeService} from "@phone/domain/service/phoneCode.service";
+import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
+import {CreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/createPhoneCode.useCase";
+import {PhoneCodeMapper} from "@phone/infrastructure/mappers/phoneCode.mapper";
+import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
+import {PhoneCodeRepository} from "@phone/infrastructure/repositories/phoneCode.repository";
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);
+container.registerSingleton<IPhoneCodeService>("IPhoneCodeService", PhoneCodeService);
 //#endregion
 
 //#region UseCases
@@ -29,11 +37,16 @@ container.registerSingleton<ICreatePhoneTypeUseCase>("ICreatePhoneTypeUseCase", 
 container.registerSingleton<IFindPhoneTypesUseCase>("IFindPhoneTypesUseCase", FindPhoneTypesUseCase);
 container.registerSingleton<IUpdatePhoneTypeUseCase>("IUpdatePhoneTypeUseCase", UpdatePhoneTypeUseCase);
 container.registerSingleton<IDeletePhoneTypesUseCase>("IDeletePhoneTypesUseCase", DeletePhoneTypesUseCase);
+
+container.registerSingleton<ICreatePhoneCodeUseCase>("ICreatePhoneCodeUseCase", CreatePhoneCodeUseCase);
 // #endregion
 
 //#region Infrastructure
 container.registerSingleton<PhoneTypeMapper>("PhoneTypeMapper", PhoneTypeMapper);
 container.registerSingleton<IPhoneTypeRepository>("IPhoneTypeRepository", PhoneTypeRepository);
+
+container.registerSingleton<PhoneCodeMapper>("PhoneCodeMapper", PhoneCodeMapper);
+container.registerSingleton<IPhoneCodeRepository>("IPhoneCodeRepository", PhoneCodeRepository);
 //#endregion
 
 //#region Adapters

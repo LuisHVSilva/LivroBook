@@ -1,21 +1,29 @@
 import {BaseEntity} from "@coreShared/base/baseEntity";
 import {PhoneCodeValidator} from "@phone/domain/validations/phoneCode.validation";
-import {PhoneTypeProps} from "@phone/domain/entities/phoneType.entity";
 
 export interface PhoneCodeProps{
     id?: number;
-    ddiCode: string;
-    dddCode: string;
+    ddiCode: number;
+    dddCode: number;
     stateId: number;
     statusId: number;
 }
 
 export class PhoneCodeEntity extends BaseEntity<PhoneCodeProps>{
     //#region PROPERTIES
-    public static readonly MIN_DESC_DDI: number = 2;
-    public static readonly MAX_DESC_DDI: number = 10;
-    public static readonly MIN_DESC_DDD: number = 2;
-    public static readonly MAX_DESC_DDD: number = 20;
+    private static readonly MIN_DDI_DIGITS: number = 1;
+    public static readonly MIN_DDI_VALUE: number = Math.pow(10, this.MIN_DDI_DIGITS - 1);
+
+
+    private static readonly MAX_DDI_DIGITS: number = 4;
+    public static readonly MAX_DDI_VALUE: number = Math.pow(10, this.MAX_DDI_DIGITS) - 1;
+
+    private static readonly MIN_DDD_DIGITS: number = 1;
+    public static readonly MIN_DDD_VALUE: number = Math.pow(10, this.MIN_DDD_DIGITS - 1);
+
+    private static readonly MAX_DDD_DIGITS: number = 4;
+    public static readonly MAX_DDD_VALUE: number = Math.pow(10, this.MAX_DDD_DIGITS) - 1;
+
     public static readonly ENTITY_NAME: string = 'phone_code';
     //#endregion
 
@@ -33,11 +41,11 @@ export class PhoneCodeEntity extends BaseEntity<PhoneCodeProps>{
         return this.props.id;
     }
 
-    get ddiCode(): string {
+    get ddiCode(): number {
         return this.props.ddiCode;
     }
 
-    get dddCode(): string {
+    get dddCode(): number {
         return this.props.dddCode;
     }
 
@@ -52,8 +60,8 @@ export class PhoneCodeEntity extends BaseEntity<PhoneCodeProps>{
 
     //#region VALIDATION
     private validate(): void {
-        PhoneCodeValidator.validateDdiCodeLength(this.props.ddiCode, PhoneCodeEntity.MIN_DESC_DDI, PhoneCodeEntity.MAX_DESC_DDI);
-        PhoneCodeValidator.validateDddCodeLength(this.props.dddCode, PhoneCodeEntity.MIN_DESC_DDD, PhoneCodeEntity.MAX_DESC_DDD);
+        PhoneCodeValidator.validateDdiCodeLength(this.props.ddiCode, PhoneCodeEntity.MIN_DDI_VALUE, PhoneCodeEntity.MAX_DDI_VALUE);
+        PhoneCodeValidator.validateDddCodeLength(this.props.dddCode, PhoneCodeEntity.MIN_DDD_VALUE, PhoneCodeEntity.MAX_DDD_VALUE);
     }
     //#endregion
 
@@ -64,7 +72,7 @@ export class PhoneCodeEntity extends BaseEntity<PhoneCodeProps>{
     //#endregion
 
     //#region UPDATE
-    public update(props: Partial<PhoneTypeProps>): this {
+    public update(props: Partial<PhoneCodeProps>): this {
         return this.cloneWith(props);
     }
     //#endregion

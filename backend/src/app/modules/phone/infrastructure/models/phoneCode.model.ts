@@ -26,13 +26,13 @@ class PhoneCodeModel extends Model<InferAttributes<PhoneCodeModel>, InferCreatio
 
     @AllowNull(false)
     @Unique
-    @DbColumn(DataType.STRING(10))
-    declare ddiCode: string;
+    @DbColumn(DataType.NUMBER)
+    declare ddiCode: number;
 
     @AllowNull(false)
     @Unique
-    @DbColumn(DataType.STRING(20))
-    declare dddCode: string;
+    @DbColumn(DataType.NUMBER)
+    declare dddCode: number;
 
     @ForeignKey(() => StateModel)
     @AllowNull(false)
