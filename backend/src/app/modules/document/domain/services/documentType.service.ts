@@ -103,11 +103,10 @@ export class DocumentTypeService implements IDocumentTypeService {
 
     @LogError()
     async update(newData: UpdateDocumentTypeDTO, transaction: Transaction): Promise<DocumentTypeEntity> {
-        const dbEntityFound: ResultType<DocumentTypeEntity> = await this.repo.findById(newData.id);
+        const entityFound: DocumentTypeEntity | null = await this.getById(newData.id);
 
-        if (!dbEntityFound.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
+        if (!entityFound) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
 
-        const entityFound: DocumentTypeEntity = dbEntityFound.unwrapOrThrow();
         let updatedEntity: DocumentTypeEntity = entityFound.updateProps({
             description: newData.newDescription ?? entityFound.description,
             countryId: newData.newCountryId ?? entityFound.countryId,
@@ -120,6 +119,7 @@ export class DocumentTypeService implements IDocumentTypeService {
                 throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, this.DESCRIPTION));
             }
         }
+
         if(newData.newDescription || newData.newCountryId) {
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
             updatedEntity = updatedEntity.updateProps({ statusId: updatedStatusId});

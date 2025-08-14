@@ -1,5 +1,5 @@
 import {inject, injectable} from "tsyringe";
-import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneTypeUseCase";
+import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
 import {CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO} from "@phone/adapters/dtos/phoneType.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
