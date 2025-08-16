@@ -15,6 +15,7 @@ export const EntitiesMessage = {
         retrieval: {
             notFound: (entity: string) => `Nenhum valor encontrado para ${entity.toUpperCase()}.`,
             notFoundById: (id: string) => `Valor de id não encontrado: ${id.toString()}`,
+            notFoundForeignKey: (entity: string, id: number) => `Id ${id.toString()} não encontrado para ${entity.toUpperCase()}.`,
             notFoundGeneric: "Nenhum valor encontrado para os parâmetros passados.",
             inactiveStatus: 'Status está inativo. Favor entrar em contato com o administrador do sistema'
         },

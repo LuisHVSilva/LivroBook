@@ -16,7 +16,17 @@ import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTy
 import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePhoneType.useCase";
 import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
-import {CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO} from "@phone/adapters/dtos/phoneCode.dto";
+import {
+    CreatePhoneCodeDTO,
+    CreatePhoneCodeResponseDTO, DeletePhoneCodesDTO, DeletePhoneCodesResponseDTO,
+    FindPhoneCodesDTO,
+    FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO, UpdatePhoneCodeResponseDTO
+} from "@phone/adapters/dtos/phoneCode.dto";
+import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
+import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
+import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
+import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
+import {CreatePhoneDTO, CreatePhoneResponseDTO} from "@phone/adapters/dtos/phone.dto";
 
 @injectable()
 export class PhoneController implements IPhoneController {
@@ -26,6 +36,10 @@ export class PhoneController implements IPhoneController {
         @inject("IUpdatePhoneTypeUseCase") private readonly updatePhoneTypeUseCase: IUpdatePhoneTypeUseCase,
         @inject("IDeletePhoneTypesUseCase") private readonly deletePhoneTypesUseCase: IDeletePhoneTypesUseCase,
         @inject("ICreatePhoneCodeUseCase") private readonly createPhoneCodeUseCase: ICreatePhoneCodeUseCase,
+        @inject("IFindPhoneCodesUseCase") private readonly findPhoneCodesUseCase: IFindPhoneCodesUseCase,
+        @inject("IUpdatePhoneCodeUseCase") private readonly updatePhoneCodeUseCase: IUpdatePhoneCodeUseCase,
+        @inject("IDeletePhoneCodesUseCase") private readonly deletePhoneCodesUseCase: IDeletePhoneCodesUseCase,
+        @inject("ICreatePhoneUseCase") private readonly createPhoneUseCase: ICreatePhoneUseCase,
     ) {
     }
 
@@ -95,5 +109,58 @@ export class PhoneController implements IPhoneController {
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
+    async findPhoneCodes(req: Request, res: Response): Promise<Response> {
+        const input: FindPhoneCodesDTO = req.query as FindPhoneCodesDTO;
+        const result: ResultType<FindPhoneCodesResponseDTO> = await this.findPhoneCodesUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<FindPhoneCodesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        }
+
+        if (result.isNone()) {
+            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
+    async updatePhoneCode(req: Request, res: Response): Promise<Response> {
+        const input = req.body as UpdatePhoneCodeDTO;
+        const result: ResultType<UpdatePhoneCodeResponseDTO> = await this.updatePhoneCodeUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<UpdatePhoneCodeResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        }
+
+        if (result.isNone()) {
+            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
+    async deletePhoneCodes(req: Request, res: Response): Promise<Response> {
+        const input = req.query as DeletePhoneCodesDTO;
+        const result: ResultType<DeletePhoneCodesResponseDTO> = await this.deletePhoneCodesUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<DeletePhoneCodesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+    //#endregion
+
+    //#region PHONE
+    async createPhone(req: Request, res: Response): Promise<Response> {
+        const input: CreatePhoneDTO = req.body;
+        const result: ResultType<CreatePhoneResponseDTO> = await this.createPhoneUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<CreatePhoneResponseDTO>(res, result.unwrap(), StatusCodes.CREATED);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
     //#endregion
 }

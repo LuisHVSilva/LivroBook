@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {
-    CreatePhoneCodeDTO,
+    CreatePhoneCodeDTO, PhoneCodeDTO,
     PhoneCodeFilterDTO,
     UpdatePhoneCodeDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
@@ -16,6 +16,7 @@ import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
+import {IStateService} from "@location/domain/services/interfaces/IState.service";
 
 @injectable()
 export class PhoneCodeService implements IPhoneCodeService {
@@ -27,6 +28,7 @@ export class PhoneCodeService implements IPhoneCodeService {
     constructor(
         @inject("IPhoneCodeRepository") private readonly repo: IPhoneCodeRepository,
         @inject('IStatusService') private readonly statusService: IStatusService,
+        @inject('IStateService') private readonly stateService: IStateService,
     ) {
     }
 
@@ -79,21 +81,23 @@ export class PhoneCodeService implements IPhoneCodeService {
 
         if (!existing) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.PHONE_CODE));
 
-        let updatedEntity = existing.update({
+        let updatedEntity: PhoneCodeEntity = existing.update({
             dddCode: newData.newDddCode ?? existing.dddCode,
             ddiCode: newData.newDdiCode ?? existing.ddiCode,
-            stateId: newData.id ?? existing.stateId,
-            statusId: newData.id ?? existing.statusId,
+            stateId: newData.newStateId ?? existing.stateId,
+            statusId: newData.newStatusId ?? existing.statusId,
         })
+
+        await this.validateForeignKeys(updatedEntity)
 
         if (newData.newDdiCode || newData.newDddCode || newData.newStateId) {
             const isUnique: boolean = await this.isUniqueEntity(updatedEntity.ddiCode, updatedEntity.dddCode, updatedEntity.stateId);
 
             if (!isUnique) {
-                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValueGeneric);
+                return {entity: updatedEntity, updated: false};
             }
 
-            updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
+            updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 
         const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
@@ -106,7 +110,7 @@ export class PhoneCodeService implements IPhoneCodeService {
     @LogError()
     async delete(id: number, transaction: Transaction): Promise<void> {
         const entity: PhoneCodeEntity | null = await this.getById(id);
-        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.PHONE_CODE));
+        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundById(id.toString()));
 
         const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
 
@@ -117,7 +121,7 @@ export class PhoneCodeService implements IPhoneCodeService {
     }
 
     @LogError()
-    private async isUniqueEntity(ddiCode: string, dddCode: string, stateId: number): Promise<boolean> {
+    private async isUniqueEntity(ddiCode: number, dddCode: number, stateId: number): Promise<boolean> {
         const filter: PhoneCodeFilterDTO = {
             ddiCode,
             dddCode,
@@ -128,4 +132,24 @@ export class PhoneCodeService implements IPhoneCodeService {
 
         return result.total <= 0;
     }
+
+    @LogError()
+    private async validateForeignKeys(data: Partial<PhoneCodeDTO>): Promise<void> {
+        const validateExistence = async <T>(
+            field: keyof PhoneCodeDTO,
+            id: number | undefined,
+            service: { getById: (id: number) => Promise<T | null> }
+        ): Promise<void> => {
+            if (id == null) return;
+            if (!(await service.getById(id))) {
+                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
+            }
+        };
+
+        await Promise.all([
+            validateExistence("stateId", data.stateId, this.stateService),
+            validateExistence("statusId", data.statusId, this.statusService)
+        ]);
+    }
+
 }

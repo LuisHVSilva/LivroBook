@@ -3,8 +3,8 @@ import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {PhoneCodeModel} from "@phone/infrastructure/models/phoneCode.model";
 
 type PhoneCodePersistenceDTO = {
-    ddiCode: string;
-    dddCode: string;
+    ddiCode: number;
+    dddCode: number;
     stateId: number;
     statusId: number;
 };

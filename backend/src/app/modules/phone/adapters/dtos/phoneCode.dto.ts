@@ -31,13 +31,13 @@ export type CreatePhoneCodeResponseDTO = {
 }
 
 export type FindPhoneCodesDTO = {
-    ids?: number[];
-    ddiCodes?: number[];
-    dddCodes?: number[];
-    stateIds?: number[];
-    statusId?: number[];
-    page?: number;
-    limit?: number;
+    ids?: string[];
+    ddiCodes?: string[];
+    dddCodes?: string[];
+    statesIds?: string[];
+    statusesIds?: string[];
+    page?: string;
+    limit?: string;
 }
 
 export type FindPhoneCodesResponseDTO = {
@@ -63,10 +63,10 @@ export type UpdatePhoneCodeResponseDTO = {
     statusId: number;
 }
 
-export type DeletePhoneCodeDTO = {
+export type DeletePhoneCodesDTO = {
     ids: string;
 }
 
-export type DeletePhoneCodeResponseDTO = {
+export type DeletePhoneCodesResponseDTO = {
     message: string;
 }

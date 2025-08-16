@@ -7,4 +7,9 @@ export interface IPhoneController {
     deletePhoneTypes(req: Request, res: Response): Promise<Response>;
 
     createPhoneCode(req: Request, res: Response): Promise<Response>;
+    findPhoneCodes(req: Request, res: Response): Promise<Response>;
+    updatePhoneCode(req: Request, res: Response): Promise<Response>;
+    deletePhoneCodes(req: Request, res: Response): Promise<Response>;
+
+    createPhone(req: Request, res: Response): Promise<Response>;
 }

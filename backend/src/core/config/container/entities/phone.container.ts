@@ -26,10 +26,27 @@ import {CreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/createPhone
 import {PhoneCodeMapper} from "@phone/infrastructure/mappers/phoneCode.mapper";
 import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
 import {PhoneCodeRepository} from "@phone/infrastructure/repositories/phoneCode.repository";
+import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
+import {FindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/findPhoneCodes.useCase";
+import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
+import {UpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/updatePhoneCode.useCase";
+import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
+import {DeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/deletePhoneCodes.useCase";
+import {PhoneService} from "@phone/domain/service/phone.service";
+import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
+import {PhoneMapper} from "@phone/infrastructure/mappers/phone.mapper";
+import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {PhoneRepository} from "@phone/infrastructure/repositories/phone.repository";
+import {PhoneDTO} from "@phone/adapters/dtos/phone.dto";
+import {PhoneEntity} from "@phone/domain/entities/phone.entity";
+import {PhoneModel} from "@phone/infrastructure/models/phone.model";
+import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
+import {CreatePhoneUseCase} from "@phone/useCase/createPhone/createPhone.useCase";
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);
 container.registerSingleton<IPhoneCodeService>("IPhoneCodeService", PhoneCodeService);
+container.registerSingleton<IPhoneService>("IPhoneService", PhoneService);
 //#endregion
 
 //#region UseCases
@@ -39,14 +56,20 @@ container.registerSingleton<IUpdatePhoneTypeUseCase>("IUpdatePhoneTypeUseCase", 
 container.registerSingleton<IDeletePhoneTypesUseCase>("IDeletePhoneTypesUseCase", DeletePhoneTypesUseCase);
 
 container.registerSingleton<ICreatePhoneCodeUseCase>("ICreatePhoneCodeUseCase", CreatePhoneCodeUseCase);
+container.registerSingleton<IFindPhoneCodesUseCase>("IFindPhoneCodesUseCase", FindPhoneCodesUseCase);
+container.registerSingleton<IUpdatePhoneCodeUseCase>("IUpdatePhoneCodeUseCase", UpdatePhoneCodeUseCase);
+container.registerSingleton<IDeletePhoneCodesUseCase>("IDeletePhoneCodesUseCase", DeletePhoneCodesUseCase);
+
+container.registerSingleton<ICreatePhoneUseCase>("ICreatePhoneUseCase", CreatePhoneUseCase);
 // #endregion
 
 //#region Infrastructure
 container.registerSingleton<PhoneTypeMapper>("PhoneTypeMapper", PhoneTypeMapper);
 container.registerSingleton<IPhoneTypeRepository>("IPhoneTypeRepository", PhoneTypeRepository);
-
 container.registerSingleton<PhoneCodeMapper>("PhoneCodeMapper", PhoneCodeMapper);
 container.registerSingleton<IPhoneCodeRepository>("IPhoneCodeRepository", PhoneCodeRepository);
+container.registerSingleton<PhoneMapper>("PhoneMapper", PhoneMapper);
+container.registerSingleton<IPhoneRepository>("IPhoneRepository", PhoneRepository);
 //#endregion
 
 //#region Adapters
@@ -56,6 +79,8 @@ container.registerSingleton<IPhoneController>("IPhoneController", PhoneControlle
 //#region Validators
 container.registerSingleton<EntityUniquenessValidator<PhoneTypeEntity, PhoneTypeModel, PhoneTypeDTO>>("PhoneTypeUniquenessValidator", EntityUniquenessValidator);
 container.registerSingleton<IBaseRepository<any, any, any>>("PhoneTypeRepository", PhoneTypeRepository);
+container.registerSingleton<EntityUniquenessValidator<PhoneEntity, PhoneModel, PhoneDTO>>("PhoneUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IBaseRepository<any, any, any>>("PhoneRepository", PhoneRepository);
 //#endregion
 
 export {container};
