@@ -17,9 +17,10 @@ import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepo
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
 import {ServiceError} from "@coreShared/errors/service.error";
-import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+
 import {CreateResultType} from "@coreShared/types/crudResult.type";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 @injectable()
 export class StatusService implements IStatusService {

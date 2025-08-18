@@ -10,6 +10,8 @@ import {CreatePhoneCodeSchema} from "@phone/schemas/createPhoneCode.schema";
 import {UpdatePhoneCodeSchema} from "@phone/schemas/updatePhoneCode.schema";
 import {DeletePhoneCodesSchema} from "@phone/schemas/deletePhoneCodes.schema";
 import {CreatePhoneSchema} from "@phone/schemas/createPhone.schema";
+import {UpdatePhoneSchema} from "@phone/schemas/updatePhone.schema";
+import {DeletePhoneSchema} from "@phone/schemas/deletePhone.schema";
 
 const phoneController: IPhoneController = makePhoneController()
 const router = Router();
@@ -70,6 +72,23 @@ router.post(
     "/create",
     validateRequest(CreatePhoneSchema),
     asyncHandler((req, res) => phoneController.createPhone(req, res))
+)
+
+router.get(
+    "/findAll",
+    asyncHandler((req, res) => phoneController.findPhones(req, res))
+)
+
+router.patch(
+    "/update",
+    validateRequest(UpdatePhoneSchema),
+    asyncHandler((req, res) => phoneController.updatePhone(req, res))
+)
+
+router.delete(
+    "/delete",
+    validateRequest(DeletePhoneSchema, 'query'),
+    asyncHandler((req, res) => phoneController.deletePhone(req, res))
 )
 //#endregion
 

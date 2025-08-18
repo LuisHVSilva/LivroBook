@@ -37,4 +37,7 @@ export const EntitiesMessage = {
             nullFieldRequired: (field: string) => `O campo '${field}' é obrigatório`,
         },
     },
+    info: {
+        alreadyInactive: "As propriedades já foram apagadas."
+    }
 } as const;

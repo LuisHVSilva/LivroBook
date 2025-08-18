@@ -3,6 +3,7 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
 import {CreateResultType, UpdateResultType} from "@coreShared/types/crudResult.type";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
@@ -18,6 +19,7 @@ import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
 import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 
 @injectable()
 export class PhoneService implements IPhoneService {
@@ -89,11 +91,11 @@ export class PhoneService implements IPhoneService {
         if (!existing) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.PHONE));
 
         let updatedEntity: PhoneEntity = existing.update({
-            number: newData.newNumber ?? existing.number,
-            phoneCodeId: newData.newPhoneCodeId ?? existing.phoneCodeId,
-            phoneTypeId: newData.newPhoneTypeId ?? existing.phoneTypeId,
-            statusId: newData.newStatusId ?? existing.statusId,
-        })
+            number: newData.newNumber !== undefined ? newData.newNumber : existing.number,
+            phoneCodeId: newData.newPhoneCodeId !== undefined ? newData.newPhoneCodeId : existing.phoneCodeId,
+            phoneTypeId: newData.newPhoneTypeId !== undefined ? newData.newPhoneTypeId : existing.phoneTypeId,
+            statusId: newData.newStatusId !== undefined ? newData.newStatusId : existing.statusId,
+        });
 
         await this.validateForeignKeys(updatedEntity)
 
@@ -117,16 +119,49 @@ export class PhoneService implements IPhoneService {
     }
 
     @LogError()
-    async delete(id: number, transaction: Transaction): Promise<void> {
+    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
         const entity: PhoneEntity | null = await this.getById(id);
-        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundById(id.toString()));
+        if (!entity) return DeleteStatusEnum.NOT_FOUND;
 
         const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
 
-        if (entity.statusId === inactiveStatus.id) return;
+        if (entity.statusId === inactiveStatus.id) {
+            return DeleteStatusEnum.ALREADY_INACTIVE;
+        }
 
-        const deletedEntity: PhoneEntity = entity.update({statusId: inactiveStatus.id});
+        const deletedEntity: PhoneEntity = entity.update({ statusId: inactiveStatus.id });
         await this.repo.update(deletedEntity, transaction);
+
+        return DeleteStatusEnum.DELETED;
+    }
+
+    @LogError()
+    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
+        const deleted: number[] = [];
+        const alreadyInactive: number[] = [];
+        const notFound: number[] = [];
+
+        const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
+
+        for (const id of ids) {
+            const entity: PhoneEntity | null = await this.getById(id);
+
+            if (!entity) {
+                notFound.push(id);
+                continue;
+            }
+
+            if (entity.statusId === inactiveStatus.id) {
+                alreadyInactive.push(id);
+                continue;
+            }
+
+            const deletedEntity: PhoneEntity = entity.update({ statusId: inactiveStatus.id });
+            await this.repo.update(deletedEntity, transaction);
+            deleted.push(id);
+        }
+
+        return { deleted, alreadyInactive, notFound };
     }
 
     @LogError()
@@ -148,5 +183,4 @@ export class PhoneService implements IPhoneService {
             validateExistence("statusId", data.statusId, this.statusService)
         ]);
     }
-
 }

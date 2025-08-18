@@ -42,6 +42,12 @@ import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
 import {CreatePhoneUseCase} from "@phone/useCase/createPhone/createPhone.useCase";
+import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
+import {FindPhonesUseCase} from "@phone/useCase/findPhones/findPhones.useCase";
+import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCase";
+import {UpdatePhoneUseCase} from "@phone/useCase/updatePhone/updatePhone.useCase";
+import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
+import {DeletePhoneUseCase} from "@phone/useCase/deletePhone/deletePhone.useCase";
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);
@@ -61,6 +67,9 @@ container.registerSingleton<IUpdatePhoneCodeUseCase>("IUpdatePhoneCodeUseCase", 
 container.registerSingleton<IDeletePhoneCodesUseCase>("IDeletePhoneCodesUseCase", DeletePhoneCodesUseCase);
 
 container.registerSingleton<ICreatePhoneUseCase>("ICreatePhoneUseCase", CreatePhoneUseCase);
+container.registerSingleton<IFindPhonesUseCase>("IFindPhonesUseCase", FindPhonesUseCase);
+container.registerSingleton<IUpdatePhoneUseCase>("IUpdatePhoneUseCase", UpdatePhoneUseCase);
+container.registerSingleton<IDeletePhoneUseCase>("IDeletePhoneUseCase", DeletePhoneUseCase);
 // #endregion
 
 //#region Infrastructure

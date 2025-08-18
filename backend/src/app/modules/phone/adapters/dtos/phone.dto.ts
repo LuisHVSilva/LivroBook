@@ -31,7 +31,7 @@ export type CreatePhoneResponseDTO = {
     statusId: number;
 }
 
-export type FindPhoneDTO = {
+export type FindPhonesDTO = {
     ids: string[];
     numbers: string[];
     phoneCodesIds: string[];
@@ -41,7 +41,7 @@ export type FindPhoneDTO = {
     limit?: string;
 }
 
-export type FindPhoneResponseDTO = {
+export type FindPhonesResponseDTO = {
     page: number;
     limit: number;
     totalPages: number;
@@ -69,5 +69,9 @@ export type DeletePhoneDTO = {
 }
 
 export type DeletePhoneResponseDTO = {
-    message: string;
+    report: {
+        deleted: number[];
+        alreadyInactive: number[];
+        notFound: number[];
+    };
 }

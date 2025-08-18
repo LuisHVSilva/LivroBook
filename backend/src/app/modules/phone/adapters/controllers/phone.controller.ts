@@ -26,7 +26,15 @@ import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPho
 import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
 import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
-import {CreatePhoneDTO, CreatePhoneResponseDTO} from "@phone/adapters/dtos/phone.dto";
+import {
+    CreatePhoneDTO,
+    CreatePhoneResponseDTO, DeletePhoneDTO, DeletePhoneResponseDTO,
+    FindPhonesDTO,
+    FindPhonesResponseDTO, UpdatePhoneDTO, UpdatePhoneResponseDTO
+} from "@phone/adapters/dtos/phone.dto";
+import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
+import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCase";
+import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
 
 @injectable()
 export class PhoneController implements IPhoneController {
@@ -40,6 +48,9 @@ export class PhoneController implements IPhoneController {
         @inject("IUpdatePhoneCodeUseCase") private readonly updatePhoneCodeUseCase: IUpdatePhoneCodeUseCase,
         @inject("IDeletePhoneCodesUseCase") private readonly deletePhoneCodesUseCase: IDeletePhoneCodesUseCase,
         @inject("ICreatePhoneUseCase") private readonly createPhoneUseCase: ICreatePhoneUseCase,
+        @inject("IFindPhonesUseCase") private readonly findPhonesUseCase: IFindPhonesUseCase,
+        @inject("IUpdatePhoneUseCase") private readonly updatePhoneUseCase: IUpdatePhoneUseCase,
+        @inject("IDeletePhoneUseCase") private readonly deletePhoneUseCase: IDeletePhoneUseCase,
     ) {
     }
 
@@ -158,6 +169,47 @@ export class PhoneController implements IPhoneController {
 
         if (result.isSuccess()) {
             return ApiResponseUtil.success<CreatePhoneResponseDTO>(res, result.unwrap(), StatusCodes.CREATED);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
+    async findPhones(req: Request, res: Response): Promise<Response> {
+        const input: FindPhonesDTO = req.query as FindPhonesDTO;
+        const result: ResultType<FindPhonesResponseDTO> = await this.findPhonesUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<FindPhonesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        }
+
+        if (result.isNone()) {
+            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
+    async updatePhone(req: Request, res: Response): Promise<Response> {
+        const input = req.body as UpdatePhoneDTO;
+        const result: ResultType<UpdatePhoneResponseDTO> = await this.updatePhoneUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.success<UpdatePhoneResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        }
+
+        if (result.isNone()) {
+            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+        }
+
+        return ApiResponseUtil.handleResultError(res, result.getError());
+    }
+
+    async deletePhone(req: Request, res: Response): Promise<Response> {
+        const input = req.query as DeletePhoneDTO;
+        const result: ResultType<DeletePhoneResponseDTO> = await this.deletePhoneUseCase.execute(input);
+
+        if (result.isSuccess()) {
+            return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
