@@ -85,9 +85,9 @@ export class StatusRepository implements IStatusRepository {
 
         if (filters == null) return where;
 
-        if (filters.id !== undefined) where.id = filters.id[0];
-        if (filters.description !== undefined) where.description = filters.description[0];
-        if (filters.active !== undefined) where.active = filters.active[0];
+        if (filters.id !== undefined) where.id = filters.id;
+        if (filters.description !== undefined) where.description = filters.description;
+        if (filters.active !== undefined) where.active = filters.active;
 
         return where;
     }

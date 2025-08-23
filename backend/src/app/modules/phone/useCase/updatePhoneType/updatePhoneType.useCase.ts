@@ -5,7 +5,7 @@ import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
-import {UpdatePhoneTypeDTO, UpdatePhoneTypeResponseDTO} from "@phone/adapters/dtos/phoneType.dto";
+import {UpdatePhoneTypeDTO} from "@phone/adapters/dtos/phoneType.dto";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
@@ -20,18 +20,14 @@ export class UpdatePhoneTypeUseCase implements IUpdatePhoneTypeUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(request: UpdatePhoneTypeDTO, transaction?: Transaction): Promise<ResultType<UpdatePhoneTypeResponseDTO>> {
+    async execute(request: UpdatePhoneTypeDTO, transaction?: Transaction): Promise<ResultType< UpdateResultType<PhoneTypeEntity>>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
         try {
             const updated: UpdateResultType<PhoneTypeEntity> = await this.phoneTypeService.update(request, transaction);
 
-            return ResultType.success({
-                id: updated.entity.id!,
-                description: updated.entity.description,
-                statusId: updated.entity.statusId
-            });
+            return ResultType.success(updated);
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

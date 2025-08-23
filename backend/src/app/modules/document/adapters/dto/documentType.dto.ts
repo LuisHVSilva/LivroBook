@@ -27,10 +27,10 @@ export type CreateDocumentTypeResponseDTO = {
 }
 
 export type FindDocumentTypesDTO = {
-    ids?: string[];
-    descriptions?: string[];
-    countiesIds?: string[];
-    statusesIds?: string[];
+    id?: string[];
+    description?: string[];
+    countryId?: string[];
+    statusId?: string[];
     page?: string;
     limit?: string;
 };
@@ -44,22 +44,7 @@ export type FindDocumentTypesResponseDTO = {
 
 export type UpdateDocumentTypeDTO = {
     id: number;
-    newDescription?: string;
-    newCountryId?: number;
-    newStatusId?: number;
-}
-
-export type UpdateDocumentTypeResponseDTO = {
-    id: number;
-    description: string;
-    countryId: number;
-    statusId: number;
-}
-
-export type DeleteDocumentTypesDTO = {
-    ids: string;
-}
-
-export type DeleteDocumentTypesResponseDTO = {
-    message: string;
+    description?: string;
+    countryId?: number;
+    statusId?: number;
 }

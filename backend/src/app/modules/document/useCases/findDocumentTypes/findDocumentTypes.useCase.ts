@@ -27,7 +27,7 @@ export class FindDocumentTypesUseCase implements IFindDocumentTypesUseCase {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
-            const {entities, total}: FindAllType<DocumentTypeEntity> = await this.documentTypeService.getAll(filter, page, limit);
+            const {entities, total}: FindAllType<DocumentTypeEntity> = await this.documentTypeService.findMany(filter, page, limit);
 
             return ResultType.success({
                 page,
@@ -43,9 +43,9 @@ export class FindDocumentTypesUseCase implements IFindDocumentTypesUseCase {
 
     private mapLocationFilter(input: FindDocumentTypesDTO): DocumentTypeFilterDTO {
         return {
-            description: StringUtil.parseCsvFilter(input.descriptions?.toString(), String),
-            countryId: StringUtil.parseCsvFilter(input.countiesIds?.toString(), Number),
-            statusId: StringUtil.parseCsvFilter(input.statusesIds?.toString(), Number),
+            description: StringUtil.parseCsvFilter(input.description?.toString(), String),
+            countryId: StringUtil.parseCsvFilter(input.countryId?.toString(), Number),
+            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
         };
     }
 }

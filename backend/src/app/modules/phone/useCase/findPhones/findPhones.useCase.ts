@@ -22,7 +22,7 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
-            const phones: FindAllType<PhoneDTO> = await this.service.getAll(filter, page, limit);
+            const phones: FindAllType<PhoneDTO> = await this.service.findMany(filter, page, limit);
 
             return ResultType.success({
                 page,
@@ -37,11 +37,11 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
 
     private mapPhoneFilter(input: FindPhonesDTO): PhoneFilterDTO {
         return {
-            id: StringUtil.parseCsvFilter(input.ids?.toString(), Number),
-            number: StringUtil.parseCsvFilter(input.numbers?.toString(), String),
-            phoneCodeId: StringUtil.parseCsvFilter(input.phoneCodesIds?.toString(), Number),
-            phoneTypeId: StringUtil.parseCsvFilter(input.phoneTypesIds?.toString(), Number),
-            statusId: StringUtil.parseCsvFilter(input.statusesIds?.toString(), Number)
+            id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
+            number: StringUtil.parseCsvFilter(input.number?.toString(), String),
+            phoneCodeId: StringUtil.parseCsvFilter(input.phoneCodeId?.toString(), Number),
+            phoneTypeId: StringUtil.parseCsvFilter(input.phoneTypeId?.toString(), Number),
+            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number)
         }
     }
 }

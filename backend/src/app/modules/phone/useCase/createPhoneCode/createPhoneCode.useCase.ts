@@ -7,7 +7,6 @@ import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {Transactional} from "@coreShared/decorators/Transactional";
 
@@ -26,14 +25,14 @@ export class CreatePhoneCodeUseCase implements ICreatePhoneCodeUseCase {
         }
 
         try {
-            const created: CreateResultType<PhoneCodeEntity> = await this.service.create(input, transaction);
+            const created: PhoneCodeEntity = await this.service.create(input, transaction);
 
             return ResultType.success({
-                id: created.entity.id!,
-                ddiCode: created.entity.ddiCode,
-                dddCode: created.entity.dddCode,
-                stateId: created.entity.stateId,
-                statusId: created.entity.statusId
+                id: created.id!,
+                ddiCode: created.ddiCode,
+                dddCode: created.dddCode,
+                stateId: created.stateId,
+                statusId: created.statusId
             })
 
         } catch (error) {

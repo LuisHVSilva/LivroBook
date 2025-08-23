@@ -1,20 +1,33 @@
 import {CreateStatusDTO, FindFilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
 import {Transaction} from "sequelize";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {FindAllType} from "@coreShared/types/findAll.type";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
 export interface IStatusService {
-     create(data: CreateStatusDTO, transaction: Transaction): Promise<CreateResultType<StatusEntity>>;
-     get(filter: FindFilterStatusDTO): Promise<StatusEntity | null>;
-     getById(id: number): Promise<StatusEntity | null>;
-     getStatusActiveById(id: number): Promise<StatusEntity>;
-     findByDescription(description: string): Promise<StatusEntity | null>;
-     findStausActiveByDescription(description: string): Promise<StatusEntity>;
-     findAll(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>>;
-     delete(id: number[], transaction: Transaction): Promise<void>;
-     update(newData: UpdateStatusDTO, transaction: Transaction): Promise<StatusEntity>;
-     getStatusForNewEntities(): Promise<StatusEntity>;
-     getStatusForUpdateEntities(): Promise<StatusEntity>;
-     getStatusForInactiveEntities(): Promise<StatusEntity>;
+    create(data: CreateStatusDTO, transaction: Transaction): Promise<StatusEntity>;
+
+    getById(id: number): Promise<StatusEntity>;
+
+    getStatusActiveById(id: number): Promise<StatusEntity>;
+
+    getByDescription(description: string): Promise<StatusEntity | null>;
+
+    getStausActiveByDescription(description: string): Promise<StatusEntity>;
+
+    findMany(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>>;
+
+    getStatusForNewEntities(): Promise<StatusEntity>;
+
+    getStatusForUpdateEntities(): Promise<StatusEntity>;
+
+    getStatusForInactiveEntities(): Promise<StatusEntity>;
+
+    update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<StatusEntity>>;
+
+    delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
+
+    deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
 }

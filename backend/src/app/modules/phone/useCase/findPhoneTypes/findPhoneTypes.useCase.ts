@@ -27,7 +27,7 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
-            const phoneTypes: FindAllType<PhoneTypeDTO> = await this.phoneTypeService.getAll(filter, page, limit);
+            const phoneTypes: FindAllType<PhoneTypeDTO> = await this.phoneTypeService.findMany(filter, page, limit);
 
             return ResultType.success({
                 page,
@@ -42,8 +42,9 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
 
     private mapPhoneTypesFilter(input: FindPhoneTypesDTO): PhoneTypeFilterDTO {
         return {
-            description: StringUtil.parseCsvFilter(input.descriptions?.toString(), String),
-            statusId: StringUtil.parseCsvFilter(input.statusesIds?.toString(), Number),
+            id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
+            description: StringUtil.parseCsvFilter(input.description?.toString(), String),
+            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
         };
     }
 }

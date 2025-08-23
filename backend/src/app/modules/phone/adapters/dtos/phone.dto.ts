@@ -32,11 +32,11 @@ export type CreatePhoneResponseDTO = {
 }
 
 export type FindPhonesDTO = {
-    ids: string[];
-    numbers: string[];
-    phoneCodesIds: string[];
-    phoneTypesIds: string[];
-    statusesIds: string[];
+    id: string[];
+    number: string[];
+    phoneCodeId: string[];
+    phoneTypeId: string[];
+    statusId: string[];
     page?: string;
     limit?: string;
 }
@@ -50,28 +50,8 @@ export type FindPhonesResponseDTO = {
 
 export type UpdatePhoneDTO = {
     id: number;
-    newNumber?: string;
-    newPhoneCodeId?: number;
-    newPhoneTypeId?: number;
-    newStatusId?: number;
-}
-
-export type UpdatePhoneResponseDTO = {
-    id: number;
-    number: string;
-    phoneCodeId: number;
-    phoneTypeId: number;
-    statusId: number;
-}
-
-export type DeletePhoneDTO = {
-    ids: string;
-}
-
-export type DeletePhoneResponseDTO = {
-    report: {
-        deleted: number[];
-        alreadyInactive: number[];
-        notFound: number[];
-    };
+    number?: string;
+    phoneCodeId?: number;
+    phoneTypeId?: number;
+    statusId?: number;
 }

@@ -4,6 +4,7 @@ export interface DeleteReport {
     alreadyInactive: number[];
 }
 
+/*
 export class OperationReportUtil {
     static summarizeDelete(report: DeleteReport) {
         const total: number = report.deleted.length + report.notFound.length + report.alreadyInactive.length;
@@ -23,3 +24,4 @@ export class OperationReportUtil {
         return { status: "PARTIAL" as const };
     }
 }
+*/

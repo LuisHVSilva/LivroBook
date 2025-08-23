@@ -14,7 +14,7 @@ import {
 } from "@document/adapters/dto/documentType.dto";
 import {Transaction} from "sequelize";
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {LogError} from "@coreShared/decorators/LogError";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
 import {ResultType} from "@coreShared/types/result.type";
@@ -24,6 +24,9 @@ import {FindAllType} from "@coreShared/types/findAll.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {ServiceError} from "@coreShared/errors/service.error";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 
 @injectable()
 export class DocumentTypeService implements IDocumentTypeService {
@@ -39,13 +42,16 @@ export class DocumentTypeService implements IDocumentTypeService {
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
         @inject("DocumentTypeRepository") documentTypeRepository: IBaseRepository<DocumentTypeEntity, DocumentTypeModel, DocumentTypeDTO>,
         @inject('IStatusService') private readonly statusService: IStatusService,
+        @inject("ICountryService") private readonly countryService: ICountryService,
     ) {
         this.uniquenessValidator = validatorFactory(documentTypeRepository);
     }
+
     //#endregion
 
+    //#region CREATE
     @LogError()
-    async create(data: CreateDocumentTypeDTO, transaction: Transaction): Promise<CreateResultType<DocumentTypeEntity>> {
+    async create(data: CreateDocumentTypeDTO, transaction: Transaction): Promise<DocumentTypeEntity> {
         const status: StatusEntity = await this.statusService.getStatusForNewEntities();
         const statusId: number = status.id!;
 
@@ -55,32 +61,30 @@ export class DocumentTypeService implements IDocumentTypeService {
             statusId: statusId
         });
 
+        await this.validateForeignKeys(entity);
+
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
 
-        if (!isUnique) {
-            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, 'description'));
-        }
+        if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, 'description'));
 
-        const created: DocumentTypeEntity = (await this.repo.create(entity, transaction)).unwrapOrThrow();
+        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
+    }
 
-        return {entity: created, created: true};
+    //#endregion
+
+    //#region READ
+    @LogError()
+    async getById(id: number): Promise<DocumentTypeEntity> {
+        const found: ResultType<DocumentTypeEntity> = await this.repo.findById(id);
+        const entity: DocumentTypeEntity | null = found.unwrapOrNull();
+
+        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
+
+        return entity;
     }
 
     @LogError()
-    async getOneByFilter(filter: DocumentTypeFilterDTO): Promise<DocumentTypeEntity | null> {
-        if (filter.description) {
-            filter.description = DocumentTypeTransform.normalizeDescription(filter.description[0]);
-        }
-
-        const found: ResultType<DocumentTypeEntity | null> = await this.repo.findOneByFilter(filter);
-
-        if (!found.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
-
-        return found.unwrapOrNull();
-    }
-
-    @LogError()
-    async getAll(filter?: DocumentTypeFilterDTO, page?: number, limit?: number): Promise<FindAllType<DocumentTypeEntity>> {
+    async findMany(filter?: DocumentTypeFilterDTO, page?: number, limit?: number): Promise<FindAllType<DocumentTypeEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -96,54 +100,119 @@ export class DocumentTypeService implements IDocumentTypeService {
         return found.unwrap();
     }
 
+    //#endregion
+
+    //#region UPDATE
     @LogError()
-    async getById(id: number): Promise<DocumentTypeEntity | null> {
-        return (await this.repo.findById(id)).unwrapOrNull() ?? null;
-    }
+    async update(newData: UpdateDocumentTypeDTO, transaction: Transaction): Promise<UpdateResultType<DocumentTypeEntity>> {
+        const entity: DocumentTypeEntity = await this.getById(newData.id);
 
-    @LogError()
-    async update(newData: UpdateDocumentTypeDTO, transaction: Transaction): Promise<DocumentTypeEntity> {
-        const entityFound: DocumentTypeEntity | null = await this.getById(newData.id);
+        const updatedProps: Partial<DocumentTypeDTO> = {
+            description: newData.description ?? entity.description,
+            countryId: newData.countryId ?? entity.countryId,
+            statusId: newData.statusId ?? entity.statusId,
+        };
 
-        if (!entityFound) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
+        let updatedEntity: DocumentTypeEntity = entity.updateProps(updatedProps);
 
-        let updatedEntity: DocumentTypeEntity = entityFound.updateProps({
-            description: newData.newDescription ?? entityFound.description,
-            countryId: newData.newCountryId ?? entityFound.countryId,
-            statusId: newData.newStatusId ?? entityFound.statusId,
-        });
+        await this.validateForeignKeys(updatedEntity);
 
-        if (newData.newDescription && entityFound.description !== newData.newDescription) {
-            const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.newDescription);
+        if (updatedEntity.isEqual(entity)) {
+            return { entity: entity, updated: false };
+        }
+
+        const descriptionChanged: boolean = newData.description !== entity.description;
+        const countryChanged: boolean = newData.countryId !== entity.countryId;
+
+        if (descriptionChanged || countryChanged) {
+            const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
             if (!isUnique) {
                 throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, this.DESCRIPTION));
             }
+
+            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
+            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
         }
 
-        if(newData.newDescription || newData.newCountryId) {
-            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.updateProps({ statusId: updatedStatusId});
-        }
 
         const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
-
-        if (!updated.isSuccess() || (updated.isSuccess()) && !updated.unwrap()) {
+        if (!updated.isSuccess()) {
             throw new ServiceError(EntitiesMessage.error.failure.update(this.DOCUMENT_TYPE));
         }
 
-        return updatedEntity;
+        return {entity: updatedEntity, updated: true};
     }
 
+    //#endregion
+
+    //#region DELETE
     @LogError()
-    async delete(id: number, transaction: Transaction): Promise<void> {
-        const entity: DocumentTypeEntity | null = await this.getById(id);
-        if (!entity)  throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
+    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
+        let entity: DocumentTypeEntity;
+
+        try {
+            entity = await this.getById(id);
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return DeleteStatusEnum.NOT_FOUND;
+            }
+            throw error;
+        }
 
         const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
 
-        if(entity.statusId === inactiveStatus.id) return;
+        if (entity.statusId === inactiveStatus.id) {
+            return DeleteStatusEnum.ALREADY_INACTIVE;
+        }
 
-        const deletedEntity: DocumentTypeEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
         await this.repo.update(deletedEntity, transaction);
+
+        return DeleteStatusEnum.DELETED;
+    }
+
+    @LogError()
+    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
+        const deleted: number[] = [];
+        const alreadyInactive: number[] = [];
+        const notFound: number[] = [];
+
+        for (const id of ids) {
+            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
+
+            switch (deleteEntityResult) {
+                case DeleteStatusEnum.DELETED:
+                    deleted.push(id);
+                    break;
+                case DeleteStatusEnum.ALREADY_INACTIVE:
+                    alreadyInactive.push(id);
+                    break;
+                default:
+                    notFound.push(id);
+                    break;
+            }
+        }
+
+        return {deleted, alreadyInactive, notFound};
+    }
+    //#endregion
+
+    @LogError()
+    private async validateForeignKeys(data: Partial<DocumentTypeDTO>): Promise<void> {
+        const validateExistence = async <T>(
+            field: keyof DocumentTypeDTO,
+            id: number | undefined,
+            service: { getById: (id: number) => Promise<T | null> }
+        ): Promise<void> => {
+            if (id == null) return;
+            if (!(await service.getById(id))) {
+                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
+            }
+        };
+
+        await Promise.all([
+            validateExistence("countryId", data.countryId, this.countryService),
+            validateExistence("statusId", data.statusId, this.statusService)
+        ]);
     }
 }

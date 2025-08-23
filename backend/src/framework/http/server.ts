@@ -5,7 +5,7 @@ import {router} from "./router";
 import morgan from "morgan";
 import {Database} from "@coreConfig/database.config";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
-import '../../core/shared/validators/zodConfig';
+import '../../core/config/zod.config';
 
 class Server {
     private readonly app: Application;

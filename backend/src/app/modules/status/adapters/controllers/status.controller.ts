@@ -12,11 +12,14 @@ import {IUpdateStatusUseCase} from "@status/useCases/updateStatus/IUpdateStatus.
 import {IDeleteStatusUseCase} from "@status/useCases/deleteStatus/IDeleteStatus.useCase";
 import {
     CreateStatusDTO,
-    CreateStatusResponseDTO, DeleteStatusDTO, DeleteStatusResponseDTO,
+    CreateStatusResponseDTO,
     FindStatusesDTO,
-    FindStatusesResponseDTO, UpdateStatusDTO, UpdateStatusResponseDTO
+    FindStatusesResponseDTO,
+    UpdateStatusDTO
 } from "@status/adapters/dtos/status.dto";
-import {EntitiesMessage} from "@coreShared/messages/entities.message";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {StatusEntity} from "@status/domain/entities/status.entity";
 
 @injectable()
 export class StatusController implements IStatusController {
@@ -47,9 +50,6 @@ export class StatusController implements IStatusController {
         if (result.isSuccess()) {
             return ApiResponseUtil.success<FindStatusesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
         }
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
-        }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
@@ -57,13 +57,10 @@ export class StatusController implements IStatusController {
     @LogExecution()
     async updateStatus(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateStatusDTO;
-        const result: ResultType<UpdateStatusResponseDTO> = await this.updateStatusUseCase.execute(input);
-        if (result.isSuccess()) {
-            return ApiResponseUtil.success<UpdateStatusResponseDTO>(res, result.unwrap(), StatusCodes.OK);
-        }
+        const result: ResultType<UpdateResultType<StatusEntity>> = await this.updateStatusUseCase.execute(input);
 
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundById(input.id.toString()));
+        if (result.isSuccess()) {
+            return ApiResponseUtil.handleUpdateResult<StatusEntity>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
@@ -71,15 +68,11 @@ export class StatusController implements IStatusController {
 
     @LogExecution()
     async deleteStatus(req: Request, res: Response): Promise<Response> {
-        const input: DeleteStatusDTO = req.query as DeleteStatusDTO;
-        const result: ResultType<DeleteStatusResponseDTO> = await this.deleteStatusUseCase.execute(input);
+        const input: DeleteRequestDTO = req.query as DeleteRequestDTO;
+        const result: ResultType<DeleteResponseDTO> = await this.deleteStatusUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<DeleteStatusResponseDTO>(res, result.unwrap(), StatusCodes.OK);
-        }
-
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundById(input.id.toString()));
+            return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());

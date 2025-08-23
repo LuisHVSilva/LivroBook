@@ -1,7 +1,8 @@
 import { z } from "zod";
-import {EntitiesMessage} from "@coreShared/messages/entities.message";
+import {ZodValidator} from "@coreShared/validators/zod.validator";
+import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
 
 export const CreateDocumentTypeSchema = z.object({
-    description: z.string().nonempty(EntitiesMessage.error.validation.descriptionRequired),
-    countryId: z.number().int().positive(EntitiesMessage.error.validation.idType),
+    description: ZodValidator.stringInputValue(DocumentTypeEntity.MIN_DESC, DocumentTypeEntity.MAX_DESC),
+    countryId: ZodValidator.intInputValue(),
 });

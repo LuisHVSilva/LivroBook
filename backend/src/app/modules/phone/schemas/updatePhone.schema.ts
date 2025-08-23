@@ -1,9 +1,11 @@
 import { z } from "zod";
+import {ZodValidator} from "@coreShared/validators/zod.validator";
+import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 
 export const UpdatePhoneSchema = z.object({
-    id: z.number().int().positive(),
-    newNumber: z.string().min(4).optional(),
-    newPhoneCodeId: z.number().int().positive().optional(),
-    newPhoneTypeId: z.number().int().positive().optional(),
-    newStatusId: z.number().int().positive().optional(),
+    id: ZodValidator.intInputValue(),
+    number: ZodValidator.stringInputValue(PhoneEntity.MIN_NUMBER, PhoneEntity.MAX_NUMBER, true),
+    phoneCodeId: ZodValidator.intInputValue(undefined, undefined, true),
+    phoneTypeId: ZodValidator.intInputValue(undefined, undefined, true),
+    statusId: ZodValidator.intInputValue(undefined, undefined, true),
 });

@@ -6,10 +6,8 @@ import {StatusCodes} from "http-status-codes";
 import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
 import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
 import {
-    CreatePhoneTypeDTO,
-    CreatePhoneTypeResponseDTO, DeletePhoneTypesDTO, DeletePhoneTypesResponseDTO,
-    FindPhoneTypesDTO,
-    FindPhoneTypesResponseDTO, UpdatePhoneTypeDTO, UpdatePhoneTypeResponseDTO
+    CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO, FindPhoneTypesDTO,
+    FindPhoneTypesResponseDTO, UpdatePhoneTypeDTO
 } from "@phone/adapters/dtos/phoneType.dto";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTypes.useCase";
@@ -17,24 +15,25 @@ import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePho
 import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
 import {
-    CreatePhoneCodeDTO,
-    CreatePhoneCodeResponseDTO, DeletePhoneCodesDTO, DeletePhoneCodesResponseDTO,
-    FindPhoneCodesDTO,
-    FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO, UpdatePhoneCodeResponseDTO
+    CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO, FindPhoneCodesDTO,
+    FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
 import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
 import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
 import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
 import {
-    CreatePhoneDTO,
-    CreatePhoneResponseDTO, DeletePhoneDTO, DeletePhoneResponseDTO,
-    FindPhonesDTO,
-    FindPhonesResponseDTO, UpdatePhoneDTO, UpdatePhoneResponseDTO
+    CreatePhoneDTO, CreatePhoneResponseDTO, FindPhonesDTO,
+    FindPhonesResponseDTO, UpdatePhoneDTO
 } from "@phone/adapters/dtos/phone.dto";
 import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
 import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCase";
 import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
+import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
+import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
+import {PhoneEntity} from "@phone/domain/entities/phone.entity";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 
 @injectable()
 export class PhoneController implements IPhoneController {
@@ -83,29 +82,26 @@ export class PhoneController implements IPhoneController {
 
     async updatePhoneType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneTypeDTO;
-        const result: ResultType<UpdatePhoneTypeResponseDTO> = await this.updatePhoneTypeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<PhoneTypeEntity>> = await this.updatePhoneTypeUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<UpdatePhoneTypeResponseDTO>(res, result.unwrap(), StatusCodes.OK);
-        }
-
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+            return ApiResponseUtil.handleUpdateResult<PhoneTypeEntity>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
     async deletePhoneTypes(req: Request, res: Response): Promise<Response> {
-        const input = req.query as DeletePhoneTypesDTO;
-        const result: ResultType<DeletePhoneTypesResponseDTO> = await this.deletePhoneTypesUseCase.execute(input);
+        const input = req.query as DeleteRequestDTO;
+        const result: ResultType<DeleteResponseDTO> = await this.deletePhoneTypesUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<DeletePhoneTypesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+            return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
+
     //#endregion
 
     //#region PHONE CODE
@@ -137,29 +133,26 @@ export class PhoneController implements IPhoneController {
 
     async updatePhoneCode(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneCodeDTO;
-        const result: ResultType<UpdatePhoneCodeResponseDTO> = await this.updatePhoneCodeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<PhoneCodeEntity>> = await this.updatePhoneCodeUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<UpdatePhoneCodeResponseDTO>(res, result.unwrap(), StatusCodes.OK);
-        }
-
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+            return ApiResponseUtil.handleUpdateResult<PhoneCodeEntity>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
     async deletePhoneCodes(req: Request, res: Response): Promise<Response> {
-        const input = req.query as DeletePhoneCodesDTO;
-        const result: ResultType<DeletePhoneCodesResponseDTO> = await this.deletePhoneCodesUseCase.execute(input);
+        const input = req.query as DeleteRequestDTO;
+        const result: ResultType<DeleteResponseDTO> = await this.deletePhoneCodesUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<DeletePhoneCodesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+            return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
+
     //#endregion
 
     //#region PHONE
@@ -191,22 +184,18 @@ export class PhoneController implements IPhoneController {
 
     async updatePhone(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneDTO;
-        const result: ResultType<UpdatePhoneResponseDTO> = await this.updatePhoneUseCase.execute(input);
+        const result: ResultType<UpdateResultType<PhoneEntity>> = await this.updatePhoneUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.success<UpdatePhoneResponseDTO>(res, result.unwrap(), StatusCodes.OK);
-        }
-
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
+            return ApiResponseUtil.handleUpdateResult<PhoneEntity>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
     async deletePhone(req: Request, res: Response): Promise<Response> {
-        const input = req.query as DeletePhoneDTO;
-        const result: ResultType<DeletePhoneResponseDTO> = await this.deletePhoneUseCase.execute(input);
+        const input = req.query as DeleteRequestDTO;
+        const result: ResultType<DeleteResponseDTO> = await this.deletePhoneUseCase.execute(input);
 
         if (result.isSuccess()) {
             return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
@@ -214,5 +203,6 @@ export class PhoneController implements IPhoneController {
 
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
+
     //#endregion
 }

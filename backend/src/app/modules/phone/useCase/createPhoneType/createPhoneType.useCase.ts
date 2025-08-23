@@ -8,7 +8,6 @@ import {Transaction} from "sequelize";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 @injectable()
@@ -26,12 +25,12 @@ export class CreatePhoneTypeUseCase implements ICreatePhoneTypeUseCase {
         }
 
         try {
-            const created: CreateResultType<PhoneTypeEntity> = await this.phoneTypeService.create(input, transaction);
+            const created: PhoneTypeEntity = await this.phoneTypeService.create(input, transaction);
 
             return ResultType.success({
-                id: created.entity.id!,
-                description: created.entity.description,
-                statusId: created.entity.statusId
+                id: created.id!,
+                description: created.description,
+                statusId: created.statusId
             })
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);

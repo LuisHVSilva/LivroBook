@@ -6,18 +6,12 @@ z.config(pt());
 
 z.config({
     customError: (iss) => {
-        let field: string = '';
-
-        if (iss.path) {
-            field = iss.path.join(".")
+        if (!iss.path) {
+            return {message: EntitiesMessage.error.validation.nullBodyRequest}
         }
 
-        if (iss.code === "invalid_type") {
-            if (!iss.input) {
-                return {message: EntitiesMessage.error.validation.nullFieldRequired(field)};
-            }
-        }
-
+        const field: string = iss.path.join(".")
+        console.log(iss.code)
         switch (iss.code) {
             case "too_small":
                 return {message: EntitiesMessage.error.validation.invalidMinLen(field, iss.minimum.toString())};
@@ -30,3 +24,4 @@ z.config({
         }
     },
 });
+

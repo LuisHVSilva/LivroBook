@@ -3,7 +3,6 @@ import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCa
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
-import {DeletePhoneDTO, DeletePhoneResponseDTO} from "@phone/adapters/dtos/phone.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {Transaction} from "sequelize";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -12,6 +11,7 @@ import {StringUtil} from "@coreShared/utils/string.util";
 import {DomainError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 
 
 @injectable()
@@ -23,13 +23,13 @@ export class DeletePhoneUseCase implements IDeletePhoneUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(input: DeletePhoneDTO, transaction?: Transaction): Promise<ResultType<DeletePhoneResponseDTO>> {
+    async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
 
         try {
-            const ids: number[] | undefined = StringUtil.parseCsvFilter(input.ids, Number);
+            const ids: number[] | undefined = StringUtil.parseCsvFilter(input.id, Number);
             if (!ids) {
                 return ResultType.failure(new DomainError(EntitiesMessage.error.validation.idRequired));
             }

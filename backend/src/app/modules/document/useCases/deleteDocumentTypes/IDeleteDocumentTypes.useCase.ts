@@ -1,5 +1,5 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {DeleteDocumentTypesDTO, DeleteDocumentTypesResponseDTO} from "@document/adapters/dto/documentType.dto";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 
-export interface IDeleteDocumentTypesUseCase extends IUseCase<DeleteDocumentTypesDTO, DeleteDocumentTypesResponseDTO> {
+export interface IDeleteDocumentTypesUseCase extends IUseCase<DeleteRequestDTO, DeleteResponseDTO> {
 }

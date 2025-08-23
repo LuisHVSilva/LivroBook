@@ -1,28 +1,12 @@
 import {z} from "zod";
-import {EntitiesMessage} from "@coreShared/messages/entities.message";
+import {ZodValidator} from "@coreShared/validators/zod.validator";
 
-export const FindDocumentTypesDTOSchema = z.object({
-    ids: z.string().optional(),
-    descriptions: z.string().optional(),
-    countiesIds: z.string().optional(),
-    statusesIds: z.string().optional(),
-    page: z.string().optional(),
-    limit: z.string().optional(),
-});
-
-
-export const FindDocumentTypesSchema = FindDocumentTypesDTOSchema.extend({
-    page: z.string()
-        .optional()
-        .transform(val => (val !== undefined ? Number(val) : undefined))
-        .refine(val => val === undefined || (!isNaN(val) && Number.isInteger(val) && val > 0), {
-            message: EntitiesMessage.error.validation.numberPositive
-        }),
-    limit: z.string()
-        .optional()
-        .transform(val => (val !== undefined ? Number(val) : undefined))
-        .refine(val => val === undefined || (!isNaN(val) && Number.isInteger(val) && val > 0), {
-            message: EntitiesMessage.error.validation.numberPositive
-        }),
+export const FindDocumentTypesSchema = z.object({
+    id: ZodValidator.positiveIntArrayFromString(),
+    description: ZodValidator.stringInputValue(undefined, undefined, true),
+    countryId: ZodValidator.positiveIntArrayFromString(),
+    statusId: ZodValidator.positiveIntArrayFromString(),
+    page: ZodValidator.positiveIntArrayFromString(),
+    limit: ZodValidator.positiveIntArrayFromString(),
 });
 

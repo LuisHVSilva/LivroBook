@@ -1,15 +1,8 @@
 import { z } from "zod";
-import {EntitiesMessage} from "@coreShared/messages/entities.message";
 
-/**
- * Schema for creating a status.
- *
- * @property {number} description - The description of the new status.
- *
- * @returns {z.ZodObject} A Zod schema object for validating the update status request.
- *
- * @throws {Error} If the description doesn't exist.
- */
+import {StatusEntity} from "@status/domain/entities/status.entity";
+import {ZodValidator} from "@coreShared/validators/zod.validator";
+
 export const CreateStatusSchema = z.object({
-    description: z.string().nonempty(EntitiesMessage.error.validation.descriptionRequired),
+    description: ZodValidator.stringInputValue(StatusEntity.MIN_DESC, StatusEntity.MAX_DESC),
 });

@@ -6,13 +6,20 @@ export const ControllersMessage = {
         },
     },
     clientError: {
+        update: {
+            badRequest: "Nenhum registro atualizado.",
+        },
         delete: {
-            badRequest: "Registros já deletados.",
             notFound: "Nenhum registro encontrado para ser deletado."
         },
         generic: {
             badRequest: "Nenhuma operação realizada",
             notFound: "Nenhum registro encontrado",
+        },
+    },
+    info: {
+        generic: {
+            okNotChanged: "Nenhum registro alterado.",
         },
     }
 } as const;

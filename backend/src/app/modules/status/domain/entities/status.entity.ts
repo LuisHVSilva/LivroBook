@@ -57,6 +57,20 @@ export class StatusEntity extends BaseEntity<StatusProps> {
     //#endregion
 
     //#region UPDATES
+    public update(props: Partial<StatusProps>): this {
+        let updated = this;
+
+        if (props.description !== undefined) {
+            updated = updated.updateDescription(props.description);
+        }
+
+        if (props.active !== undefined) {
+            updated = props.active ? updated.activate() : updated.deactivate();
+        }
+
+        return updated;
+    }
+
     public updateDescription(description: string): this {
         const updatedProps: Partial<StatusProps> = { description };
         return this.cloneWith(updatedProps);

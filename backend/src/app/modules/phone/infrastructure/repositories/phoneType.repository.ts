@@ -84,7 +84,7 @@ export class PhoneTypeRepository implements IPhoneTypeRepository {
         if (filters == null) return where;
 
         if (filters.id !== undefined) where.id = filters.id;
-        if (filters.description !== undefined) where.description = filters.description[0];
+        if (filters.description !== undefined) where.description = filters.description;
         if (filters.statusId !== undefined) where.statusId = filters.statusId;
 
         return where;

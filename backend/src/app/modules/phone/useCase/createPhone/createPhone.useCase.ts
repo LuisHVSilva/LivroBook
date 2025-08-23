@@ -8,7 +8,6 @@ import {Transactional} from "@coreShared/decorators/Transactional";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 
 @injectable()
@@ -26,14 +25,14 @@ export class CreatePhoneUseCase implements ICreatePhoneUseCase {
         }
 
         try {
-            const created: CreateResultType<PhoneEntity> = await this.service.create(input, transaction);
+            const created: PhoneEntity = await this.service.create(input, transaction);
 
             return ResultType.success({
-                id: created.entity.id!,
-                number: created.entity.number,
-                phoneCodeId: created.entity.phoneCodeId,
-                phoneTypeId: created.entity.phoneTypeId,
-                statusId: created.entity.statusId,
+                id: created.id!,
+                number: created.number,
+                phoneCodeId: created.phoneCodeId,
+                phoneTypeId: created.phoneTypeId,
+                statusId: created.statusId,
             });
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);

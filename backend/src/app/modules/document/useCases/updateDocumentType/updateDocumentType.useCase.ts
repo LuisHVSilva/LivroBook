@@ -3,11 +3,13 @@ import {IUpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/
 import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
-import {UpdateDocumentTypeDTO, UpdateDocumentTypeResponseDTO} from "@document/adapters/dto/documentType.dto";
+import {UpdateDocumentTypeDTO} from "@document/adapters/dto/documentType.dto";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 @injectable()
 export class UpdateDocumentTypeUseCase implements IUpdateDocumentTypeUseCase {
@@ -18,16 +20,15 @@ export class UpdateDocumentTypeUseCase implements IUpdateDocumentTypeUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(input: UpdateDocumentTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateDocumentTypeResponseDTO>> {
-        try {
-            const updatedEntity: DocumentTypeEntity = await this.documentTypeService.update(input, transaction!);
+    async execute(input: UpdateDocumentTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<DocumentTypeEntity>>> {
+        if (!transaction) {
+            return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
+        }
 
-            return ResultType.success({
-                id: updatedEntity.id!,
-                description: updatedEntity.description,
-                countryId: updatedEntity.countryId,
-                statusId: updatedEntity.statusId,
-            });
+        try {
+            const updatedEntity: UpdateResultType<DocumentTypeEntity> = await this.documentTypeService.update(input, transaction);
+
+            return ResultType.success(updatedEntity);
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

@@ -15,7 +15,7 @@ export type CreateStatusDTO = {
 };
 
 export type CreateStatusResponseDTO = {
-    id: string;
+    id: number;
     description: string;
     active: boolean;
 };
@@ -37,20 +37,6 @@ export type FindStatusesResponseDTO = {
 
 export type UpdateStatusDTO = {
     id: number;
-    newDescription?: string;
-    newActive?: boolean;
-};
-
-export type UpdateStatusResponseDTO = {
-    id: number;
-    description: string;
-    active: boolean;
-};
-
-export type DeleteStatusDTO = {
-    id: string[];
-};
-
-export type DeleteStatusResponseDTO = {
-    message: string;
+    description?: string;
+    active?: boolean;
 };

@@ -3,7 +3,6 @@ import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePh
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
-import {DeletePhoneCodesDTO, DeletePhoneCodesResponseDTO} from "@phone/adapters/dtos/phoneCode.dto";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -11,7 +10,8 @@ import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {DomainError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
 @injectable()
 export class DeletePhoneCodesUseCase implements IDeletePhoneCodesUseCase {
@@ -22,21 +22,22 @@ export class DeletePhoneCodesUseCase implements IDeletePhoneCodesUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(input: DeletePhoneCodesDTO, transaction?: Transaction): Promise<ResultType<DeletePhoneCodesResponseDTO>> {
+    async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
 
         try {
-            const ids: number[] | undefined = StringUtil.parseCsvFilter(input.ids, Number);
-            if (!ids) return ResultType.failure(new DomainError(EntitiesMessage.error.validation.idRequired));
+            const ids: number[] | undefined = StringUtil.parseCsvFilter(input.id, Number);
 
-            for (const id of ids) {
-                await this.service.delete(id, transaction);
+            if (!ids) {
+                return ResultType.failure(new DomainError(EntitiesMessage.error.validation.idRequired));
             }
 
+            const report: DeleteReport = await this.service.deleteMany(ids, transaction);
+
             return ResultType.success({
-                message: EntitiesMessage.success.delete(PhoneCodeEntity.ENTITY_NAME)
+                report
             });
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);

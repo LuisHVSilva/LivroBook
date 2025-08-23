@@ -7,13 +7,17 @@ import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
 import {StatusCodes} from "http-status-codes";
 import {
     CreateDocumentTypeDTO,
-    CreateDocumentTypeResponseDTO, DeleteDocumentTypesDTO, DeleteDocumentTypesResponseDTO,
-    FindDocumentTypesDTO, FindDocumentTypesResponseDTO, UpdateDocumentTypeDTO, UpdateDocumentTypeResponseDTO
+    CreateDocumentTypeResponseDTO,
+    FindDocumentTypesDTO, FindDocumentTypesResponseDTO, UpdateDocumentTypeDTO
 } from "@document/adapters/dto/documentType.dto";
 import {IFindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/IFindDocumentTypes.useCase";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {UpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/updateDocumentType.useCase";
 import {IDeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentTypes/IDeleteDocumentTypes.useCase";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
+import {StatusEntity} from "@status/domain/entities/status.entity";
 
 @injectable()
 export class DocumentTypeController implements IDocumentTypeController {
@@ -53,26 +57,22 @@ export class DocumentTypeController implements IDocumentTypeController {
 
     async updateDocumentType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateDocumentTypeDTO;
-        const result: ResultType<UpdateDocumentTypeResponseDTO> = await this.updateDocumentTypeUseCase.execute(input);
-        if (result.isSuccess()) {
-            return ApiResponseUtil.success<UpdateDocumentTypeResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        const result: ResultType<UpdateResultType<DocumentTypeEntity>> = await this.updateDocumentTypeUseCase.execute(input);
+        if (!result.isSuccess()) {
+            return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        if (result.isNone()) {
-            return ApiResponseUtil.notFound(res, EntitiesMessage.error.retrieval.notFoundGeneric);
-        }
-
-        return ApiResponseUtil.handleResultError(res, result.getError());
+        return ApiResponseUtil.handleUpdateResult<StatusEntity>(res, result.unwrap());
     }
 
     async deleteDocumentTypes(req: Request, res: Response): Promise<Response> {
-        const input = req.query as DeleteDocumentTypesDTO;
-        const result: ResultType<DeleteDocumentTypesResponseDTO> = await this.deleteDocumentTypesUseCase.execute(input);
+        const input: DeleteRequestDTO = req.query as DeleteRequestDTO;
+        const result: ResultType<DeleteResponseDTO> = await this.deleteDocumentTypesUseCase.execute(input);
 
-        if (result.isSuccess()) {
-            return ApiResponseUtil.success<DeleteDocumentTypesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
+        if (!result.isSuccess()) {
+            return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleResultError(res, result.getError());
+        return ApiResponseUtil.handleDeleteResult(res, result.unwrap().report);
     }
 }

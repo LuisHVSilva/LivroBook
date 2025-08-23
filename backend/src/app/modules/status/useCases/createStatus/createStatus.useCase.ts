@@ -8,8 +8,8 @@ import {Transaction} from "sequelize";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/status.dto";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {CreateResultType} from "@coreShared/types/crudResult.type";
 import {StatusEntity} from "@status/domain/entities/status.entity";
+import {ErrorMessages} from "@coreShared/messages/errorMessages";
 
 @injectable()
 export class CreateStatusUseCase implements ICreateStatusUseCase {
@@ -21,13 +21,17 @@ export class CreateStatusUseCase implements ICreateStatusUseCase {
     @LogExecution()
     @Transactional()
     public async execute(input: CreateStatusDTO, transaction?: Transaction): Promise<ResultType<CreateStatusResponseDTO>> {
+        if (!transaction) {
+            return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
+        }
+
         try {
-            const result: CreateResultType<StatusEntity> = await this.statusService.create(input, transaction!);
+            const result: StatusEntity = await this.statusService.create(input, transaction);
 
             return ResultType.success({
-                id: result.entity.id!.toString(),
-                description: result.entity.description,
-                active: result.entity.active,
+                id: result.id!,
+                description: result.description,
+                active: result.active,
             });
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);

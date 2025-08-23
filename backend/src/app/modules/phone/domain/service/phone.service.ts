@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
-import {CreateResultType, UpdateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
@@ -42,8 +42,9 @@ export class PhoneService implements IPhoneService {
 
     //#endregion
 
+    //#region CREATE
     @LogError()
-    async create(data: CreatePhoneDTO, transaction: Transaction): Promise<CreateResultType<PhoneEntity>> {
+    async create(data: CreatePhoneDTO, transaction: Transaction): Promise<PhoneEntity> {
         const status: StatusEntity = await this.statusService.getStatusForNewEntities();
         const statusId: number = status.id!;
 
@@ -54,20 +55,30 @@ export class PhoneService implements IPhoneService {
             statusId: statusId
         });
 
-        const isUnique: boolean = await this.uniquenessValidator.validate('number', entity.number);
         await this.validateForeignKeys(entity);
+        const isUnique: boolean = await this.uniquenessValidator.validate('number', entity.number);
 
         if (!isUnique) {
             throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue("PHONE", "number"));
         }
 
-        const created: PhoneEntity = (await this.repo.create(entity, transaction)).unwrapOrThrow();
+        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
+    }
+    //#endregion
 
-        return {entity: created, created: true};
+    //#region READ
+    @LogError()
+    async getById(id: number): Promise<PhoneEntity> {
+        const found: ResultType<PhoneEntity> = await this.repo.findById(id);
+        const entity: PhoneEntity | null = found.unwrapOrNull();
+
+        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.PHONE));
+
+        return entity;
     }
 
     @LogError()
-    async getAll(filter?: PhoneFilterDTO, page?: number, limit?: number): Promise<FindAllType<PhoneEntity>> {
+    async findMany(filter?: PhoneFilterDTO, page?: number, limit?: number): Promise<FindAllType<PhoneEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -78,28 +89,27 @@ export class PhoneService implements IPhoneService {
 
         return found.unwrap();
     }
+    //#endregion
 
-    @LogError()
-    async getById(id: number): Promise<PhoneEntity | null> {
-        return (await this.repo.findById(id)).unwrapOrNull() ?? null;
-    }
-
+    //#region UPDATE
     @LogError()
     async update(newData: UpdatePhoneDTO, transaction: Transaction): Promise<UpdateResultType<PhoneEntity>> {
-        const existing: PhoneEntity | null = await this.getById(newData.id!);
+        const entity: PhoneEntity = await this.getById(newData.id!);
 
-        if (!existing) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.PHONE));
-
-        let updatedEntity: PhoneEntity = existing.update({
-            number: newData.newNumber !== undefined ? newData.newNumber : existing.number,
-            phoneCodeId: newData.newPhoneCodeId !== undefined ? newData.newPhoneCodeId : existing.phoneCodeId,
-            phoneTypeId: newData.newPhoneTypeId !== undefined ? newData.newPhoneTypeId : existing.phoneTypeId,
-            statusId: newData.newStatusId !== undefined ? newData.newStatusId : existing.statusId,
+        let updatedEntity: PhoneEntity = entity.update({
+            number: newData.number ?? entity.number,
+            phoneCodeId: newData.phoneCodeId ?? entity.phoneCodeId,
+            phoneTypeId: newData.phoneTypeId ?? entity.phoneTypeId,
+            statusId: newData.statusId ?? entity.statusId,
         });
 
-        await this.validateForeignKeys(updatedEntity)
+        await this.validateForeignKeys(updatedEntity);
 
-        if (newData.newNumber) {
+        if (updatedEntity.isEqual(entity)) {
+            return { entity: entity, updated: false };
+        }
+        
+        if (newData.number) {
             const isUnique: boolean = await this.uniquenessValidator.validate('number', updatedEntity.number);
 
             if (!isUnique) {
@@ -107,7 +117,7 @@ export class PhoneService implements IPhoneService {
             }
         }
 
-        if (newData.newNumber || newData.newPhoneCodeId || newData.newPhoneTypeId) {
+        if (newData.number || newData.phoneCodeId || newData.phoneTypeId) {
             updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 
@@ -117,19 +127,19 @@ export class PhoneService implements IPhoneService {
 
         return {entity: updatedEntity, updated: updated.unwrap()};
     }
+    //#endregion
 
+    //#region DELETE
     @LogError()
     async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
-        const entity: PhoneEntity | null = await this.getById(id);
-        if (!entity) return DeleteStatusEnum.NOT_FOUND;
-
+        const entity: PhoneEntity = await this.getById(id);
         const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
 
         if (entity.statusId === inactiveStatus.id) {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity: PhoneEntity = entity.update({ statusId: inactiveStatus.id });
+        const deletedEntity: PhoneEntity = entity.update({statusId: inactiveStatus.id});
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;
@@ -156,13 +166,14 @@ export class PhoneService implements IPhoneService {
                 continue;
             }
 
-            const deletedEntity: PhoneEntity = entity.update({ statusId: inactiveStatus.id });
+            const deletedEntity: PhoneEntity = entity.update({statusId: inactiveStatus.id});
             await this.repo.update(deletedEntity, transaction);
             deleted.push(id);
         }
 
-        return { deleted, alreadyInactive, notFound };
+        return {deleted, alreadyInactive, notFound};
     }
+    //#endregion
 
     @LogError()
     private async validateForeignKeys(data: Partial<PhoneDTO>): Promise<void> {

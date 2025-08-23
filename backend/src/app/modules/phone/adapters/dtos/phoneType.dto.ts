@@ -24,9 +24,9 @@ export type CreatePhoneTypeResponseDTO = {
 }
 
 export type FindPhoneTypesDTO = {
-    ids?: string[];
-    descriptions?: string[];
-    statusesIds?: string[];
+    id?: string[];
+    description?: string[];
+    statusId?: string[];
     page?: string;
     limit?: string;
 };
@@ -40,21 +40,6 @@ export type FindPhoneTypesResponseDTO = {
 
 export type UpdatePhoneTypeDTO = {
     id: number;
-    newDescription?: string;
-    newStatusId?: number;
+    description?: string;
+    statusId?: number;
 }
-
-export type UpdatePhoneTypeResponseDTO = {
-    id: number;
-    description: string;
-    statusId: number;
-}
-
-export type DeletePhoneTypesDTO = {
-    ids: string;
-}
-
-export type DeletePhoneTypesResponseDTO = {
-    message: string;
-}
-

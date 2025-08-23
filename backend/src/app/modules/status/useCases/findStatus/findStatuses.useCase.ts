@@ -28,7 +28,7 @@ export class FindStatusesUseCase implements IFindStatusesUseCase {
                 active: StringUtil.parseCsvFilter(input.active, StringUtil.parseBoolean),
             };
 
-            const {entities, total}: FindAllType<StatusEntity> = await this.statusService.findAll(filter, page, limit);
+            const {entities, total}: FindAllType<StatusEntity> = await this.statusService.findMany(filter, page, limit);
 
             const response: FindStatusesResponseDTO = {
                 page,

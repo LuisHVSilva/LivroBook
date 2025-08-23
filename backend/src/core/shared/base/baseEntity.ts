@@ -38,4 +38,11 @@ export abstract class BaseEntity<T extends { id?: unknown }> {
         const mergedProps = { ...this.props, ...overrides };
         return new (this.constructor as any)(mergedProps);
     }
+
+    public isEqual(other: BaseEntity<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
+        const keys = Object.keys(this.props) as (keyof T)[];
+        return keys
+            .filter(key => !excludeKeys.includes(key))
+            .every(key => this.props[key] === other.props[key]);
+    }
 }

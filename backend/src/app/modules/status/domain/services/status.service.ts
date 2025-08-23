@@ -2,11 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {StatusModel} from "@status/infrastructure/models/status.model";
-import {
-    CreateStatusDTO,
-    FindFilterStatusDTO,
-    StatusDto, UpdateStatusDTO
-} from "@status/adapters/dtos/status.dto";
+import {CreateStatusDTO, FindFilterStatusDTO, StatusDto, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
 import {Transaction} from "sequelize";
@@ -17,10 +13,11 @@ import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepo
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
 import {ServiceError} from "@coreShared/errors/service.error";
-
-import {CreateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 
 @injectable()
 export class StatusService implements IStatusService {
@@ -44,79 +41,61 @@ export class StatusService implements IStatusService {
 
     //#endregion
 
+    //#region CREATE
     @LogError()
-    async create(data: CreateStatusDTO, transaction: Transaction): Promise<CreateResultType<StatusEntity>> {
+    async create(data: CreateStatusDTO, transaction: Transaction): Promise<StatusEntity> {
         const entity: StatusEntity = StatusEntity.create({description: data.description, active: false});
+
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+        if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATUS, this.DESCRIPTION));
 
-        if (!isUnique) {
-            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATUS, this.DESCRIPTION));
-        }
-
-        const created: StatusEntity = (await this.repo.create(entity, transaction)).unwrapOrThrow();
-
-        return {entity: created, created: true};
+        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
     }
 
+    //#endregion
+
+    //#region READ
     @LogError()
-    async get(filter: FindFilterStatusDTO): Promise<StatusEntity | null> {
+    async getById(id: number): Promise<StatusEntity> {
+        const found: ResultType<StatusEntity> = await this.repo.findById(id);
+        const entity: StatusEntity | null = found.unwrapOrNull();
 
-        if (filter.description) {
-            filter.description = filter.description.map(StatusTransformer.normalizeDescription);
-        }
+        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
 
-        const found: StatusEntity | null = (await this.repo.findOneByFilter(filter)).unwrapOrNull();
-
-        return found ?? null;
-    }
-
-    @LogError()
-    async getById(id: number): Promise<StatusEntity | null> {
-        const found: StatusEntity | null = (await this.repo.findById(id)).unwrapOrNull();
-
-        return found ?? null;
+        return entity;
     }
 
     @LogError()
     async getStatusActiveById(id: number): Promise<StatusEntity> {
-        const foundedStatus = await this.getById(id);
-
-        if (!foundedStatus?.active) {
-            throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
-        }
+        const foundedStatus: StatusEntity = await this.getById(id);
+        if (foundedStatus?.active) throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
 
         return foundedStatus;
     }
 
     @LogError()
-    async findByDescription(description: string): Promise<StatusEntity | null> {
-        const descriptionFilter: string = StatusTransformer.normalizeDescription(description);
-        const statusFinder: ResultType<StatusEntity> = await this.repo.findByDescription(descriptionFilter);
+    async getByDescription(description: string): Promise<StatusEntity> {
+        const normalizedDescription: string = StatusTransformer.normalizeDescription(description);
+        const result: ResultType<StatusEntity> = await this.repo.findByDescription(normalizedDescription);
 
-        if (!statusFinder.isSuccess()) {
+        const entity: StatusEntity | null = result.unwrapOrNull();
+        if (!entity) {
             throw new ValidationError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
         }
 
-        return statusFinder.unwrap();
+        return entity;
     }
 
     @LogError()
-    async findStausActiveByDescription(description: string): Promise<StatusEntity> {
-        const foundedStatus = await this.findByDescription(description);
-
-        if (!foundedStatus) {
-            throw new ValidationError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
-        }
-
-        if (!foundedStatus.active) {
-            throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
-        }
+    async getStausActiveByDescription(description: string): Promise<StatusEntity> {
+        const foundedStatus: StatusEntity = await this.getByDescription(description);
+        if (!foundedStatus.active) throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
 
         return foundedStatus;
     }
 
     @LogError()
-    async findAll(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>> {
+    async findMany(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -135,65 +114,101 @@ export class StatusService implements IStatusService {
     }
 
     @LogError()
-    async delete(id: number[], transaction: Transaction): Promise<void> {
-        const {entities, total}: FindAllType<StatusEntity> = await this.findAll({id});
-
-        if (total === 0) {
-            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
-        }
-
-        for (const entity of entities) {
-            const deactivateEntity: StatusEntity = entity.deactivate();
-            const updated: ResultType<boolean> = await this.repo.update(deactivateEntity, transaction);
-
-            if (!updated.isSuccess()) {
-                throw new ServiceError(EntitiesMessage.error.failure.delete(this.STATUS));
-            }
-        }
-    }
-
-    @LogError()
-    async update(newData: UpdateStatusDTO, transaction: Transaction): Promise<StatusEntity> {
-        let entity: StatusEntity | null = await this.getById(newData.id);
-
-        if (!entity) {
-            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS))
-        }
-
-        if (newData.newActive !== undefined) {
-            entity = newData.newActive ? entity.activate() : entity.deactivate();
-        }
-
-        if (newData.newDescription !== undefined) {
-            entity = entity.updateDescription(newData.newDescription).deactivate();
-            const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
-
-            if (!isUnique) {
-                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATUS, this.DESCRIPTION))
-            }
-        }
-
-        const updated: ResultType<boolean> = await this.repo.update(entity, transaction);
-
-        if (!updated.isSuccess() || (updated.isSuccess()) && !updated.unwrap()) {
-            throw new ServiceError(EntitiesMessage.error.failure.update(this.STATUS));
-        }
-
-        return entity;
-    }
-
-    @LogError()
     async getStatusForNewEntities(): Promise<StatusEntity> {
-        return this.findStausActiveByDescription(this.NEW_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(this.NEW_ENTITIES_STATUS);
     }
 
     @LogError()
     async getStatusForUpdateEntities(): Promise<StatusEntity> {
-        return this.findStausActiveByDescription(this.UPDATED_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(this.UPDATED_ENTITIES_STATUS);
     }
 
     @LogError()
     async getStatusForInactiveEntities(): Promise<StatusEntity> {
-        return this.findStausActiveByDescription(this.INACTIVE_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(this.INACTIVE_ENTITIES_STATUS);
     }
+
+    //#endregion
+
+    //#region UPDATE
+    @LogError()
+    async update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<StatusEntity>> {
+        const entity: StatusEntity | null = await this.getById(newData.id);
+
+        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
+
+        let updatedEntity: StatusEntity = entity.update({
+            ...newData,
+        });
+
+        if (newData.description !== undefined) {
+            const isUnique: boolean = await this.uniquenessValidator.validate('description', updatedEntity.description);
+            if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATUS, this.DESCRIPTION));
+
+            updatedEntity = updatedEntity.deactivate();
+        }
+
+        if (updatedEntity.isEqual(entity)) {
+            return { entity: entity, updated: false };
+        }
+
+        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+
+        if (!updated.isSuccess()) throw new ServiceError(EntitiesMessage.error.failure.update(this.STATUS));
+
+        return {entity: updatedEntity, updated: true};
+    }
+
+    //#endregion
+
+    //#region DELETE
+    @LogError()
+    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
+        let entity: StatusEntity;
+
+        try {
+            entity = await this.getById(id);
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return DeleteStatusEnum.NOT_FOUND;
+            }
+            throw error;
+        }
+
+        if (!entity) return DeleteStatusEnum.NOT_FOUND;
+
+        if (!entity.active) return DeleteStatusEnum.ALREADY_INACTIVE;
+
+        const deletedEntity: StatusEntity = entity.deactivate();
+        await this.repo.update(deletedEntity, transaction);
+
+        return DeleteStatusEnum.DELETED;
+    }
+
+    @LogError()
+    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
+        const deleted: number[] = [];
+        const alreadyInactive: number[] = [];
+        const notFound: number[] = [];
+
+        for (const id of ids) {
+            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
+
+            switch (deleteEntityResult) {
+                case DeleteStatusEnum.DELETED:
+                    deleted.push(id);
+                    break;
+                case DeleteStatusEnum.ALREADY_INACTIVE:
+                    alreadyInactive.push(id);
+                    break;
+                default:
+                    notFound.push(id);
+                    break;
+            }
+        }
+
+        return {deleted, alreadyInactive, notFound};
+    }
+
+    //#endregion
 }

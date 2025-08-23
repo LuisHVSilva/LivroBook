@@ -1,9 +1,10 @@
 import { z } from "zod";
+import {ZodValidator} from "@coreShared/validators/zod.validator";
 
 export const UpdatePhoneCodeSchema = z.object({
-    id: z.number().int().positive(),
-    newDdiCode: z.number().int().positive().optional(),
-    newDddCode: z.number().int().positive().optional(),
-    newStateId: z.number().int().positive().optional(),
-    newStatusId: z.number().int().positive().optional(),
+    id: ZodValidator.intInputValue(),
+    ddiCode: ZodValidator.intInputValue(undefined, undefined, true),
+    dddCode: ZodValidator.intInputValue(undefined, undefined, true),
+    stateId: ZodValidator.intInputValue(undefined, undefined, true),
+    statusId: ZodValidator.intInputValue(undefined, undefined, true),
 });

@@ -1,5 +1,5 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {DeletePhoneCodesDTO, DeletePhoneCodesResponseDTO} from "@phone/adapters/dtos/phoneCode.dto";
+import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 
-export interface IDeletePhoneCodesUseCase extends IUseCase<DeletePhoneCodesDTO, DeletePhoneCodesResponseDTO> {
+export interface IDeletePhoneCodesUseCase extends IUseCase<DeleteRequestDTO, DeleteResponseDTO> {
 }
