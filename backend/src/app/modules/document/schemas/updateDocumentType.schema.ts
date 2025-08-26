@@ -4,7 +4,7 @@ import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity"
 
 export const UpdateDocumentTypeSchema = z.object({
     id: ZodValidator.intInputValue(),
-    description: ZodValidator.stringInputValue(DocumentTypeEntity.MIN_DESC, DocumentTypeEntity.MAX_DESC),
+    description: ZodValidator.stringInputValue(DocumentTypeEntity.MIN_DESC, DocumentTypeEntity.MAX_DESC, true),
     countryId: ZodValidator.intInputValue(undefined, undefined, true),
     statusId: ZodValidator.intInputValue(undefined, undefined, true),
 });

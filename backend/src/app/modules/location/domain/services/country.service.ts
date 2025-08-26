@@ -4,22 +4,23 @@ import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniq
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CountryEntity} from "@location/domain/entities/country.entity";
 import {CountryModel} from "@location/infrastructure/models/country.model";
-import {CountryDTO, CountryFilterDTO} from "@location/adapters/dtos/country.dto";
+import {CountryDTO, CountryFilterDTO, CreateCountryDTO, UpdateCountryDTO} from "@location/adapters/dtos/country.dto";
 import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
-import {CountryTransformer} from "@location/domain/transformers/country.transform";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {ResultType} from "@coreShared/types/result.type";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {CreateResultType, UpdateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ServiceError} from "@coreShared/errors/service.error";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
 
 @injectable()
@@ -41,48 +42,43 @@ export class CountryService implements ICountryService {
 
     //#endregion
 
+    //#region CREATE
     @LogError()
-    async createOrGetCountry(description: string, transaction: Transaction): Promise<CreateResultType<CountryEntity>> {
+    async create(data: CreateCountryDTO, transaction: Transaction): Promise<CountryEntity> {
         const status: StatusEntity = await this.statusService.getStatusForNewEntities();
         const statusId: number = status.id!;
-        const entity: CountryEntity = CountryEntity.create({description, statusId});
+
+        const entity: CountryEntity = CountryEntity.create({
+            description: data.description,
+            statusId
+        });
+
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
 
         if (!isUnique) {
-            const descriptionFilter: CountryFilterDTO = {
-                description: StringUtil.parseCsvFilter(entity.description, String)
-            };
-
-            const existing: CountryEntity | null = await this.get(descriptionFilter);
-            return {entity: existing!, created: false};
+            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, 'description'))
         }
 
-        const created: CountryEntity = (await this.repo.create(entity, transaction)).unwrapOrThrow();
-
-        return {entity: created, created: true};
+        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
     }
 
+    //#endregion
 
+    //#region READ
     @LogError()
-    async get(filter: CountryFilterDTO): Promise<CountryEntity | null> {
-        if (filter.description) {
-            filter.description = CountryTransformer.normalizeDescription(filter.description[0]);
+    async getById(id: number): Promise<CountryEntity> {
+        const found: ResultType<CountryEntity> = await this.repo.findById(id);
+        const entity: CountryEntity | null = found.unwrapOrNull();
+
+        if (!entity) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.COUNTRY));
         }
 
-        const found: ResultType<CountryEntity | null> = await this.repo.findOneByFilter(filter);
-
-        if (!found.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.COUNTRY));
-
-        return found.unwrapOrNull();
+        return entity;
     }
 
     @LogError()
-    async getById(id: number): Promise<CountryEntity | null> {
-        return (await this.repo.findById(id)).unwrapOrNull();
-    }
-
-    @LogError()
-    async getAll(filter?: CountryFilterDTO, page?: number, limit?: number): Promise<FindAllType<CountryEntity>> {
+    async findMany(filter?: CountryFilterDTO, page?: number, limit?: number): Promise<FindAllType<CountryEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -98,37 +94,109 @@ export class CountryService implements ICountryService {
         return found.unwrap();
     }
 
+    //#endregion
+
+    //#region UPDATE
     @LogError()
-    async updateProperties(currentCountry: CountryEntity, properties: CountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>> {
-        let updatedCountry: CountryEntity = currentCountry.withProps(properties);
+    async update(newData: UpdateCountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>> {
+        const entity: CountryEntity = await this.getById(newData.id);
 
-        const shouldUpdateStatus: boolean = updatedCountry.statusId !== currentCountry.statusId;
-        const shouldUpdateDescription: boolean = updatedCountry.description !== currentCountry.description;
+        let updatedEntity: CountryEntity = entity.updateProps(newData);
 
-        if (!shouldUpdateStatus && !shouldUpdateDescription) {
-            return {entity: currentCountry, updated: false};
+        if (updatedEntity.isEqual(entity)) {
+            return {entity: entity, updated: false};
         }
 
-        if (shouldUpdateDescription) {
-            const pendingApprovalStatus: StatusEntity = await this.statusService.getStatusForUpdateEntities()
-            updatedCountry = updatedCountry.updateProps({statusId: pendingApprovalStatus.id!})
+        if (updatedEntity.statusId !== entity.statusId) {
+            await this.validateForeignKeys(updatedEntity);
         }
 
-        const updateResult: boolean = (await this.repo.update(updatedCountry, transaction)).unwrapOrThrow();
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
+            const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
+            if (!isUnique) {
+                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, "description"));
+            }
 
-        if (!updateResult) {
+            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
+            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
+        }
+
+        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        if (!updated.isSuccess()) {
             throw new ServiceError(EntitiesMessage.error.failure.update(this.COUNTRY));
         }
 
-        return {entity: updatedCountry, updated: true};
+        return {entity: updatedEntity, updated: true};
+    }
+    //#endregion
+
+    //#region DELETE
+    @LogError()
+    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
+        let entity: CountryEntity;
+
+        try {
+            entity = await this.getById(id);
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return DeleteStatusEnum.NOT_FOUND;
+            }
+            throw error;
+        }
+
+        const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
+
+        if (entity.statusId === inactiveStatus.id) {
+            return DeleteStatusEnum.ALREADY_INACTIVE;
+        }
+
+        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        await this.repo.update(deletedEntity, transaction);
+
+        return DeleteStatusEnum.DELETED;
     }
 
     @LogError()
-    async deleteCountry(id: number, transaction: Transaction): Promise<void> {
-        const inactiveId: number = (await this.statusService.getStatusForInactiveEntities()).id!;
-        const entity: CountryEntity | null = await this.getById(id);
-        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.COUNTRY));
-        
-        await this.updateProperties(entity, {statusId: inactiveId}, transaction)
+    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
+        const deleted: number[] = [];
+        const alreadyInactive: number[] = [];
+        const notFound: number[] = [];
+
+        for (const id of ids) {
+            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
+
+            switch (deleteEntityResult) {
+                case DeleteStatusEnum.DELETED:
+                    deleted.push(id);
+                    break;
+                case DeleteStatusEnum.ALREADY_INACTIVE:
+                    alreadyInactive.push(id);
+                    break;
+                default:
+                    notFound.push(id);
+                    break;
+            }
+        }
+
+        return {deleted, alreadyInactive, notFound};
+    }
+    //#endregion
+
+    @LogError()
+    private async validateForeignKeys(data: Partial<CountryDTO>): Promise<void> {
+        const validateExistence = async <T>(
+            field: keyof CountryDTO,
+            id: number | undefined,
+            service: { getById: (id: number) => Promise<T | null> }
+        ): Promise<void> => {
+            if (id == null) return;
+            if (!(await service.getById(id))) {
+                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
+            }
+        };
+
+        await Promise.all([
+            validateExistence("statusId", data.statusId, this.statusService)
+        ]);
     }
 }

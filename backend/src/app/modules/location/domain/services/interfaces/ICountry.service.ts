@@ -1,14 +1,21 @@
-import {CountryDTO, CountryFilterDTO} from "@location/adapters/dtos/country.dto";
+import {CountryFilterDTO, CreateCountryDTO, UpdateCountryDTO} from "@location/adapters/dtos/country.dto";
 import {Transaction} from "sequelize";
-import {CreateResultType, UpdateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {CountryEntity} from "@location/domain/entities/country.entity";
 import {FindAllType} from "@coreShared/types/findAll.type";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
 export interface ICountryService {
-    createOrGetCountry(description: string, transaction: Transaction): Promise<CreateResultType<CountryEntity>>;
-    get(filter: CountryFilterDTO): Promise<CountryEntity | null>;
-    getById(id: number): Promise<CountryEntity | null>;
-    getAll(filter?: CountryFilterDTO, page?: number, limit?: number): Promise<FindAllType<CountryEntity>>;
-    updateProperties(currentCountry: CountryEntity, properties: CountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>>;
-    deleteCountry(id: number, transaction: Transaction): Promise<void>;
+    create(data: CreateCountryDTO, transaction: Transaction): Promise<CountryEntity>;
+
+    getById(id: number): Promise<CountryEntity>;
+
+    findMany(filter?: CountryFilterDTO, page?: number, limit?: number): Promise<FindAllType<CountryEntity>>;
+
+    update(newData: UpdateCountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>>;
+
+    delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
+
+    deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
 }

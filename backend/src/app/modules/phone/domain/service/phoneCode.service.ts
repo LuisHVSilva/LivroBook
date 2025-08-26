@@ -90,20 +90,15 @@ export class PhoneCodeService implements IPhoneCodeService {
     async update(newData: UpdatePhoneCodeDTO, transaction: Transaction): Promise<UpdateResultType<PhoneCodeEntity>> {
         const entity: PhoneCodeEntity = await this.getById(newData.id!);
 
-        let updatedEntity: PhoneCodeEntity = entity.update({
-            dddCode: newData.dddCode ?? entity.dddCode,
-            ddiCode: newData.ddiCode ?? entity.ddiCode,
-            stateId: newData.stateId ?? entity.stateId,
-            statusId: newData.statusId ?? entity.statusId,
-        })
-
-        await this.validateForeignKeys(updatedEntity)
+        let updatedEntity: PhoneCodeEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
             return { entity: entity, updated: false };
         }
 
-        if (newData.dddCode || newData.ddiCode || newData.stateId) {
+        await this.validateForeignKeys(updatedEntity);
+
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
             const isUnique: boolean = await this.isUniqueEntity(updatedEntity.ddiCode, updatedEntity.dddCode, updatedEntity.stateId);
 
             if (!isUnique) {

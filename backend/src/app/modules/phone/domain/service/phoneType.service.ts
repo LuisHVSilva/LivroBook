@@ -120,7 +120,7 @@ export class PhoneTypeService implements IPhoneTypeService {
 
         await this.validateForeignKeys(updatedEntity);
 
-        if (entity.description !== updatedEntity.description) {
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
             const isUnique: boolean = await this.uniquenessValidator.validate('description', updatedEntity.description);
 
             if (!isUnique) {

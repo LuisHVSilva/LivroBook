@@ -3,23 +3,25 @@ import {ICityRepository} from "@location/infrastructure/repositories/interfaces/
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {CityModel} from "@location/infrastructure/models/city.model";
-import {CityCreateDTO, CityDTO, CityFilterDTO} from "@location/adapters/dtos/city.dto";
+import {CityDTO, CityFilterDTO, CreateCityDTO, UpdateCityDTO} from "@location/adapters/dtos/city.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {CityTransformer} from "@location/domain/transformers/city.transform";
 import {ResultType} from "@coreShared/types/result.type";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {CreateResultType, UpdateResultType} from "@coreShared/types/crudResult.type";
+import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 import {ServiceError} from "@coreShared/errors/service.error";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
+import {IStateService} from "@location/domain/services/interfaces/IState.service";
+import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
 @injectable()
 export class CityService implements ICityService {
@@ -34,14 +36,16 @@ export class CityService implements ICityService {
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
         @inject("CityRepository") cityRepo: IBaseRepository<CityEntity, CityModel, CityDTO>,
         @inject('IStatusService') private readonly statusService: IStatusService,
+        @inject("IStateService") private readonly stateService: IStateService,
     ) {
         this.uniquenessValidator = validatorFactory(cityRepo);
     }
 
     //#endregion
 
+    //#region CREATE
     @LogError()
-    async createOrGetCity(data: CityCreateDTO, transaction: Transaction): Promise<CreateResultType<CityEntity>> {
+    async create(data: CreateCityDTO, transaction: Transaction): Promise<CityEntity> {
         const status: StatusEntity = await this.statusService.getStatusForNewEntities();
         const statusId: number = status.id!;
 
@@ -51,43 +55,34 @@ export class CityService implements ICityService {
             statusId: statusId,
         })
 
+        await this.validateForeignKeys(entity);
+
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
 
         if (!isUnique) {
-            const cityFilter: CityFilterDTO = {
-                description: StringUtil.parseCsvFilter(entity.description, String),
-                stateId: StringUtil.parseCsvFilter(entity.stateId.toString(), Number)
-            };
-
-            const existing: CityEntity | null = await this.get(cityFilter);
-            return {entity: existing!, created: false};
+            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.CITY, 'description'))
         }
 
-        const created: CityEntity = (await this.repo.create(entity, transaction)).unwrapOrThrow();
-
-        return {entity: created, created: true};
+        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
     }
 
+    //#endregion
+
+    //#region READ
     @LogError()
-    async get(filter: CityFilterDTO): Promise<CityEntity | null> {
-        if (filter.description) {
-            filter.description = CityTransformer.normalizeDescription(filter.description[0]);
+    async getById(id: number): Promise<CityEntity> {
+        const found: ResultType<CityEntity> = await this.repo.findById(id);
+        const entity: CityEntity | null = found.unwrapOrNull();
+
+        if (!entity) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.CITY));
         }
 
-        const found: ResultType<CityEntity | null> = await this.repo.findOneByFilter(filter);
-
-        if (!found.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.CITY));
-
-        return found.unwrapOrNull();
+        return entity;
     }
 
     @LogError()
-    async getById(id: number): Promise<CityEntity | null> {
-        return (await this.repo.findById(id)).unwrapOrNull();
-    }
-
-    @LogError()
-    async getAll(filter: CityFilterDTO, page?: number, limit?: number): Promise<FindAllType<CityEntity>> {
+    async findMany(filter: CityFilterDTO, page?: number, limit?: number): Promise<FindAllType<CityEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -103,37 +98,111 @@ export class CityService implements ICityService {
         return found.unwrap();
     }
 
+    //#endregion
+
+    //#region UPDATE
     @LogError()
-    async updateProperties(currentCity: CityEntity, properties: CityDTO, transaction: Transaction): Promise<UpdateResultType<CityEntity>> {
-        let updatedCity: CityEntity = currentCity.withProps(properties);
+    async update(newData: UpdateCityDTO, transaction: Transaction): Promise<UpdateResultType<CityEntity>> {
+        const entity: CityEntity = await this.getById(newData.id);
 
-        const shouldUpdateStatus: boolean = updatedCity.statusId !== currentCity.statusId;
-        const shouldUpdateDescription: boolean = updatedCity.description !== currentCity.description;
-        const shouldUpdateStateId: boolean = updatedCity.stateId !== currentCity.stateId;
+        let updatedEntity: CityEntity = entity.updateProps(newData);
 
-        if (!shouldUpdateStatus && !shouldUpdateDescription && !shouldUpdateStateId) {
-            return {entity: currentCity, updated: false};
+        if (updatedEntity.isEqual(entity)) {
+            return {entity: entity, updated: false};
         }
 
-        if (shouldUpdateDescription || shouldUpdateStateId) {
-            const pendingApprovalStatus: StatusEntity = await this.statusService.getStatusForUpdateEntities()
-            updatedCity = updatedCity.updateProps({statusId: pendingApprovalStatus.id!})
+        await this.validateForeignKeys(updatedEntity);
+
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
+            if(newData.description !== entity.description) {
+                const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
+                if (!isUnique) {
+                    throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.CITY, "description"));
+                }
+            }
+
+            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
+            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
         }
 
-        const updateResult: boolean = (await this.repo.update(updatedCity, transaction)).unwrapOrThrow();
-
-        if (!updateResult) {
+        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        if (!updated.isSuccess()) {
             throw new ServiceError(EntitiesMessage.error.failure.update(this.CITY));
         }
 
-        return {entity: updatedCity, updated: true};
+        return {entity: updatedEntity, updated: true};
+
+    }
+    //#endregion
+
+    //#region DELETE
+    @LogError()
+    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
+        let entity: CityEntity;
+
+        try {
+            entity = await this.getById(id);
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return DeleteStatusEnum.NOT_FOUND;
+            }
+            throw error;
+        }
+
+        const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
+
+        if (entity.statusId === inactiveStatus.id) {
+            return DeleteStatusEnum.ALREADY_INACTIVE;
+        }
+
+        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        await this.repo.update(deletedEntity, transaction);
+
+        return DeleteStatusEnum.DELETED;
     }
 
     @LogError()
-    async deleteCity(id: number, transaction: Transaction): Promise<void> {
-        const inactiveId: number = (await this.statusService.getStatusForInactiveEntities()).id!;
-        const entity: CityEntity | null = await this.getById(id);
-        if(!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.CITY));
-        await this.updateProperties(entity, {statusId: inactiveId}, transaction);
+    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
+        const deleted: number[] = [];
+        const alreadyInactive: number[] = [];
+        const notFound: number[] = [];
+
+        for (const id of ids) {
+            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
+
+            switch (deleteEntityResult) {
+                case DeleteStatusEnum.DELETED:
+                    deleted.push(id);
+                    break;
+                case DeleteStatusEnum.ALREADY_INACTIVE:
+                    alreadyInactive.push(id);
+                    break;
+                default:
+                    notFound.push(id);
+                    break;
+            }
+        }
+
+        return {deleted, alreadyInactive, notFound};
+    }
+    //#endregion
+
+    @LogError()
+    private async validateForeignKeys(data: Partial<CityDTO>): Promise<void> {
+        const validateExistence = async <T>(
+            field: keyof CityDTO,
+            id: number | undefined,
+            service: { getById: (id: number) => Promise<T | null> }
+        ): Promise<void> => {
+            if (id == null) return;
+            if (!(await service.getById(id))) {
+                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
+            }
+        };
+
+        await Promise.all([
+            validateExistence("stateId", data.stateId, this.stateService),
+            validateExistence("statusId", data.statusId, this.statusService)
+        ]);
     }
 }

@@ -98,7 +98,7 @@ router.post(
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get(
-    "/find",
+    "/findAll",
     validateRequest(FindStatusesSchema, 'query'),
     asyncHandler((req, res) => statusController.findStatuses(req, res))
 )

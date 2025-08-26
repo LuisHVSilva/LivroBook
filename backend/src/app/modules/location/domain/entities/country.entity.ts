@@ -56,14 +56,6 @@ export class CountryEntity extends BaseEntity<CountryProps> {
         return new CountryEntity(props);
     }
 
-    public withProps(props: Partial<CountryProps>): CountryEntity {
-        return CountryEntity.create({
-            id: this.id,
-            description: props.description ?? this.description,
-            statusId: props.statusId ?? this.statusId,
-        });
-    }
-
     //#endregion
 
     //#region UPDATES

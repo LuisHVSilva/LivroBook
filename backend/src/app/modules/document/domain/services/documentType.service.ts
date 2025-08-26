@@ -118,22 +118,20 @@ export class DocumentTypeService implements IDocumentTypeService {
         await this.validateForeignKeys(updatedEntity);
 
         if (updatedEntity.isEqual(entity)) {
-            return { entity: entity, updated: false };
+            return {entity: entity, updated: false};
         }
 
-        const descriptionChanged: boolean = newData.description !== entity.description;
-        const countryChanged: boolean = newData.countryId !== entity.countryId;
-
-        if (descriptionChanged || countryChanged) {
-            const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
-            if (!isUnique) {
-                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, this.DESCRIPTION));
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
+            if (newData.description !== entity.description) {
+                const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
+                if (!isUnique) {
+                    throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, this.DESCRIPTION));
+                }
             }
 
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
             updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
         }
-
 
         const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
         if (!updated.isSuccess()) {
@@ -165,7 +163,7 @@ export class DocumentTypeService implements IDocumentTypeService {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        const deletedEntity = entity.updateProps({statusId: inactiveStatus.id});
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;
@@ -195,6 +193,7 @@ export class DocumentTypeService implements IDocumentTypeService {
 
         return {deleted, alreadyInactive, notFound};
     }
+
     //#endregion
 
     @LogError()

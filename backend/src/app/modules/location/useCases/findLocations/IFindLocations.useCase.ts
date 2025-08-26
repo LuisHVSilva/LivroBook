@@ -1,5 +1,0 @@
-import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {GetLocationsDTO, GetLocationsResponseDTO} from "@location/adapters/dtos/location.dto";
-
-export interface IFindLocationsUseCase extends IUseCase<GetLocationsDTO, GetLocationsResponseDTO> {
-}

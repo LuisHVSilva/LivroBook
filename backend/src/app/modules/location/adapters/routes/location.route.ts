@@ -1,39 +1,99 @@
 import {Router} from "express";
-import {asyncHandler} from "@coreShared/middlewares/asyncHandler";
-import {validateRequest} from "@coreShared/middlewares/validateRequest";
 import {makeLocationController} from "@location/adapters/factories/controller.factory";
-import {CreateLocationSchema} from "@location/schemas/createLocation.schema";
+import {validateRequest} from "@coreShared/middlewares/validateRequest";
+import {asyncHandler} from "@coreShared/middlewares/asyncHandler";
+import {CreateCountrySchema} from "@location/schemas/createCountry.schema";
+import {CreateStateSchema} from "@location/schemas/createState.schema";
+import {CreateCitySchema} from "@location/schemas/createCity.schema";
+import {FindCountriesSchema} from "@location/schemas/findCountries.schema";
+import {FindStatesSchema} from "@location/schemas/findStates.schema";
+import {FindCitiesSchema} from "@location/schemas/findCities.schema";
+import {UpdateCountrySchema} from "@location/schemas/updateCountry.schema";
+import {UpdateStateSchema} from "@location/schemas/updateState.schema";
+import {UpdateCitySchema} from "@location/schemas/updateCity.schema";
+import {DeleteCountrySchema} from "@location/schemas/deleteCountry.schema";
+import {DeleteStateSchema} from "@location/schemas/deleteState.schema";
+import {DeleteCitySchema} from "@location/schemas/deleteCity.schema";
 
 const locationController = makeLocationController()
 const router = Router();
 
-/**
- * @swagger
- * tags:
- *   name: Location
- *   description: Status management in the system. Status can represent different states of an order or workflow.
- */
-
-
+//#region COUNTRY
 router.post(
-    "/create",
-    validateRequest(CreateLocationSchema),
-    asyncHandler((req, res) => locationController.createLocation(req, res))
+    "/country/create",
+    validateRequest(CreateCountrySchema),
+    asyncHandler((req, res) => locationController.createCountry(req, res))
 );
 
 router.get(
-    "/find",
-    asyncHandler((req, res) => locationController.findLocations(req, res))
-);
+    "/country/findAll",
+    validateRequest(FindCountriesSchema, 'query'),
+    asyncHandler((req, res) => locationController.findCountries(req, res))
+)
 
 router.patch(
-    "/update",
-    // validateRequest(UpdateLocationSchema),
-    asyncHandler((req, res) => locationController.updateLocation(req, res))
+    "/country/update",
+    validateRequest(UpdateCountrySchema),
+    asyncHandler((req, res) => locationController.updateCountry(req, res))
 )
 
 router.delete(
-    "/delete",
-    asyncHandler((req, res) => locationController.deleteLocation(req, res))
+    "/country/delete",
+    validateRequest(DeleteCountrySchema, 'query'),
+    asyncHandler((req, res) => locationController.deleteCountry(req, res))
 )
+//#endregion
+
+//#region STATE
+router.post(
+    "/state/create",
+    validateRequest(CreateStateSchema),
+    asyncHandler((req, res) => locationController.createState(req, res))
+);
+
+router.get(
+    "/state/findAll",
+    validateRequest(FindStatesSchema, 'query'),
+    asyncHandler((req, res) => locationController.findStates(req, res))
+)
+
+router.patch(
+    "/state/update",
+    validateRequest(UpdateStateSchema),
+    asyncHandler((req, res) => locationController.updateState(req, res))
+)
+
+router.delete(
+    "/state/delete",
+    validateRequest(DeleteStateSchema, 'query'),
+    asyncHandler((req, res) => locationController.deleteState(req, res))
+)
+//#endregion
+
+//#region CITY
+router.post(
+    "/city/create",
+    validateRequest(CreateCitySchema),
+    asyncHandler((req, res) => locationController.createCity(req, res))
+);
+
+router.get(
+    "/city/findAll",
+    validateRequest(FindCitiesSchema, 'query'),
+    asyncHandler((req, res) => locationController.findCities(req, res))
+)
+
+router.patch(
+    "/city/update",
+    validateRequest(UpdateCitySchema),
+    asyncHandler((req, res) => locationController.updateCity(req, res))
+)
+
+router.delete(
+    "/city/delete",
+    validateRequest(DeleteCitySchema, 'query'),
+    asyncHandler((req, res) => locationController.deleteCity(req, res))
+)
+//#endregion
+
 export {router as locationRouter};

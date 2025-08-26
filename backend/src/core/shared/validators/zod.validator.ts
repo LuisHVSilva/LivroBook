@@ -57,7 +57,7 @@ export class ZodValidator {
     }
 
     static intInputValue(min?: number, max?: number, optional: boolean = false, positive: boolean = true): ZodNumber | ZodOptional<ZodNumber> {
-        let schema: ZodNumber | ZodOptional<ZodNumber> = z.number(EntitiesMessage.error.validation.invalidType("int", "number"));
+        let schema: ZodNumber | ZodOptional<ZodNumber> = z.number();
 
         if (min !== undefined) {
             schema = schema.min(min, {

@@ -30,12 +30,9 @@ export const EntitiesMessage = {
             transactionRequired: "Transação é obrigatória.",
             nullBodyRequest: "A requisição não pode ter corpo vazio",
             invalidLen: (field: string, minLen: number, maxLen: number): string => `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
-            invalidMinDescriptionLen: (len: number) => `A descrição deve ter pelo menos ${len} caracteres.`,
-            invalidMaxDescriptionLen: (len: number) => `A descrição deve ter até ${len} caracteres.`,
             invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,
             invalidMaxLen: (field: string, max: string) => `O campo '${field}' deve ter até ${max} caracteres.`,
             invalidType: (field: string, type: string)=> `O campo '${field}' deve ser do tipo ${type}.`,
-            nullFieldRequired: (field: string) => `O campo '${field}' é obrigatório`,
         },
     },
     info: {

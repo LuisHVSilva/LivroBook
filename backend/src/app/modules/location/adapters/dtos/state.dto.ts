@@ -12,7 +12,37 @@ export type StateFilterDTO = {
     statusId?: number[] | number;
 }
 
-export type StateCreateDTO = {
+export type CreateStateDTO = {
     description: string;
     countryId: number;
+}
+
+export type CreateStateResponseDTO = {
+    id: number;
+    description: string;
+    countryId: number;
+    statusId: number
+}
+
+export type FindStatesDTO = {
+    id?: string[];
+    description?: string[];
+    countryId?: string[];
+    statusId?: string[];
+    page?: string;
+    limit?: string;
+};
+
+export type FindStatesResponseDTO = {
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    data: StateDTO[];
+};
+
+export type UpdateStateDTO = {
+    id: number;
+    description?: string;
+    countryId?: number;
+    statusId?: number;
 }

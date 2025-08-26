@@ -96,28 +96,23 @@ export class PhoneService implements IPhoneService {
     async update(newData: UpdatePhoneDTO, transaction: Transaction): Promise<UpdateResultType<PhoneEntity>> {
         const entity: PhoneEntity = await this.getById(newData.id!);
 
-        let updatedEntity: PhoneEntity = entity.update({
-            number: newData.number ?? entity.number,
-            phoneCodeId: newData.phoneCodeId ?? entity.phoneCodeId,
-            phoneTypeId: newData.phoneTypeId ?? entity.phoneTypeId,
-            statusId: newData.statusId ?? entity.statusId,
-        });
-
-        await this.validateForeignKeys(updatedEntity);
+        let updatedEntity: PhoneEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
             return { entity: entity, updated: false };
         }
-        
-        if (newData.number) {
-            const isUnique: boolean = await this.uniquenessValidator.validate('number', updatedEntity.number);
 
-            if (!isUnique) {
-                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue("PHONE", "number"));
+        await this.validateForeignKeys(updatedEntity);
+
+        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
+            if (newData.number !== updatedEntity.number) {
+                const isUnique: boolean = await this.uniquenessValidator.validate('number', updatedEntity.number);
+
+                if (!isUnique) {
+                    throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue("PHONE", "number"));
+                }
             }
-        }
 
-        if (newData.number || newData.phoneCodeId || newData.phoneTypeId) {
             updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 

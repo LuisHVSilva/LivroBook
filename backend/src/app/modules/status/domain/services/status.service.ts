@@ -137,19 +137,17 @@ export class StatusService implements IStatusService {
 
         if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
 
-        let updatedEntity: StatusEntity = entity.update({
-            ...newData,
-        });
+        let updatedEntity: StatusEntity = entity.update(newData);
 
-        if (newData.description !== undefined) {
+        if (updatedEntity.isEqual(entity)) {
+            return { entity: entity, updated: false };
+        }
+
+        if (newData.description) {
             const isUnique: boolean = await this.uniquenessValidator.validate('description', updatedEntity.description);
             if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATUS, this.DESCRIPTION));
 
             updatedEntity = updatedEntity.deactivate();
-        }
-
-        if (updatedEntity.isEqual(entity)) {
-            return { entity: entity, updated: false };
         }
 
         const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);

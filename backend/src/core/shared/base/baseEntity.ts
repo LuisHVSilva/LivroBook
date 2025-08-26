@@ -45,4 +45,11 @@ export abstract class BaseEntity<T extends { id?: unknown }> {
             .filter(key => !excludeKeys.includes(key))
             .every(key => this.props[key] === other.props[key]);
     }
+
+    public hasDifferencesExceptStatus(other: BaseEntity<T>): boolean {
+        const keys = Object.keys(this.props) as (keyof T)[];
+        return keys
+            .filter(key => key !== "statusId")
+            .some(key => this.props[key] !== other.props[key]);
+    }
 }

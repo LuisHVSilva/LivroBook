@@ -17,7 +17,6 @@ import {IDeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentType
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {StatusEntity} from "@status/domain/entities/status.entity";
 
 @injectable()
 export class DocumentTypeController implements IDocumentTypeController {
@@ -62,7 +61,7 @@ export class DocumentTypeController implements IDocumentTypeController {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleUpdateResult<StatusEntity>(res, result.unwrap());
+        return ApiResponseUtil.handleUpdateResult<DocumentTypeEntity>(res, result.unwrap());
     }
 
     async deleteDocumentTypes(req: Request, res: Response): Promise<Response> {
