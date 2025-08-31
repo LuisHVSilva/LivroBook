@@ -2,7 +2,7 @@ import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
 
-export interface IBaseRepository<TEntity, TModel, TFilter> {
+export interface IBaseRepository<TEntity, TFilter> {
     /**
      * Create a new register.
      * @param entity - The T entity to create.
@@ -15,9 +15,15 @@ export interface IBaseRepository<TEntity, TModel, TFilter> {
      * @param limit - The maximum number of statuses to return.
      * @param offset - The number of statuses to skip before starting to collect the result set.
      * @param filter - Optional filter criteria to apply when searching for entity.
+     * @param orderBy -
      * @return A ResultType containing an array of StatusEntity objects and the total count of matching statuses.
      */
-    findMany(limit: number,offset: number,filter?: TFilter): Promise<ResultType<FindAllType<TEntity>>>;
+    findMany(
+        limit: number,
+        offset: number,
+        filter?: TFilter,
+        orderBy?: { field: keyof TEntity; direction: 'ASC' | 'DESC' }
+    ): Promise<ResultType<FindAllType<TEntity>>>;
 
     /**
      * Finds a single entity by its ID.
@@ -36,8 +42,7 @@ export interface IBaseRepository<TEntity, TModel, TFilter> {
      *
      * @param entity - The StatusEntity to be updated.
      * @param transaction - Optional transaction for database operations.
-     * @param model - Optional model for additional operations.
      * @returns A ResultType containing the updated StatusEntity.
      */
-    update(entity: TEntity, transaction?: Transaction, model?: TModel): Promise<ResultType<boolean>>;
+    update(entity: TEntity, transaction?: Transaction): Promise<ResultType<TEntity>>;
 }
