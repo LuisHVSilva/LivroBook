@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {PhoneCodeValidator} from "@phone/domain/validations/phoneCode.validation";
 
 export interface PhoneCodeProps{
@@ -9,7 +9,7 @@ export interface PhoneCodeProps{
     statusId: number;
 }
 
-export class PhoneCodeEntity extends BaseEntity<PhoneCodeProps>{
+export class PhoneCodeEntity extends EntityBase<PhoneCodeProps>{
     //#region PROPERTIES
     private static readonly MIN_DDI_DIGITS: number = 1;
     public static readonly MIN_DDI_VALUE: number = Math.pow(10, this.MIN_DDI_DIGITS - 1);

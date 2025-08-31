@@ -108,11 +108,9 @@ export class PhoneCodeService implements IPhoneCodeService {
             updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        const updated: ResultType<PhoneCodeEntity> = await this.repo.update(updatedEntity, transaction);
 
-        if (!updated.isSuccess()) throw new Error(EntitiesMessage.error.failure.update(this.PHONE_CODE));
-
-        return {entity: updatedEntity, updated: updated.unwrap()};
+        return {entity: updated.unwrapOrThrow(), updated: updated.unwrap()};
     }
     //#endregion
 

@@ -1,4 +1,4 @@
-import {CreateStatusDTO, FindFilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
+import {CreateStatusDTO, FilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
 import {Transaction} from "sequelize";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StatusEntity} from "@status/domain/entities/status.entity";
@@ -17,7 +17,7 @@ export interface IStatusService {
 
     getStausActiveByDescription(description: string): Promise<StatusEntity>;
 
-    findMany(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>>;
+    findMany(filter: FilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>>;
 
     getStatusForNewEntities(): Promise<StatusEntity>;
 

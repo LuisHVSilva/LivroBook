@@ -1,23 +1,25 @@
 import {container} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
 import {DocumentTypeService} from "@document/domain/services/documentType.service";
 import {ICreateDocumentTypeUseCase} from "@document/useCases/createDocumentType/ICreateDocumentType.useCase";
 import {CreateDocumentTypeUseCase} from "@document/useCases/createDocumentType/createDocumentType.useCase";
-import {DocumentTypeMapper} from "@document/infrastructure/mappers/documentType.mapper";
 import {IDocumentTypeController} from "@document/adapters/controllers/IDocumentType.controller";
 import {DocumentTypeController} from "@document/adapters/controllers/documentType.controller";
-import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {DocumentTypeDTO} from "@document/adapters/dto/documentType.dto";
-import {DocumentTypeRepository} from "@document/infrastructure/repositories/interface/documentType.repository";
-import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
+import {DocumentTypeRepository} from "@document/infrastructure/repositories/documentType.repository";
+import {
+    DocumentTypeBaseRepositoryType,
+    IDocumentTypeRepository
+} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {IFindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/IFindDocumentTypes.useCase";
 import {FindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/findDocumentTypes.useCase";
 import {IUpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/IUpdateDocumentType.useCase";
 import {UpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/updateDocumentType.useCase";
 import {IDeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentTypes/IDeleteDocumentTypes.useCase";
 import {DeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentTypes/deleteDocumentTypes.useCase";
+import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
+import {ModelStatic} from "sequelize";
 
 //#region Services
 container.registerSingleton<IDocumentTypeService>("IDocumentTypeService", DocumentTypeService);
@@ -31,7 +33,7 @@ container.registerSingleton<IDeleteDocumentTypesUseCase>("IDeleteDocumentTypesUs
 // #endregion
 
 //#region Infrastructure
-container.registerSingleton<DocumentTypeMapper>("DocumentTypeMapper", DocumentTypeMapper);
+container.register<ModelStatic<DocumentTypeModel>>("DocumentTypeModel", {useValue: DocumentTypeModel});
 container.registerSingleton<IDocumentTypeRepository>("IDocumentTypeRepository", DocumentTypeRepository);
 //#endregion
 
@@ -40,8 +42,8 @@ container.registerSingleton<IDocumentTypeController>("IDocumentTypeController", 
 //#endregion
 
 //#region Validators
-container.registerSingleton<EntityUniquenessValidator<DocumentTypeEntity, DocumentTypeMapper, DocumentTypeDTO>>("DocumentTypeUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<IBaseRepository<any, any, any>>("DocumentTypeRepository", DocumentTypeRepository);
+container.registerSingleton<EntityUniquenessValidator<DocumentTypeBaseRepositoryType>>("DocumentTypeUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IRepositoryBase<DocumentTypeBaseRepositoryType>>("DocumentTypeRepository", DocumentTypeRepository);
 //#endregion
 
 export {container};

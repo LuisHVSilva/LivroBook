@@ -1,4 +1,4 @@
-import {BaseEntity} from '@coreShared/base/baseEntity';
+import {EntityBase} from '@coreShared/base/entity.base';
 import {CountryTransformer} from "@location/domain/transformers/country.transform";
 import {CountryValidator} from "@location/domain/validators/country.validator";
 
@@ -8,7 +8,7 @@ export interface CountryProps {
     statusId: number;
 }
 
-export class CountryEntity extends BaseEntity<CountryProps> {
+export class CountryEntity extends EntityBase<CountryProps> {
     //#region PROPERTIES
     public static readonly MIN_DESC: number = 3;
     public static readonly MAX_DESC: number = 100;
@@ -51,17 +51,14 @@ export class CountryEntity extends BaseEntity<CountryProps> {
     //#endregion
 
     //# region CREATION
-
     public static create(props: CountryProps): CountryEntity {
         return new CountryEntity(props);
     }
-
     //#endregion
 
     //#region UPDATES
-    public updateProps(props: Partial<CountryProps>): this {
+    public update(props: Partial<CountryProps>): this {
         return this.cloneWith(props);
     }
-
     //#endregion
 }

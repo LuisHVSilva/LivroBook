@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {PasswordHasherSecurity} from "@coreShared/security/passwordHasher.security";
 import { isIP } from 'net';
 import {PasswordValidatorUtil} from "@coreShared/utils/passwordValidator.util";
@@ -16,7 +16,7 @@ export interface UserCredentialProps{
     statusId: number;
 }
 
-export class UserCredentialEntity extends BaseEntity<UserCredentialProps>{
+export class UserCredentialEntity extends EntityBase<UserCredentialProps>{
     private readonly _id: number | undefined;
     private readonly _password: string | undefined;
     private readonly _loginAttempts: number;

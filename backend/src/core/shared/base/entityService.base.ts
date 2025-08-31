@@ -1,14 +1,10 @@
-// import {ResultType} from "@coreShared/types/result.type";
-// import {NotFoundError} from "@coreShared/errors/domain.error";
-// import {EntitiesMessage} from "@coreShared/messages/entities.message";
-// import {unmanaged} from "inversify";
-// import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
 // import {EntityType} from "@coreShared/types/entity.type";
+// import {unmanaged} from "inversify";
 //
 // export abstract class BaseEntityService<T extends EntityType<any, any, any, any, any, any>> {
 //     protected constructor(
 //         @unmanaged()
-//         protected readonly repo: IBaseRepository<T["Entity"], T["Model"], T["FilterDTO"]>,
+//         protected readonly repo: IRepositoryBase<T["Entity"], T["Model"], T["FilterDTO"]>,
 //     ) {
 //     }
 //

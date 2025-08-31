@@ -1,11 +1,13 @@
 import {inject, injectable} from "tsyringe";
-import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
+import {
+    CityBaseRepositoryType,
+    ICityRepository
+} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CityEntity} from "@location/domain/entities/city.entity";
-import {CityModel} from "@location/infrastructure/models/city.model";
 import {CityDTO, CityFilterDTO, CreateCityDTO, UpdateCityDTO} from "@location/adapters/dtos/city.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
 import {StatusEntity} from "@status/domain/entities/status.entity";
@@ -16,7 +18,6 @@ import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
-import {ServiceError} from "@coreShared/errors/service.error";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
@@ -26,7 +27,7 @@ import {DeleteReport} from "@coreShared/utils/operationReport.util";
 @injectable()
 export class CityService implements ICityService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<CityEntity, CityModel, CityDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<CityBaseRepositoryType>;
     private readonly CITY: string = CityEntity.ENTITY_NAME;
     //#endregion
 
@@ -34,7 +35,7 @@ export class CityService implements ICityService {
     constructor(
         @inject("ICityRepository") private readonly repo: ICityRepository,
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("CityRepository") cityRepo: IBaseRepository<CityEntity, CityModel, CityDTO>,
+        @inject("CityRepository") cityRepo: IRepositoryBase<CityBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
         @inject("IStateService") private readonly stateService: IStateService,
     ) {
@@ -105,7 +106,7 @@ export class CityService implements ICityService {
     async update(newData: UpdateCityDTO, transaction: Transaction): Promise<UpdateResultType<CityEntity>> {
         const entity: CityEntity = await this.getById(newData.id);
 
-        let updatedEntity: CityEntity = entity.updateProps(newData);
+        let updatedEntity: CityEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
             return {entity: entity, updated: false};
@@ -122,16 +123,12 @@ export class CityService implements ICityService {
             }
 
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
+            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
-        if (!updated.isSuccess()) {
-            throw new ServiceError(EntitiesMessage.error.failure.update(this.CITY));
-        }
+        const updated: ResultType<CityEntity> = await this.repo.update(updatedEntity, transaction);
 
-        return {entity: updatedEntity, updated: true};
-
+        return {entity: updated.unwrapOrThrow(), updated: true};
     }
     //#endregion
 
@@ -155,7 +152,7 @@ export class CityService implements ICityService {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        const deletedEntity = entity.update({ statusId: inactiveStatus.id });
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;

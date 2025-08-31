@@ -12,6 +12,12 @@ export type StateFilterDTO = {
     statusId?: number[] | number;
 }
 
+export type StatePersistenceDTO = {
+    description: string;
+    statusId: number;
+    countryId: number;
+};
+
 export type CreateStateDTO = {
     description: string;
     countryId: number;

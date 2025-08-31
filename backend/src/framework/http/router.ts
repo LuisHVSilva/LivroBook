@@ -1,8 +1,9 @@
 import {Router} from "express";
-import {statusRoutes} from "@status/adapters/routes/status.route";
-import {locationRouter} from "@location/adapters/routes/location.route";
 import {swaggerSpec} from "../../../swagger/swagger.config";
 import swaggerUi from 'swagger-ui-express';
+
+import {statusRoutes} from "@status/adapters/routes/status.route";
+import {locationRouter} from "@location/adapters/routes/location.route";
 import {documentTypeRouter} from "@document/adapters/rountes/documentType.route";
 import {phoneRoute} from "@phone/adapters/routes/phone.route";
 

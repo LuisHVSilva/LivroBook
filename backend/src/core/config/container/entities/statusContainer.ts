@@ -1,11 +1,10 @@
 import {container} from "tsyringe";
-import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
+import {IStatusRepository, StatusBaseRepositoryType} from "@status/infrastructure/repositories/IStatusRepository";
 import {IStatusController} from "@status/adapters/controllers/IStatus.controller";
 import {StatusController} from "@status/adapters/controllers/status.controller";
 import {StatusRepository} from "@status/infrastructure/repositories/status.repository";
 import {ICreateStatusUseCase} from "@status/useCases/createStatus/ICreateStatus.useCase";
 import {CreateStatusUseCase} from "@status/useCases/createStatus/createStatus.useCase";
-import {StatusMapper} from "@status/infrastructure/mappers/status.mapper";
 import {IFindStatusesUseCase} from "@status/useCases/findStatus/IFindStatuses.useCase";
 import {FindStatusesUseCase} from "@status/useCases/findStatus/findStatuses.useCase";
 import {IUpdateStatusUseCase} from "@status/useCases/updateStatus/IUpdateStatus.useCase";
@@ -14,10 +13,10 @@ import {IDeleteStatusUseCase} from "@status/useCases/deleteStatus/IDeleteStatus.
 import {DeleteStatusUseCase} from "@status/useCases/deleteStatus/deleteStatus.useCase";
 import {StatusService} from "@status/domain/services/status.service";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {StatusEntity} from "@status/domain/entities/status.entity";
-import {StatusDto} from "@status/adapters/dtos/status.dto";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
+import {StatusModel} from "@status/infrastructure/models/status.model";
+import {ModelStatic} from "sequelize";
 
 //#region Services
 container.registerSingleton<IStatusService>("IStatusService", StatusService);
@@ -31,7 +30,7 @@ container.registerSingleton<IDeleteStatusUseCase>("IDeleteStatusUseCase", Delete
 // #endregion
 
 //#region Infrastructure
-container.registerSingleton<StatusMapper>("StatusMapper", StatusMapper);
+container.register<ModelStatic<StatusModel>>("StatusModel", {useValue: StatusModel});
 container.registerSingleton<IStatusRepository>("IStatusRepository", StatusRepository);
 //#endregion
 
@@ -40,8 +39,8 @@ container.registerSingleton<IStatusController>("IStatusController", StatusContro
 //#endregion
 
 //#region Validators
-container.registerSingleton<EntityUniquenessValidator<StatusEntity, StatusMapper, StatusDto>>("StatusUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<IBaseRepository<any, any, any>>("StatusRepository", StatusRepository);
+container.registerSingleton<EntityUniquenessValidator<StatusBaseRepositoryType>>("StatusUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IRepositoryBase<StatusBaseRepositoryType>>("StatusRepository", StatusRepository);
 //#endregion
 
 export {container};

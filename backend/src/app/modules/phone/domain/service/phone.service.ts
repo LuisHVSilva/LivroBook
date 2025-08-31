@@ -11,12 +11,14 @@ import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
-import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 import {CreatePhoneDTO, PhoneDTO, PhoneFilterDTO, UpdatePhoneDTO} from "@phone/adapters/dtos/phone.dto";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {
+    IPhoneRepository,
+    PhoneBaseRepositoryType
+} from "@phone/infrastructure/repositories/interface/IPhone.repository";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
@@ -24,7 +26,7 @@ import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 @injectable()
 export class PhoneService implements IPhoneService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<PhoneEntity, PhoneModel, PhoneDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<PhoneBaseRepositoryType>;
     private readonly PHONE: string = PhoneEntity.ENTITY_NAME;
     //#endregion
 
@@ -32,7 +34,7 @@ export class PhoneService implements IPhoneService {
     constructor(
         @inject("IPhoneRepository") private readonly repo: IPhoneRepository,
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("PhoneRepository") phoneRepository: IBaseRepository<PhoneEntity, PhoneModel, PhoneDTO>,
+        @inject("PhoneRepository") phoneRepository: IRepositoryBase<PhoneBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
         @inject("IPhoneCodeService") private readonly phoneCodeService: IPhoneCodeService,
         @inject("IPhoneTypeService") private readonly phoneTypeService: IPhoneTypeService,
@@ -116,11 +118,9 @@ export class PhoneService implements IPhoneService {
             updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        const updated: ResultType<PhoneEntity> = await this.repo.update(updatedEntity, transaction);
 
-        if (!updated.isSuccess()) throw new Error(EntitiesMessage.error.failure.update(this.PHONE));
-
-        return {entity: updatedEntity, updated: updated.unwrap()};
+        return {entity: updated.unwrapOrThrow(), updated: updated.unwrap()};
     }
     //#endregion
 

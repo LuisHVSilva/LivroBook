@@ -1,15 +1,14 @@
 import {inject, injectable} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {StatusModel} from "@status/infrastructure/models/status.model";
-import {CreateStatusDTO, FindFilterStatusDTO, StatusDto, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
+import {CreateStatusDTO, FilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {Transaction} from "sequelize";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError, ValidationError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
+import {IStatusRepository, StatusBaseRepositoryType} from "@status/infrastructure/repositories/IStatusRepository";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
 import {ServiceError} from "@coreShared/errors/service.error";
@@ -22,7 +21,7 @@ import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 @injectable()
 export class StatusService implements IStatusService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<StatusEntity, StatusModel, StatusDto>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<StatusBaseRepositoryType>;
     private readonly STATUS: string = StatusEntity.ENTITY_NAME;
     private readonly DESCRIPTION: string = 'description';
     private readonly NEW_ENTITIES_STATUS: string = "PENDENTE DE APROVACAO";
@@ -33,10 +32,10 @@ export class StatusService implements IStatusService {
     //#region CONSTRUCTOR
     constructor(
         @inject("IStatusRepository") private readonly repo: IStatusRepository,
-        @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("StatusRepository") statusRepo: IBaseRepository<StatusEntity, StatusModel, StatusDto>
+        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("StatusRepository") private readonly statusRepo: IRepositoryBase<StatusBaseRepositoryType>
     ) {
-        this.uniquenessValidator = validatorFactory(statusRepo);
+        this.uniquenessValidator = this.validatorFactory(this.statusRepo);
     }
 
     //#endregion
@@ -95,7 +94,7 @@ export class StatusService implements IStatusService {
     }
 
     @LogError()
-    async findMany(filter: FindFilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>> {
+    async findMany(filter: FilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
@@ -150,7 +149,7 @@ export class StatusService implements IStatusService {
             updatedEntity = updatedEntity.deactivate();
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        const updated: ResultType<StatusEntity> = await this.repo.update(updatedEntity, transaction);
 
         if (!updated.isSuccess()) throw new ServiceError(EntitiesMessage.error.failure.update(this.STATUS));
 

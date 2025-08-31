@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {StateTransformer} from "@location/domain/transformers/state.transform";
 import {StateValidator} from "@location/domain/validators/state.validator";
 
@@ -9,7 +9,7 @@ export interface StateProps {
     statusId: number;
 }
 
-export class StateEntity extends BaseEntity<StateProps> {
+export class StateEntity extends EntityBase<StateProps> {
     //#region PROPERTIES
     public static readonly MIN_DESC: number = 3;
     public static readonly MAX_DESC: number = 100;
@@ -53,23 +53,14 @@ export class StateEntity extends BaseEntity<StateProps> {
 
     //#endregion
 
-    //# region CREATION | RESTORATION
+    //# region CREATION
     public static create(props: StateProps): StateEntity {
         return new StateEntity(props);
-    }
-
-    public withProps(props: Partial<StateProps>): StateEntity {
-        return StateEntity.create({
-            id: this.id,
-            description: props.description ?? this.description,
-            countryId: props.countryId ?? this.countryId,
-            statusId: props.statusId ?? this.statusId,
-        });
     }
     //#endregion
 
     //#region UPDATES
-    public updateProps(props: Partial<StateProps>): this {
+    public update(props: Partial<StateProps>): this {
         return this.cloneWith(props);
     }
     //#endregion
