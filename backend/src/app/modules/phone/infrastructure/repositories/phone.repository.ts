@@ -1,97 +1,48 @@
 import {inject, injectable} from "tsyringe";
-import {Transaction, WhereOptions} from "sequelize";
-import {ResultType} from "@coreShared/types/result.type";
-import {FindAllType} from "@coreShared/types/findAll.type";
+import {ModelStatic} from "sequelize";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
-import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
-import {PhoneDTO, PhoneFilterDTO} from "@phone/adapters/dtos/phone.dto";
-import {PhoneMapper} from "@phone/infrastructure/mappers/phone.mapper";
-import {PhoneEntity} from "@phone/domain/entities/phone.entity";
+import {
+    IPhoneRepository,
+    PhoneBaseRepositoryType
+} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {PhonePersistenceDTO} from "@phone/adapters/dtos/phone.dto";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
+import {RepositoryBase} from "@coreShared/base/repository.base";
+import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 
 @injectable()
-export class PhoneRepository implements IPhoneRepository {
+export class PhoneRepository extends RepositoryBase<PhoneBaseRepositoryType> implements IPhoneRepository {
     constructor(
-        @inject("PhoneMapper") private mapper: PhoneMapper,
+        @inject("PhoneModel") model: ModelStatic<PhoneModel>,
     ) {
+        super(model);
     }
 
-    async create(entity: PhoneEntity, transaction?: Transaction): Promise<ResultType<PhoneEntity>> {
-        const data = this.mapper.toPersistence(entity);
-        const model: PhoneModel = await PhoneModel.create(data, {transaction});
-        const restored: PhoneEntity = this.mapper.toEntity(model);
-
-        return ResultType.success(restored);
-    }
-
-    async findMany(limit: number, offset: number, filters?: PhoneFilterDTO): Promise<ResultType<FindAllType<PhoneEntity>>> {
-        const builder = new SequelizeWhereBuilderUtil<PhoneFilterDTO>(filters, {
+    protected override makeFilter(filters?: PhoneBaseRepositoryType["Filter"]): SequelizeWhereBuilderUtil<PhoneBaseRepositoryType["Filter"]> {
+        return super.makeFilter(filters, {
             id: {in: true},
-            number: {like: true},
             phoneCodeId: {in: true},
             phoneTypeId: {in: true},
             statusId: {in: true},
         });
-
-        const where: WhereOptions = builder.build();
-
-        const [models, total] = await Promise.all([
-            PhoneModel.findAll({
-                where,
-                limit,
-                offset,
-                order: [['id', 'ASC']],
-            }),
-            PhoneModel.count({
-                where,
-            }),
-        ]);
-
-        const entities: PhoneEntity[] = models.map(model => this.mapper.toEntity(model))
-
-        return ResultType.success({entities: entities, total: total});
     }
 
-    async findOneByFilter(filter?: PhoneFilterDTO): Promise<ResultType<PhoneEntity>> {
-        const where = this.buildWhereClause(filter)
+    protected toPersistence(entity: PhoneEntity): PhonePersistenceDTO {
+        return {
+            number: entity.number,
+            phoneCodeId: entity.phoneCodeId,
+            phoneTypeId: entity.phoneTypeId,
+            statusId: entity.statusId,
+        };
+    }
 
-        const model: PhoneModel | null = await PhoneModel.findOne({
-            where,
-            order: [['id', 'ASC']],
+    protected toEntity(model: PhoneModel): PhoneEntity {
+        return PhoneEntity.create({
+            id: model.id,
+            number: model.number,
+            phoneCodeId: model.phoneCodeId,
+            phoneTypeId: model.phoneTypeId,
+            statusId: model.statusId,
         });
-
-        return model ? ResultType.success(this.mapper.toEntity(model)) : ResultType.none();
-    }
-
-    async findById(id: number): Promise<ResultType<PhoneEntity>> {
-        const model: PhoneModel | null = await PhoneModel.findByPk(id);
-        return model ? ResultType.success(this.mapper.toEntity(model)) : ResultType.none();
-    }
-
-    async update(entity: PhoneEntity, transaction?: Transaction, model?: PhoneModel): Promise<ResultType<boolean>> {
-        const modelToUpdate = model ?? await PhoneModel.findByPk(entity.id, {transaction});
-        if (!modelToUpdate) return ResultType.failure(new Error("Phone not found"));
-
-        modelToUpdate.number = entity.number;
-        modelToUpdate.phoneCodeId = entity.phoneCodeId;
-        modelToUpdate.phoneTypeId = entity.phoneTypeId;
-        modelToUpdate.statusId = entity.statusId;
-        await modelToUpdate.save({transaction});
-
-        return ResultType.success(true);
-    }
-
-    private buildWhereClause(filters?: PhoneFilterDTO): Partial<Record<keyof PhoneDTO, any>> {
-        const where: Partial<Record<keyof PhoneDTO, any>> = {};
-
-        if (filters == null) return where;
-
-        if (filters.id !== undefined) where.id = filters.id;
-        if (filters.number !== undefined) where.number = filters.number;
-        if (filters.phoneCodeId !== undefined) where.phoneCodeId = filters.phoneCodeId;
-        if (filters.phoneTypeId !== undefined) where.phoneTypeId = filters.phoneTypeId;
-        if (filters.statusId !== undefined) where.statusId = filters.statusId;
-
-        return where;
     }
 }

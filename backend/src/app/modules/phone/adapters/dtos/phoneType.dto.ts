@@ -12,6 +12,12 @@ export type PhoneTypeFilterDTO = {
     limit?: number;
 }
 
+export type PhoneTypePersistenceDTO = {
+    description: string;
+    statusId: number;
+};
+
+
 export type CreatePhoneTypeDTO = {
     description: string;
     statusId: number;

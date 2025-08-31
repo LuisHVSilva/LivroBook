@@ -6,15 +6,6 @@ import {CreatePhoneDTO, PhoneFilterDTO, UpdatePhoneDTO} from "@phone/adapters/dt
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 
-// interface PhoneTypes extends EntityType<
-//     PhoneEntity,
-//     PhoneModel,
-//     PhoneDTO,
-//     CreatePhoneDTO,
-//     UpdatePhoneDTO,
-//     PhoneFilterDTO
-// > {
-// }
 
 export interface IPhoneService {
     create(data: CreatePhoneDTO, transaction: Transaction): Promise<PhoneEntity>;

@@ -1,7 +1,12 @@
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {CityModel} from "@location/infrastructure/models/city.model";
-import {CityFilterDTO} from "@location/adapters/dtos/city.dto";
+import {CityFilterDTO, CityPersistenceDTO} from "@location/adapters/dtos/city.dto";
+import {BaseRepositoryType} from "@coreShared/types/entity.type";
+import {StateEntity} from "@location/domain/entities/state.entity";
 
-export interface ICityRepository extends IBaseRepository<CityEntity, CityModel, CityFilterDTO> {
+export type CityBaseRepositoryType = BaseRepositoryType<CityModel, CityEntity, CityFilterDTO, CityPersistenceDTO>;
+
+export interface ICityRepository extends IRepositoryBase<CityBaseRepositoryType> {
+
 }

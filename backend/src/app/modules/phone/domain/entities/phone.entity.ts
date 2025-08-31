@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {PhoneValidator} from "@phone/domain/validations/phone.validation";
 
 export interface PhoneProps {
@@ -9,7 +9,7 @@ export interface PhoneProps {
     statusId: number;
 }
 
-export class PhoneEntity extends BaseEntity<PhoneProps> {
+export class PhoneEntity extends EntityBase<PhoneProps> {
     //#region PROPERTIES
     public static readonly MIN_NUMBER: number = 4;
     public static readonly MAX_NUMBER: number = 20;

@@ -1,32 +1,29 @@
 import {container} from "tsyringe";
-import {CountryMapper} from "@location/infrastructure/mappers/country.mapper";
 import {ILocationController} from "@location/adapters/controllers/ILocation.controller";
 import {LocationController} from "@location/adapters/controllers/location.controller";
 import {CountryRepository} from "@location/infrastructure/repositories/country.repository";
 import {StateRepository} from "@location/infrastructure/repositories/state.repository";
-import {StateMapper} from "@location/infrastructure/mappers/state.mapper";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {StateEntity} from "@location/domain/entities/state.entity";
-import {StateModel} from "@location/infrastructure/models/state.model";
-import {StateDTO} from "@location/adapters/dtos/state.dto";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {CountryService} from "@location/domain/services/country.service";
 import {StateService} from "@location/domain/services/state.service";
 import {CityService} from "@location/domain/services/city.service";
-import {CountryEntity} from "@location/domain/entities/country.entity";
-import {CountryModel} from "@location/infrastructure/models/country.model";
-import {CountryDTO} from "@location/adapters/dtos/country.dto";
-import {CityEntity} from "@location/domain/entities/city.entity";
-import {CityModel} from "@location/infrastructure/models/city.model";
-import {CityDTO} from "@location/adapters/dtos/city.dto";
-import {CityMapper} from "@location/infrastructure/mappers/city.mapper";
-import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
+import {
+    CityBaseRepositoryType,
+    ICityRepository
+} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {CityRepository} from "@location/infrastructure/repositories/city.repository";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
-import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
-import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
+import {
+    IStateRepository,
+    StateBaseRepositoryType
+} from "@location/infrastructure/repositories/interfaces/IState.repository";
+import {
+    CountryBaseRepositoryType,
+    ICountryRepository
+} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
 import {ICreateCountryUseCase} from "@location/useCases/createCountry/ICreateCountry.useCase";
 import {CreateCountryUseCase} from "@location/useCases/createCountry/createCountry.useCase";
 import {ICreateStateUseCase} from "@location/useCases/createState/ICreateState.useCase";
@@ -51,6 +48,10 @@ import {IDeleteStateUseCase} from "@location/useCases/deleteState/IDeleteState.u
 import {DeleteStateUseCase} from "@location/useCases/deleteState/deleteState.useCase";
 import {IDeleteCityUseCase} from "@location/useCases/deleteCity/IDeleteCity.useCase";
 import {DeleteCityUseCase} from "@location/useCases/deleteCity/deleteCity.useCase";
+import {CountryModel} from "@location/infrastructure/models/country.model";
+import {ModelStatic} from "sequelize";
+import {StateModel} from "@location/infrastructure/models/state.model";
+import {CityModel} from "@location/infrastructure/models/city.model";
 
 //#region Domain
 container.registerSingleton<ICountryService>("ICountryService", CountryService);
@@ -73,15 +74,12 @@ container.registerSingleton<IUpdateCityUseCase>("IUpdateCityUseCase", UpdateCity
 container.registerSingleton<IDeleteCityUseCase>("IDeleteCityUseCase", DeleteCityUseCase);
 // #endregion
 
-//#region Mappers
-container.registerSingleton<CountryMapper>("CountryMapper", CountryMapper);
-container.registerSingleton<StateMapper>("StateMapper", StateMapper);
-container.registerSingleton<CityMapper>("CityMapper", CityMapper);
-//#endregion
-
 //#region Infrastructure
+container.register<ModelStatic<CountryModel>>("CountryModel", {useValue: CountryModel});
 container.registerSingleton<ICountryRepository>("ICountryRepository", CountryRepository);
+container.register<ModelStatic<StateModel>>("StateModel", {useValue: StateModel});
 container.registerSingleton<IStateRepository>("IStateRepository", StateRepository);
+container.register<ModelStatic<CityModel>>("CityModel", {useValue: CityModel});
 container.registerSingleton<ICityRepository>("ICityRepository", CityRepository);
 //#endregion
 
@@ -90,13 +88,13 @@ container.registerSingleton<ILocationController>("ILocationController", Location
 //#endregion
 
 //#region Validators
-container.registerSingleton<EntityUniquenessValidator<CountryEntity, CountryModel, CountryDTO>>("CountryUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<EntityUniquenessValidator<StateEntity, StateModel, StateDTO>>("StateUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<EntityUniquenessValidator<CityEntity, CityModel, CityDTO>>("CityUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<EntityUniquenessValidator<CountryBaseRepositoryType>>("CountryUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<EntityUniquenessValidator<StateBaseRepositoryType>>("StateUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<EntityUniquenessValidator<CityBaseRepositoryType>>("CityUniquenessValidator", EntityUniquenessValidator);
 
-container.registerSingleton<IBaseRepository<any, any, any>>("CountryRepository", CountryRepository);
-container.registerSingleton<IBaseRepository<any, any, any>>("StateRepository", StateRepository);
-container.registerSingleton<IBaseRepository<any, any, any>>("CityRepository", CityRepository);
+container.registerSingleton<IRepositoryBase<CountryBaseRepositoryType>>("CountryRepository", CountryRepository);
+container.registerSingleton<IRepositoryBase<StateBaseRepositoryType>>("StateRepository", StateRepository);
+container.registerSingleton<IRepositoryBase<CityBaseRepositoryType>>("CityRepository", CityRepository);
 //#endregion
 
 export {container};

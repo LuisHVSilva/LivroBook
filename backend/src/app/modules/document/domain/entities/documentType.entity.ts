@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {DocumentTypeValidator} from "@document/domain/validators/documentType.validator";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
 
@@ -9,7 +9,7 @@ export interface DocumentTypeProps {
     statusId: number;
 }
 
-export class DocumentTypeEntity extends BaseEntity<DocumentTypeProps> {
+export class DocumentTypeEntity extends EntityBase<DocumentTypeProps> {
     //#region PROPERTIES
     public static readonly ENTITY_NAME: string = 'DOCUMENT TYPE';
     public static readonly MIN_DESC: number = 2;
@@ -59,7 +59,7 @@ export class DocumentTypeEntity extends BaseEntity<DocumentTypeProps> {
     //#endregion
 
     //#region UPDATES
-    public updateProps(props: Partial<DocumentTypeProps>): this {
+    public update(props: Partial<DocumentTypeProps>): this {
         return this.cloneWith(props);
     }
     //#endregion

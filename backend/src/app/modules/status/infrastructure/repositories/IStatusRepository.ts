@@ -1,16 +1,16 @@
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
-import {ResultType} from "@coreShared/types/result.type";
-import {FindFilterStatusDTO} from "@status/adapters/dtos/status.dto";
 import {StatusModel} from "@status/infrastructure/models/status.model";
+import {FilterStatusDTO} from "@status/adapters/dtos/status.dto";
+import {BaseRepositoryType} from "@coreShared/types/entity.type";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
+import {ResultType} from "@coreShared/types/result.type";
 
-export interface IStatusRepository extends IBaseRepository<StatusEntity, StatusModel, FindFilterStatusDTO> {
-    /**
-     * Search for a status by its description.
-     *
-     * @param description - The description of the status to be searched for.
-     * @returns A status object if found.
-     */
+export type StatusPersistenceDTO = {
+    description: string;
+    active: boolean;
+};
+export type StatusBaseRepositoryType = BaseRepositoryType<StatusModel, StatusEntity, FilterStatusDTO, StatusPersistenceDTO>;
+
+export interface IStatusRepository extends IRepositoryBase<StatusBaseRepositoryType> {
     findByDescription(description: string): Promise<ResultType<StatusEntity>>;
-
 }

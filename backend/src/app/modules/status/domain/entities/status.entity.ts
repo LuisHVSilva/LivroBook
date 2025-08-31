@@ -1,4 +1,4 @@
-import { BaseEntity } from '@coreShared/base/baseEntity';
+import { EntityBase } from '@coreShared/base/entity.base';
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 import {StatusValidator} from "@status/domain/validators/status.validator";
 
@@ -8,7 +8,7 @@ export interface StatusProps {
     active: boolean;
 }
 
-export class StatusEntity extends BaseEntity<StatusProps> {
+export class StatusEntity extends EntityBase<StatusProps> {
     //#region PROPERTIES
     public static readonly MIN_DESC: number = 3;
     public static readonly MAX_DESC: number = 50;
@@ -84,12 +84,6 @@ export class StatusEntity extends BaseEntity<StatusProps> {
     public deactivate(): this {
         const updatedProps: Partial<StatusProps> = { active: false };
         return this.cloneWith(updatedProps);
-    }
-    //#endregion
-
-    //#region HELPERS
-    public toJSON(): Record<string, unknown> {
-        return { ...this.props };
     }
     //#endregion
 }

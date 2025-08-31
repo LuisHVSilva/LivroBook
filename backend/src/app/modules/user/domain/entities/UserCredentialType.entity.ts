@@ -1,5 +1,5 @@
 import {StringUtil} from "@coreShared/utils/string.util";
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 
 export interface UserCredentialTypeProps {
     id?: number;
@@ -7,7 +7,7 @@ export interface UserCredentialTypeProps {
     statusId: number;
 }
 
-export class UserCredentialTypeEntity extends BaseEntity<UserCredentialTypeProps>{
+export class UserCredentialTypeEntity extends EntityBase<UserCredentialTypeProps>{
     private readonly _id: number | undefined;
     private readonly _description: string;
     private readonly _status: number;

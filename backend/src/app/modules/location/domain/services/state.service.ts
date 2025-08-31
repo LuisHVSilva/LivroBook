@@ -1,10 +1,12 @@
 import {inject, injectable} from "tsyringe";
-import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
+import {
+    IStateRepository,
+    StateBaseRepositoryType
+} from "@location/infrastructure/repositories/interfaces/IState.repository";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {StateEntity} from "@location/domain/entities/state.entity";
-import {StateModel} from "@location/infrastructure/models/state.model";
 import {
     CreateStateDTO,
     StateDTO,
@@ -21,7 +23,6 @@ import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
-import {ServiceError} from "@coreShared/errors/service.error";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
@@ -31,7 +32,7 @@ import {DeleteReport} from "@coreShared/utils/operationReport.util";
 @injectable()
 export class StateService implements IStateService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<StateEntity, StateModel, StateDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<StateBaseRepositoryType>;
     private readonly STATE: string = StateEntity.ENTITY_NAME;
     //#endregion
 
@@ -39,7 +40,7 @@ export class StateService implements IStateService {
     constructor(
         @inject("IStateRepository") private readonly repo: IStateRepository,
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("StateRepository") stateRepo: IBaseRepository<StateEntity, StateModel, StateDTO>,
+        @inject("StateRepository") stateRepo: IRepositoryBase<StateBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
         @inject('ICountryService') private readonly countryService: ICountryService,
     ) {
@@ -110,7 +111,7 @@ export class StateService implements IStateService {
     async update(newData: UpdateStateDTO, transaction: Transaction): Promise<UpdateResultType<StateEntity>> {
         const entity: StateEntity = await this.getById(newData.id);
 
-        let updatedEntity: StateEntity = entity.updateProps(newData);
+        let updatedEntity: StateEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
             return {entity: entity, updated: false};
@@ -126,16 +127,12 @@ export class StateService implements IStateService {
                 }
             }
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
+            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
-        if (!updated.isSuccess()) {
-            throw new ServiceError(EntitiesMessage.error.failure.update(this.STATE));
-        }
+        const updated: ResultType<StateEntity> = await this.repo.update(updatedEntity, transaction);
 
-        return {entity: updatedEntity, updated: true};
-
+        return {entity: updated.unwrapOrThrow(), updated: true};
     }
 
     //#endregion
@@ -160,7 +157,7 @@ export class StateService implements IStateService {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity = entity.updateProps({statusId: inactiveStatus.id});
+        const deletedEntity = entity.update({statusId: inactiveStatus.id});
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;

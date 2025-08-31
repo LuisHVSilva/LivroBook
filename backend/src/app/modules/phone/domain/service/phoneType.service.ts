@@ -2,17 +2,19 @@ import {inject, injectable} from "tsyringe";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
-import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
 import {
     CreatePhoneTypeDTO,
     PhoneTypeDTO,
     PhoneTypeFilterDTO,
     UpdatePhoneTypeDTO
 } from "@phone/adapters/dtos/phoneType.dto";
-import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {
+    IPhoneTypeRepository,
+    PhoneTypeBaseRepositoryType
+} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
@@ -29,7 +31,7 @@ import {DeleteReport} from "@coreShared/utils/operationReport.util";
 @injectable()
 export class PhoneTypeService implements IPhoneTypeService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<PhoneTypeEntity, PhoneTypeModel, PhoneTypeDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<PhoneTypeBaseRepositoryType>;
     private readonly DESCRIPTION: string = 'description';
     private readonly PHONE_TYPE: string = PhoneTypeEntity.ENTITY_NAME;
     //#endregion
@@ -38,7 +40,7 @@ export class PhoneTypeService implements IPhoneTypeService {
     constructor(
         @inject("IPhoneTypeRepository") private readonly repo: IPhoneTypeRepository,
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("PhoneTypeRepository") phoneTypeRepository: IBaseRepository<PhoneTypeEntity, PhoneTypeModel, PhoneTypeDTO>,
+        @inject("PhoneTypeRepository") phoneTypeRepository: IRepositoryBase<PhoneTypeBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
     ) {
         this.uniquenessValidator = validatorFactory(phoneTypeRepository);
@@ -130,11 +132,9 @@ export class PhoneTypeService implements IPhoneTypeService {
             updatedEntity = updatedEntity.update({statusId: (await this.statusService.getStatusForNewEntities()).id!});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
+        const updated: ResultType<PhoneTypeEntity> = await this.repo.update(updatedEntity, transaction);
 
-        if (!updated.isSuccess()) throw new Error(EntitiesMessage.error.failure.update(this.PHONE_TYPE));
-
-        return {entity: updatedEntity, updated: true};
+        return {entity: updated.unwrapOrThrow(), updated: true};
     }
 
     //#endregion

@@ -1,11 +1,13 @@
 import {inject, injectable} from "tsyringe";
 import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
-import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
+import {
+    DocumentTypeBaseRepositoryType,
+    IDocumentTypeRepository
+} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
 import {
     CreateDocumentTypeDTO,
     DocumentTypeDTO,
@@ -22,7 +24,6 @@ import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {ServiceError} from "@coreShared/errors/service.error";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
@@ -31,7 +32,7 @@ import {ICountryService} from "@location/domain/services/interfaces/ICountry.ser
 @injectable()
 export class DocumentTypeService implements IDocumentTypeService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<DocumentTypeEntity, DocumentTypeModel, DocumentTypeDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<DocumentTypeBaseRepositoryType>;
     private readonly DESCRIPTION: string = 'description';
     private readonly DOCUMENT_TYPE: string = DocumentTypeEntity.ENTITY_NAME;
     //#endregion
@@ -39,12 +40,12 @@ export class DocumentTypeService implements IDocumentTypeService {
     //#region CONSTRUCTOR
     constructor(
         @inject("IDocumentTypeRepository") private readonly repo: IDocumentTypeRepository,
-        @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("DocumentTypeRepository") documentTypeRepository: IBaseRepository<DocumentTypeEntity, DocumentTypeModel, DocumentTypeDTO>,
+        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("DocumentTypeRepository") private readonly documentTypeRepo: IRepositoryBase<DocumentTypeBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
         @inject("ICountryService") private readonly countryService: ICountryService,
     ) {
-        this.uniquenessValidator = validatorFactory(documentTypeRepository);
+        this.uniquenessValidator = this.validatorFactory(this.documentTypeRepo);
     }
 
     //#endregion
@@ -113,7 +114,7 @@ export class DocumentTypeService implements IDocumentTypeService {
             statusId: newData.statusId ?? entity.statusId,
         };
 
-        let updatedEntity: DocumentTypeEntity = entity.updateProps(updatedProps);
+        let updatedEntity: DocumentTypeEntity = entity.update(updatedProps);
 
         await this.validateForeignKeys(updatedEntity);
 
@@ -130,15 +131,12 @@ export class DocumentTypeService implements IDocumentTypeService {
             }
 
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
+            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
-        if (!updated.isSuccess()) {
-            throw new ServiceError(EntitiesMessage.error.failure.update(this.DOCUMENT_TYPE));
-        }
+        const updated: ResultType<DocumentTypeEntity> = await this.repo.update(updatedEntity, transaction);
 
-        return {entity: updatedEntity, updated: true};
+        return {entity: updated.unwrapOrThrow(), updated: true};
     }
 
     //#endregion
@@ -163,7 +161,7 @@ export class DocumentTypeService implements IDocumentTypeService {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity = entity.updateProps({statusId: inactiveStatus.id});
+        const deletedEntity = entity.update({statusId: inactiveStatus.id});
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;

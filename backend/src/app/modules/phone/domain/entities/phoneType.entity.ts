@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
 import {PhoneTypeValidator} from "@phone/domain/validations/phoneType.validation";
 
@@ -8,7 +8,7 @@ export interface PhoneTypeProps {
     statusId: number;
 }
 
-export class PhoneTypeEntity extends BaseEntity<PhoneTypeProps> {
+export class PhoneTypeEntity extends EntityBase<PhoneTypeProps> {
     //#region PROPERTIES
     public static readonly MIN_DESC: number = 4;
     public static readonly MAX_DESC: number = 50;

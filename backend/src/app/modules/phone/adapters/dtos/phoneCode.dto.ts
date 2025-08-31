@@ -16,6 +16,13 @@ export type PhoneCodeFilterDTO = {
     limit?: number;
 }
 
+export type PhoneCodePersistenceDTO = {
+    ddiCode: number;
+    dddCode: number;
+    stateId: number;
+    statusId: number;
+};
+
 export type CreatePhoneCodeDTO = {
     ddiCode: number;
     dddCode: number;

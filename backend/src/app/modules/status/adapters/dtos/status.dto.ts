@@ -1,10 +1,12 @@
+// import {DtoBaseType} from "@coreShared/types/entity.type";
+
 export type StatusDto = {
     id?: number;
     description?: string;
     active?: boolean;
 };
 
-export type FindFilterStatusDTO = {
+export type FilterStatusDTO = {
     id?: number[],
     description?: string[]
     active?: boolean[]
@@ -40,3 +42,11 @@ export type UpdateStatusDTO = {
     description?: string;
     active?: boolean;
 };
+
+// export type dtoBaseType = DtoBaseType<
+//     StatusDto,
+//     CreateStatusDTO,
+//     FindStatusesDTO,
+//     UpdateStatusDTO,
+//     FilterStatusDTO
+// >

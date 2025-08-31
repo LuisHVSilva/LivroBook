@@ -1,24 +1,12 @@
-export abstract class BaseEntity<T extends { id?: unknown }> {
+export abstract class EntityBase<T extends { id?: unknown }> {
     protected readonly props: T;
 
     protected constructor(props: T) {
         this.props = Object.freeze({ ...props }); // Protege contra mutação
     }
 
-    private getId(): unknown {
-        return this.props.id;
-    }
-
-    public hasId(): boolean {
-        return this.getId() !== undefined && this.getId() !== null;
-    }
-
     public getProps(): T {
         return this.props;
-    }
-
-    public toJSON(): Record<string, unknown> {
-        return {...this.props};
     }
 
     protected validateRequiredFields(fields: (keyof T)[]): void {
@@ -39,17 +27,19 @@ export abstract class BaseEntity<T extends { id?: unknown }> {
         return new (this.constructor as any)(mergedProps);
     }
 
-    public isEqual(other: BaseEntity<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
+    public isEqual(other: EntityBase<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
         const keys = Object.keys(this.props) as (keyof T)[];
         return keys
             .filter(key => !excludeKeys.includes(key))
             .every(key => this.props[key] === other.props[key]);
     }
 
-    public hasDifferencesExceptStatus(other: BaseEntity<T>): boolean {
+    public hasDifferencesExceptStatus(other: EntityBase<T>): boolean {
         const keys = Object.keys(this.props) as (keyof T)[];
         return keys
             .filter(key => key !== "statusId")
             .some(key => this.props[key] !== other.props[key]);
     }
+
+    abstract update(props: Partial<T>): this;
 }

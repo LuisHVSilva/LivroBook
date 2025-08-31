@@ -2,7 +2,7 @@ import { StatusEntity } from "@status/domain/entities/status.entity";
 import { StatusModel } from "@status/infrastructure/models/status.model";
 import {BaseInfrastructureMapper} from "@coreShared/base/baseInfrastructureMapper";
 
-type StatusPersistenceDTO = {
+export type StatusPersistenceDTO = {
     description: string;
     active: boolean;
 };

@@ -1,11 +1,13 @@
 import {inject, injectable} from "tsyringe";
-import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
+import {
+    CountryBaseRepositoryType,
+    ICountryRepository
+} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CountryEntity} from "@location/domain/entities/country.entity";
-import {CountryModel} from "@location/infrastructure/models/country.model";
 import {CountryDTO, CountryFilterDTO, CreateCountryDTO, UpdateCountryDTO} from "@location/adapters/dtos/country.dto";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
 import {Transaction} from "sequelize";
 import {StringUtil} from "@coreShared/utils/string.util";
@@ -16,7 +18,6 @@ import {StatusEntity} from "@status/domain/entities/status.entity";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 import {FindAllType} from "@coreShared/types/findAll.type";
-import {ServiceError} from "@coreShared/errors/service.error";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
@@ -26,7 +27,7 @@ import {DeleteReport} from "@coreShared/utils/operationReport.util";
 @injectable()
 export class CountryService implements ICountryService {
     //#region PROPERTIES
-    private readonly uniquenessValidator: EntityUniquenessValidator<CountryEntity, CountryModel, CountryDTO>;
+    private readonly uniquenessValidator: EntityUniquenessValidator<CountryBaseRepositoryType>;
     private readonly COUNTRY: string = CountryEntity.ENTITY_NAME;
     //#endregion
 
@@ -34,7 +35,7 @@ export class CountryService implements ICountryService {
     constructor(
         @inject("ICountryRepository") private readonly repo: ICountryRepository,
         @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("CountryRepository") countryRepo: IBaseRepository<CountryEntity, CountryModel, CountryDTO>,
+        @inject("CountryRepository") countryRepo: IRepositoryBase<CountryBaseRepositoryType>,
         @inject('IStatusService') private readonly statusService: IStatusService,
     ) {
         this.uniquenessValidator = validatorFactory(countryRepo);
@@ -101,7 +102,7 @@ export class CountryService implements ICountryService {
     async update(newData: UpdateCountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>> {
         const entity: CountryEntity = await this.getById(newData.id);
 
-        let updatedEntity: CountryEntity = entity.updateProps(newData);
+        let updatedEntity: CountryEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
             return {entity: entity, updated: false};
@@ -118,16 +119,14 @@ export class CountryService implements ICountryService {
             }
 
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.updateProps({statusId: updatedStatusId});
+            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
         }
 
-        const updated: ResultType<boolean> = await this.repo.update(updatedEntity, transaction);
-        if (!updated.isSuccess()) {
-            throw new ServiceError(EntitiesMessage.error.failure.update(this.COUNTRY));
-        }
+        const updated: ResultType<CountryEntity> = await this.repo.update(updatedEntity, transaction);
 
-        return {entity: updatedEntity, updated: true};
+        return {entity: updated.unwrapOrThrow(), updated: true};
     }
+
     //#endregion
 
     //#region DELETE
@@ -150,7 +149,7 @@ export class CountryService implements ICountryService {
             return DeleteStatusEnum.ALREADY_INACTIVE;
         }
 
-        const deletedEntity = entity.updateProps({ statusId: inactiveStatus.id });
+        const deletedEntity = entity.update({statusId: inactiveStatus.id});
         await this.repo.update(deletedEntity, transaction);
 
         return DeleteStatusEnum.DELETED;
@@ -180,6 +179,7 @@ export class CountryService implements ICountryService {
 
         return {deleted, alreadyInactive, notFound};
     }
+
     //#endregion
 
     @LogError()

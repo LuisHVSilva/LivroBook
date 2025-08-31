@@ -1,7 +1,10 @@
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
-import {PhoneFilterDTO} from "@phone/adapters/dtos/phone.dto";
+import {PhoneFilterDTO, PhonePersistenceDTO} from "@phone/adapters/dtos/phone.dto";
+import {BaseRepositoryType} from "@coreShared/types/entity.type";
 
-export interface IPhoneRepository extends IBaseRepository<PhoneEntity, PhoneModel, PhoneFilterDTO> {
+export type PhoneBaseRepositoryType = BaseRepositoryType<PhoneModel, PhoneEntity, PhoneFilterDTO, PhonePersistenceDTO>;
+
+export interface IPhoneRepository extends IRepositoryBase<PhoneBaseRepositoryType> {
 }

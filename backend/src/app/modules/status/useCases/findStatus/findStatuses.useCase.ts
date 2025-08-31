@@ -1,6 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IFindStatusesUseCase} from "@status/useCases/findStatus/IFindStatuses.useCase";
-import {FindStatusesDTO, FindStatusesResponseDTO, FindFilterStatusDTO} from "@status/adapters/dtos/status.dto";
+import {FindStatusesDTO, FindStatusesResponseDTO, FilterStatusDTO} from "@status/adapters/dtos/status.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {StringUtil} from "@coreShared/utils/string.util";
@@ -22,7 +22,7 @@ export class FindStatusesUseCase implements IFindStatusesUseCase {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
-            const filter: FindFilterStatusDTO = {
+            const filter: FilterStatusDTO = {
                 id: StringUtil.parseCsvFilter(input.id, Number),
                 description: StringUtil.parseCsvFilter(input.description, String),
                 active: StringUtil.parseCsvFilter(input.active, StringUtil.parseBoolean),

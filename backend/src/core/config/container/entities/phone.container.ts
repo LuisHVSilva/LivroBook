@@ -1,18 +1,17 @@
 import {container} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {IBaseRepository} from "@coreShared/interfaces/IBaseRepository";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {PhoneTypeService} from "@phone/domain/service/phoneType.service";
 import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
 import {CreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/createPhoneType.useCase";
-import {PhoneTypeMapper} from "@phone/infrastructure/mappers/phoneType.mapper";
-import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {
+    IPhoneTypeRepository,
+    PhoneTypeBaseRepositoryType
+} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {PhoneTypeRepository} from "@phone/infrastructure/repositories/phoneType.repository";
 import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
 import {PhoneController} from "@phone/adapters/controllers/phone.controller";
-import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
-import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
-import {PhoneTypeDTO} from "@phone/adapters/dtos/phoneType.dto";
 import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTypes.useCase";
 import {FindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/findPhoneTypes.useCase";
 import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePhoneType.useCase";
@@ -23,7 +22,6 @@ import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.ser
 import {PhoneCodeService} from "@phone/domain/service/phoneCode.service";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
 import {CreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/createPhoneCode.useCase";
-import {PhoneCodeMapper} from "@phone/infrastructure/mappers/phoneCode.mapper";
 import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
 import {PhoneCodeRepository} from "@phone/infrastructure/repositories/phoneCode.repository";
 import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
@@ -34,12 +32,11 @@ import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePh
 import {DeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/deletePhoneCodes.useCase";
 import {PhoneService} from "@phone/domain/service/phone.service";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {PhoneMapper} from "@phone/infrastructure/mappers/phone.mapper";
-import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {
+    IPhoneRepository,
+    PhoneBaseRepositoryType
+} from "@phone/infrastructure/repositories/interface/IPhone.repository";
 import {PhoneRepository} from "@phone/infrastructure/repositories/phone.repository";
-import {PhoneDTO} from "@phone/adapters/dtos/phone.dto";
-import {PhoneEntity} from "@phone/domain/entities/phone.entity";
-import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
 import {CreatePhoneUseCase} from "@phone/useCase/createPhone/createPhone.useCase";
 import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
@@ -48,6 +45,10 @@ import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCa
 import {UpdatePhoneUseCase} from "@phone/useCase/updatePhone/updatePhone.useCase";
 import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
 import {DeletePhoneUseCase} from "@phone/useCase/deletePhone/deletePhone.useCase";
+import {ModelStatic} from "sequelize";
+import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
+import {PhoneCodeModel} from "@phone/infrastructure/models/phoneCode.model";
+import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);
@@ -73,11 +74,11 @@ container.registerSingleton<IDeletePhoneUseCase>("IDeletePhoneUseCase", DeletePh
 // #endregion
 
 //#region Infrastructure
-container.registerSingleton<PhoneTypeMapper>("PhoneTypeMapper", PhoneTypeMapper);
+container.register<ModelStatic<PhoneTypeModel>>("PhoneTypeModel", {useValue: PhoneTypeModel});
 container.registerSingleton<IPhoneTypeRepository>("IPhoneTypeRepository", PhoneTypeRepository);
-container.registerSingleton<PhoneCodeMapper>("PhoneCodeMapper", PhoneCodeMapper);
+container.register<ModelStatic<PhoneCodeModel>>("PhoneCodeModel", {useValue: PhoneCodeModel});
 container.registerSingleton<IPhoneCodeRepository>("IPhoneCodeRepository", PhoneCodeRepository);
-container.registerSingleton<PhoneMapper>("PhoneMapper", PhoneMapper);
+container.register<ModelStatic<PhoneModel>>("PhoneModel", {useValue: PhoneModel});
 container.registerSingleton<IPhoneRepository>("IPhoneRepository", PhoneRepository);
 //#endregion
 
@@ -86,10 +87,10 @@ container.registerSingleton<IPhoneController>("IPhoneController", PhoneControlle
 //#endregion
 
 //#region Validators
-container.registerSingleton<EntityUniquenessValidator<PhoneTypeEntity, PhoneTypeModel, PhoneTypeDTO>>("PhoneTypeUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<IBaseRepository<any, any, any>>("PhoneTypeRepository", PhoneTypeRepository);
-container.registerSingleton<EntityUniquenessValidator<PhoneEntity, PhoneModel, PhoneDTO>>("PhoneUniquenessValidator", EntityUniquenessValidator);
-container.registerSingleton<IBaseRepository<any, any, any>>("PhoneRepository", PhoneRepository);
+container.registerSingleton<EntityUniquenessValidator<PhoneTypeBaseRepositoryType>>("PhoneTypeUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IRepositoryBase<PhoneTypeBaseRepositoryType>>("PhoneTypeRepository", PhoneTypeRepository);
+container.registerSingleton<EntityUniquenessValidator<PhoneBaseRepositoryType>>("PhoneUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IRepositoryBase<PhoneBaseRepositoryType>>("PhoneRepository", PhoneRepository);
 //#endregion
 
 export {container};

@@ -1,15 +1,28 @@
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
+import {BaseRepositoryType} from "@coreShared/types/entity.type";
 
-export interface IBaseRepository<TEntity, TFilter> {
+export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any>> {
     /**
      * Create a new register.
      * @param entity - The T entity to create.
      * @param transaction - Optional transaction for database operations.
      * @returns A T object created.
      */
-    create(entity: TEntity, transaction?: Transaction): Promise<ResultType<TEntity>>;
+    create(entity: T["Entity"], transaction?: Transaction): Promise<ResultType<T["Entity"]>>;
+
+    /**
+     * Finds a single entity by its ID.
+     * @param id - Entity identifier.
+     */
+    findById(id: string | number): Promise<ResultType<T["Entity"]>>;
+
+    /**
+     * Finds a single entity by filter.
+     * @param filter - Filter criteria to apply when searching for entity.
+     */
+    findOneByFilter(filter: T["Filter"]): Promise<ResultType<T["Entity"]>>;
 
     /**
      * @param limit - The maximum number of statuses to return.
@@ -21,21 +34,9 @@ export interface IBaseRepository<TEntity, TFilter> {
     findMany(
         limit: number,
         offset: number,
-        filter?: TFilter,
-        orderBy?: { field: keyof TEntity; direction: 'ASC' | 'DESC' }
-    ): Promise<ResultType<FindAllType<TEntity>>>;
-
-    /**
-     * Finds a single entity by its ID.
-     * @param id - Entity identifier.
-     */
-    findById(id: string | number): Promise<ResultType<TEntity>>;
-
-    /**
-     * Finds a single entity by filter.
-     * @param filter - Filter criteria to apply when searching for entity.
-     */
-    findOneByFilter(filter: TFilter): Promise<ResultType<TEntity>>;
+        filter?: T["Filter"],
+        orderBy?: { field: keyof T["Entity"]; direction: 'ASC' | 'DESC' }
+    ): Promise<ResultType<FindAllType<T["Entity"]>>>;
 
     /**
      * Update a status entity.
@@ -44,5 +45,5 @@ export interface IBaseRepository<TEntity, TFilter> {
      * @param transaction - Optional transaction for database operations.
      * @returns A ResultType containing the updated StatusEntity.
      */
-    update(entity: TEntity, transaction?: Transaction): Promise<ResultType<TEntity>>;
+    update(entity: T["Entity"], transaction?: Transaction): Promise<ResultType<T["Entity"]>>;
 }

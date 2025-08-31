@@ -1,4 +1,4 @@
-import {BaseEntity} from "@coreShared/base/baseEntity";
+import {EntityBase} from "@coreShared/base/entity.base";
 import {StringUtil} from "@coreShared/utils/string.util";
 
 export interface UserTypeProps {
@@ -7,7 +7,7 @@ export interface UserTypeProps {
     statusId: number;
 }
 
-export class UserTypeEntity extends BaseEntity<UserTypeProps> {
+export class UserTypeEntity extends EntityBase<UserTypeProps> {
     private readonly _id: number | undefined;
     private readonly _description: string ;
     private readonly _status: number;

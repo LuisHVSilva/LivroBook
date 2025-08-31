@@ -14,6 +14,12 @@ export type CityFilterDTO = {
     limit?: number;
 }
 
+export type CityPersistenceDTO = {
+    description: string;
+    stateId: number;
+    statusId: number;
+};
+
 export type CreateCityDTO = {
     description: string;
     stateId: number;
