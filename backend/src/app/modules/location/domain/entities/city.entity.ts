@@ -17,7 +17,7 @@ export class CityEntity extends EntityBase<CityProps> {
     //#endregion
 
     //#region CONSTRUCTOR
-    private constructor(props: CityProps) {
+    constructor(props: CityProps) {
         const normalizedProps: CityProps = {
             ...props,
             description: CityTransformer.normalizeDescription(props.description),

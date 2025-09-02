@@ -16,7 +16,7 @@ export class PhoneTypeEntity extends EntityBase<PhoneTypeProps> {
     //#endregion
 
     //#region CONSTRUCTOR
-    private constructor(props: PhoneTypeProps) {
+    constructor(props: PhoneTypeProps) {
         const normalizedProps: PhoneTypeProps = {
             ...props,
             description: PhoneTypeTransformer.normalizeDescription(props.description),

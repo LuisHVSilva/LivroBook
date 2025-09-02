@@ -1,25 +1,20 @@
 import {
-    CreateDocumentTypeDTO,
-    DocumentTypeFilterDTO,
+    CreateDocumentTypeDTO, DocumentTypeDTO,
+    DocumentTypeFilterDTO, FindDocumentTypesDTO,
     UpdateDocumentTypeDTO
 } from "@document/adapters/dto/documentType.dto";
-import {Transaction} from "sequelize";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {FindAllType} from "@coreShared/types/findAll.type";
-import {DeleteReport} from "@coreShared/utils/operationReport.util";
-import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {IServiceBase} from "@coreShared/base/interfaces/IServiceBase";
+import {DtoBaseType} from "@coreShared/types/entity.type";
 
-export interface IDocumentTypeService {
-    create(data: CreateDocumentTypeDTO, transaction: Transaction): Promise<DocumentTypeEntity>;
 
-    getById(id: number): Promise<DocumentTypeEntity>
+export type DocumentTypeDtoBaseType = DtoBaseType<
+    DocumentTypeDTO,
+    CreateDocumentTypeDTO,
+    FindDocumentTypesDTO,
+    UpdateDocumentTypeDTO,
+    DocumentTypeFilterDTO
+>
 
-    findMany(filter?: DocumentTypeFilterDTO, page?: number, limit?: number): Promise<FindAllType<DocumentTypeEntity>>;
-
-    update(newData: UpdateDocumentTypeDTO, transaction: Transaction): Promise<UpdateResultType<DocumentTypeEntity>>
-
-    delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
-
-    deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
+export interface IDocumentTypeService extends IServiceBase<DocumentTypeDtoBaseType, DocumentTypeEntity> {
 }

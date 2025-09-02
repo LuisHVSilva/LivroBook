@@ -1,21 +1,15 @@
-import {CityFilterDTO, CreateCityDTO, UpdateCityDTO} from "@location/adapters/dtos/city.dto";
-import {Transaction} from "sequelize";
-import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {DtoBaseType} from "@coreShared/types/entity.type";
+import {CityDTO, CityFilterDTO, CreateCityDTO, FindCitiesDTO, UpdateCityDTO} from "@location/adapters/dtos/city.dto";
+import {IServiceBase} from "@coreShared/base/interfaces/IServiceBase";
 import {CityEntity} from "@location/domain/entities/city.entity";
-import {FindAllType} from "@coreShared/types/findAll.type";
-import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
-import {DeleteReport} from "@coreShared/utils/operationReport.util";
 
-export interface ICityService {
-    create(data: CreateCityDTO, transaction: Transaction): Promise<CityEntity>;
+export type CityDtoBaseType = DtoBaseType<
+    CityDTO,
+    CreateCityDTO,
+    FindCitiesDTO,
+    UpdateCityDTO,
+    CityFilterDTO
+>
 
-    getById(id: number): Promise<CityEntity>;
-
-    findMany(filter: CityFilterDTO, page?: number, limit?: number): Promise<FindAllType<CityEntity>>;
-
-    update(newData: UpdateCityDTO, transaction: Transaction): Promise<UpdateResultType<CityEntity>>;
-
-    delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
-
-    deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
+export interface ICityService extends IServiceBase<CityDtoBaseType, CityEntity> {
 }
