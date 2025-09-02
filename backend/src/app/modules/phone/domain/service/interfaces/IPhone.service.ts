@@ -1,22 +1,16 @@
-import {Transaction} from "sequelize";
-import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {DeleteReport} from "@coreShared/utils/operationReport.util";
-import {FindAllType} from "@coreShared/types/findAll.type";
-import {CreatePhoneDTO, PhoneFilterDTO, UpdatePhoneDTO} from "@phone/adapters/dtos/phone.dto";
+import {DtoBaseType} from "@coreShared/types/entity.type";
+import {CreatePhoneDTO, FindPhonesDTO, PhoneDTO, PhoneFilterDTO, UpdatePhoneDTO} from "@phone/adapters/dtos/phone.dto";
+import {IServiceBase} from "@coreShared/base/interfaces/IServiceBase";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
-import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 
+export type PhoneDtoBaseType = DtoBaseType<
+    PhoneDTO,
+    CreatePhoneDTO,
+    FindPhonesDTO,
+    UpdatePhoneDTO,
+    PhoneFilterDTO
+>
 
-export interface IPhoneService {
-    create(data: CreatePhoneDTO, transaction: Transaction): Promise<PhoneEntity>;
+export interface IPhoneService extends IServiceBase<PhoneDtoBaseType, PhoneEntity> {
 
-    getById(id: number): Promise<PhoneEntity>;
-
-    findMany(filter: PhoneFilterDTO, page?: number, limit?: number): Promise<FindAllType<PhoneEntity>>;
-
-    update(newData: UpdatePhoneDTO, transaction: Transaction): Promise<UpdateResultType<PhoneEntity>>;
-
-    delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
-
-    deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
 }

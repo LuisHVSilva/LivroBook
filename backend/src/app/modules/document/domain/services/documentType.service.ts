@@ -1,5 +1,8 @@
 import {inject, injectable} from "tsyringe";
-import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
+import {
+    DocumentTypeDtoBaseType,
+    IDocumentTypeService
+} from "@document/domain/services/interfaces/IDocumentType.service";
 import {
     DocumentTypeBaseRepositoryType,
     IDocumentTypeRepository
@@ -8,194 +11,72 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {
-    CreateDocumentTypeDTO,
-    DocumentTypeDTO,
-    DocumentTypeFilterDTO,
-    UpdateDocumentTypeDTO
-} from "@document/adapters/dto/documentType.dto";
-import {Transaction} from "sequelize";
-import {StatusEntity} from "@status/domain/entities/status.entity";
-import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {DocumentTypeDTO} from "@document/adapters/dto/documentType.dto";
 import {LogError} from "@coreShared/decorators/LogError";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
-import {ResultType} from "@coreShared/types/result.type";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {FindAllType} from "@coreShared/types/findAll.type";
-import {StringUtil} from "@coreShared/utils/string.util";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
-import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
+import {ServiceBase} from "@coreShared/base/service.base";
 
 @injectable()
-export class DocumentTypeService implements IDocumentTypeService {
+export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, DocumentTypeEntity> implements IDocumentTypeService {
     //#region PROPERTIES
     private readonly uniquenessValidator: EntityUniquenessValidator<DocumentTypeBaseRepositoryType>;
-    private readonly DESCRIPTION: string = 'description';
     private readonly DOCUMENT_TYPE: string = DocumentTypeEntity.ENTITY_NAME;
     //#endregion
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("IDocumentTypeRepository") private readonly repo: IDocumentTypeRepository,
+        @inject("IDocumentTypeRepository") protected readonly repo: IDocumentTypeRepository,
         @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
         @inject("DocumentTypeRepository") private readonly documentTypeRepo: IRepositoryBase<DocumentTypeBaseRepositoryType>,
-        @inject('IStatusService') private readonly statusService: IStatusService,
+        @inject('IStatusService') protected readonly statusService: IStatusService,
         @inject("ICountryService") private readonly countryService: ICountryService,
     ) {
+        super(repo, DocumentTypeEntity, statusService)
         this.uniquenessValidator = this.validatorFactory(this.documentTypeRepo);
     }
 
     //#endregion
 
-    //#region CREATE
+    //#region HELPERS
     @LogError()
-    async create(data: CreateDocumentTypeDTO, transaction: Transaction): Promise<DocumentTypeEntity> {
-        const status: StatusEntity = await this.statusService.getStatusForNewEntities();
-        const statusId: number = status.id!;
-
-        const entity: DocumentTypeEntity = DocumentTypeEntity.create({
+    protected createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], statusId: number): DocumentTypeEntity {
+        return DocumentTypeEntity.create({
             description: data.description,
             countryId: data.countryId,
-            statusId: statusId
+            statusId
         });
+    }
 
-        await this.validateForeignKeys(entity);
-
+    @LogError()
+    protected async uniquenessValidatorEntity(entity: DocumentTypeEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, 'description'));
-
-        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
-    }
-
-    //#endregion
-
-    //#region READ
-    @LogError()
-    async getById(id: number): Promise<DocumentTypeEntity> {
-        const found: ResultType<DocumentTypeEntity> = await this.repo.findById(id);
-        const entity: DocumentTypeEntity | null = found.unwrapOrNull();
-
-        if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
-
-        return entity;
     }
 
     @LogError()
-    async findMany(filter?: DocumentTypeFilterDTO, page?: number, limit?: number): Promise<FindAllType<DocumentTypeEntity>> {
-        const pageValue: number = page ?? 1;
-        const limitValue: number = limit ?? 20;
-        const offset: number = (pageValue - 1) * limitValue;
+    protected filterTransform(input: DocumentTypeDtoBaseType['FilterDTO']): DocumentTypeDtoBaseType['FilterDTO'] {
+        const transformedFilter: DocumentTypeDtoBaseType['FilterDTO'] = {...input};
 
-        if (filter?.description) {
-            filter.description = StringUtil.toArray(filter.description).map(DocumentTypeTransform.normalizeDescription);
-        }
-
-        const found: ResultType<FindAllType<DocumentTypeEntity>> = await this.repo.findMany(limitValue, offset, filter);
-
-        if (!found.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.DOCUMENT_TYPE));
-
-        return found.unwrap();
-    }
-
-    //#endregion
-
-    //#region UPDATE
-    @LogError()
-    async update(newData: UpdateDocumentTypeDTO, transaction: Transaction): Promise<UpdateResultType<DocumentTypeEntity>> {
-        const entity: DocumentTypeEntity = await this.getById(newData.id);
-
-        const updatedProps: Partial<DocumentTypeDTO> = {
-            description: newData.description ?? entity.description,
-            countryId: newData.countryId ?? entity.countryId,
-            statusId: newData.statusId ?? entity.statusId,
-        };
-
-        let updatedEntity: DocumentTypeEntity = entity.update(updatedProps);
-
-        await this.validateForeignKeys(updatedEntity);
-
-        if (updatedEntity.isEqual(entity)) {
-            return {entity: entity, updated: false};
-        }
-
-        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
-            if (newData.description !== entity.description) {
-                const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
-                if (!isUnique) {
-                    throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, this.DESCRIPTION));
-                }
-            }
-
-            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
-        }
-
-        const updated: ResultType<DocumentTypeEntity> = await this.repo.update(updatedEntity, transaction);
-
-        return {entity: updated.unwrapOrThrow(), updated: true};
-    }
-
-    //#endregion
-
-    //#region DELETE
-    @LogError()
-    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
-        let entity: DocumentTypeEntity;
-
-        try {
-            entity = await this.getById(id);
-        } catch (error) {
-            if (error instanceof NotFoundError) {
-                return DeleteStatusEnum.NOT_FOUND;
-            }
-            throw error;
-        }
-
-        const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
-
-        if (entity.statusId === inactiveStatus.id) {
-            return DeleteStatusEnum.ALREADY_INACTIVE;
-        }
-
-        const deletedEntity = entity.update({statusId: inactiveStatus.id});
-        await this.repo.update(deletedEntity, transaction);
-
-        return DeleteStatusEnum.DELETED;
-    }
-
-    @LogError()
-    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
-        const deleted: number[] = [];
-        const alreadyInactive: number[] = [];
-        const notFound: number[] = [];
-
-        for (const id of ids) {
-            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
-
-            switch (deleteEntityResult) {
-                case DeleteStatusEnum.DELETED:
-                    deleted.push(id);
-                    break;
-                case DeleteStatusEnum.ALREADY_INACTIVE:
-                    alreadyInactive.push(id);
-                    break;
-                default:
-                    notFound.push(id);
-                    break;
+        if (input.description !== undefined) {
+            if (Array.isArray(input.description)) {
+                transformedFilter.description = input.description.map(desc =>
+                    DocumentTypeTransform.normalizeDescription(desc)
+                );
+            } else {
+                transformedFilter.description = DocumentTypeTransform.normalizeDescription(input.description);
             }
         }
 
-        return {deleted, alreadyInactive, notFound};
+        return transformedFilter;
     }
 
-    //#endregion
-
     @LogError()
-    private async validateForeignKeys(data: Partial<DocumentTypeDTO>): Promise<void> {
+    protected async validateForeignKeys(data: Partial<DocumentTypeDTO>): Promise<void> {
         const validateExistence = async <T>(
             field: keyof DocumentTypeDTO,
             id: number | undefined,
@@ -212,4 +93,13 @@ export class DocumentTypeService implements IDocumentTypeService {
             validateExistence("statusId", data.statusId, this.statusService)
         ]);
     }
+
+    @LogError()
+    protected async handleBusinessRules(oldEntity: DocumentTypeEntity, newEntity: DocumentTypeEntity): Promise<void> {
+        if (newEntity.description !== oldEntity.description) {
+            await this.uniquenessValidatorEntity(newEntity);
+        }
+    }
+
+    //#endregion
 }

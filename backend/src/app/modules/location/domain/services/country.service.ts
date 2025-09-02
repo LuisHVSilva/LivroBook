@@ -6,26 +6,18 @@ import {
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CountryEntity} from "@location/domain/entities/country.entity";
-import {CountryDTO, CountryFilterDTO, CreateCountryDTO, UpdateCountryDTO} from "@location/adapters/dtos/country.dto";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
-import {Transaction} from "sequelize";
-import {StringUtil} from "@coreShared/utils/string.util";
-import {ResultType} from "@coreShared/types/result.type";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {StatusEntity} from "@status/domain/entities/status.entity";
-import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
-import {FindAllType} from "@coreShared/types/findAll.type";
-import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
+import {CountryDtoBaseType, ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
-import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {ServiceBase} from "@coreShared/base/service.base";
+import {CountryTransformer} from "@location/domain/transformers/country.transform";
 
 
 @injectable()
-export class CountryService implements ICountryService {
+export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntity> implements ICountryService {
     //#region PROPERTIES
     private readonly uniquenessValidator: EntityUniquenessValidator<CountryBaseRepositoryType>;
     private readonly COUNTRY: string = CountryEntity.ENTITY_NAME;
@@ -33,159 +25,55 @@ export class CountryService implements ICountryService {
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("ICountryRepository") private readonly repo: ICountryRepository,
-        @inject("EntityUniquenessValidatorFactory") validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("CountryRepository") countryRepo: IRepositoryBase<CountryBaseRepositoryType>,
-        @inject('IStatusService') private readonly statusService: IStatusService,
+        @inject("ICountryRepository") protected readonly repo: ICountryRepository,
+        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("CountryRepository") protected readonly countryRepo: IRepositoryBase<CountryBaseRepositoryType>,
+        @inject('IStatusService') protected readonly statusService: IStatusService,
     ) {
-        this.uniquenessValidator = validatorFactory(countryRepo);
+        super(repo, CountryEntity, statusService);
+
+        this.uniquenessValidator = this.validatorFactory(this.countryRepo);
     }
 
     //#endregion
 
-    //#region CREATE
+    //#region HELPERS
     @LogError()
-    async create(data: CreateCountryDTO, transaction: Transaction): Promise<CountryEntity> {
-        const status: StatusEntity = await this.statusService.getStatusForNewEntities();
-        const statusId: number = status.id!;
-
-        const entity: CountryEntity = CountryEntity.create({
+    protected createEntity(data: CountryDtoBaseType["CreateDTO"], statusId: number): CountryEntity {
+        return CountryEntity.create({
             description: data.description,
             statusId
         });
+    }
 
+    @LogError()
+    protected async uniquenessValidatorEntity(entity: CountryEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
 
-        if (!isUnique) {
-            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, 'description'))
-        }
-
-        return (await this.repo.create(entity, transaction)).unwrapOrThrow();
-    }
-
-    //#endregion
-
-    //#region READ
-    @LogError()
-    async getById(id: number): Promise<CountryEntity> {
-        const found: ResultType<CountryEntity> = await this.repo.findById(id);
-        const entity: CountryEntity | null = found.unwrapOrNull();
-
-        if (!entity) {
-            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.COUNTRY));
-        }
-
-        return entity;
+        if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, 'description'));
     }
 
     @LogError()
-    async findMany(filter?: CountryFilterDTO, page?: number, limit?: number): Promise<FindAllType<CountryEntity>> {
-        const pageValue: number = page ?? 1;
-        const limitValue: number = limit ?? 20;
-        const offset: number = (pageValue - 1) * limitValue;
+    protected filterTransform(input: CountryDtoBaseType['FilterDTO']): CountryDtoBaseType['FilterDTO'] {
+        const transformedFilter: CountryDtoBaseType['FilterDTO'] = {...input};
 
-        if (filter?.description) {
-            filter.description = StringUtil.toArray(filter.description).map(StatusTransformer.normalizeDescription);
-        }
-
-        const found: ResultType<FindAllType<CountryEntity>> = await this.repo.findMany(limitValue, offset, filter);
-
-        if (!found.isSuccess()) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.COUNTRY));
-
-        return found.unwrap();
-    }
-
-    //#endregion
-
-    //#region UPDATE
-    @LogError()
-    async update(newData: UpdateCountryDTO, transaction: Transaction): Promise<UpdateResultType<CountryEntity>> {
-        const entity: CountryEntity = await this.getById(newData.id);
-
-        let updatedEntity: CountryEntity = entity.update(newData);
-
-        if (updatedEntity.isEqual(entity)) {
-            return {entity: entity, updated: false};
-        }
-
-        if (updatedEntity.statusId !== entity.statusId) {
-            await this.validateForeignKeys(updatedEntity);
-        }
-
-        if (updatedEntity.hasDifferencesExceptStatus(entity)) {
-            const isUnique: boolean = await this.uniquenessValidator.validate('description', newData.description!);
-            if (!isUnique) {
-                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, "description"));
-            }
-
-            const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
-            updatedEntity = updatedEntity.update({statusId: updatedStatusId});
-        }
-
-        const updated: ResultType<CountryEntity> = await this.repo.update(updatedEntity, transaction);
-
-        return {entity: updated.unwrapOrThrow(), updated: true};
-    }
-
-    //#endregion
-
-    //#region DELETE
-    @LogError()
-    async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
-        let entity: CountryEntity;
-
-        try {
-            entity = await this.getById(id);
-        } catch (error) {
-            if (error instanceof NotFoundError) {
-                return DeleteStatusEnum.NOT_FOUND;
-            }
-            throw error;
-        }
-
-        const inactiveStatus: StatusEntity = await this.statusService.getStatusForInactiveEntities();
-
-        if (entity.statusId === inactiveStatus.id) {
-            return DeleteStatusEnum.ALREADY_INACTIVE;
-        }
-
-        const deletedEntity = entity.update({statusId: inactiveStatus.id});
-        await this.repo.update(deletedEntity, transaction);
-
-        return DeleteStatusEnum.DELETED;
-    }
-
-    @LogError()
-    async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
-        const deleted: number[] = [];
-        const alreadyInactive: number[] = [];
-        const notFound: number[] = [];
-
-        for (const id of ids) {
-            const deleteEntityResult: DeleteStatusEnum = await this.delete(id, transaction);
-
-            switch (deleteEntityResult) {
-                case DeleteStatusEnum.DELETED:
-                    deleted.push(id);
-                    break;
-                case DeleteStatusEnum.ALREADY_INACTIVE:
-                    alreadyInactive.push(id);
-                    break;
-                default:
-                    notFound.push(id);
-                    break;
+        if (input.description !== undefined) {
+            if (Array.isArray(input.description)) {
+                transformedFilter.description = input.description.map(desc =>
+                    CountryTransformer.normalizeDescription(desc)
+                );
+            } else {
+                transformedFilter.description = CountryTransformer.normalizeDescription(input.description);
             }
         }
 
-        return {deleted, alreadyInactive, notFound};
+        return transformedFilter;
     }
 
-    //#endregion
-
     @LogError()
-    private async validateForeignKeys(data: Partial<CountryDTO>): Promise<void> {
+    protected async validateForeignKeys(data: Partial<CountryDtoBaseType["DTO"]>): Promise<void> {
         const validateExistence = async <T>(
-            field: keyof CountryDTO,
+            field: keyof CountryDtoBaseType["DTO"],
             id: number | undefined,
             service: { getById: (id: number) => Promise<T | null> }
         ): Promise<void> => {
@@ -199,4 +87,13 @@ export class CountryService implements ICountryService {
             validateExistence("statusId", data.statusId, this.statusService)
         ]);
     }
+
+    @LogError()
+    protected async handleBusinessRules(oldEntity: CountryEntity, newEntity: CountryEntity): Promise<void> {
+        if (newEntity.description !== oldEntity.description) {
+            await this.uniquenessValidatorEntity(newEntity);
+        }
+    }
+
+    //#endregion
 }

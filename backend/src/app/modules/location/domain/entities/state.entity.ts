@@ -17,7 +17,7 @@ export class StateEntity extends EntityBase<StateProps> {
     //#endregion
 
     //#region CONSTRUCTOR
-    private constructor(props: StateProps) {
+    constructor(props: StateProps) {
         const normalizedProps: StateProps = {
             ...props,
             description: StateTransformer.normalizeDescription(props.description),

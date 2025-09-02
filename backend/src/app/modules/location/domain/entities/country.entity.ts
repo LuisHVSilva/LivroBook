@@ -16,7 +16,7 @@ export class CountryEntity extends EntityBase<CountryProps> {
     //#endregion
 
     //#region CONSTRUCTOR
-    private constructor(props: CountryProps) {
+    constructor(props: CountryProps) {
         const normalizedProps: CountryProps = {
             ...props,
             description: CountryTransformer.normalizeDescription(props.description),

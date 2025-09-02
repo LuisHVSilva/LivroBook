@@ -28,7 +28,7 @@ export class PhoneCodeEntity extends EntityBase<PhoneCodeProps>{
     //#endregion
 
     //#region CONSTRUCTOR
-    private constructor(props: PhoneCodeProps) {
+    constructor(props: PhoneCodeProps) {
         super(props);
 
         this.validateRequiredFields(['ddiCode', 'dddCode', 'stateId', 'statusId']);
