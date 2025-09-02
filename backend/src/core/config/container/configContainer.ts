@@ -13,7 +13,8 @@ container.register<EntityUniquenessValidatorFactory>("EntityUniquenessValidatorF
     useFactory: () => {
         return <TModel, TEntity, TFilter, TPersistence>(
             repo: IRepositoryBase<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence>>
-        ) => new EntityUniquenessValidator<TEntity, TModel, TFilter>(repo);
+        ) =>
+            new EntityUniquenessValidator<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence>>(repo);
     }
 });
 
