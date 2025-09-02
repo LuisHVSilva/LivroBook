@@ -9,7 +9,7 @@ import {BaseRepositoryType} from "@coreShared/types/entity.type";
 @injectable()
 export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, any, any>> {
     constructor(
-        @inject("IRepository") private readonly repository: IRepositoryBase<BaseRepositoryType<T["Entity"], T["Model"], T["Filter"], T["Persistence"]>>
+        @inject("IRepository") private readonly repository: IRepositoryBase<BaseRepositoryType<T["Model"], T["Entity"], T["Filter"], T["Persistence"]>>
     ) {
     }
 
