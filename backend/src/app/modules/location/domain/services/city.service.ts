@@ -39,7 +39,7 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
 
     //#region HELPERS
     @LogError()
-    protected createEntity(data: CityDtoBaseType["CreateDTO"], statusId: number): CityEntity {
+    protected async createEntity(data: CityDtoBaseType["CreateDTO"], statusId: number): Promise<CityEntity> {
         return CityEntity.create({
             description: data.description,
             stateId: data.stateId,

@@ -15,7 +15,7 @@ import {DbColumn} from "@coreShared/decorators/dbColumn";
 import {IUserCredentialTypeModel} from "@user/infrastructure/models/interfaces/IUserCredentialType.model";
 import {StatusModel} from "@status/infrastructure/models/status.model";
 
-@Table({tableName: "USER_CREDENTIAL_TYPE", timestamps: true})
+@Table({tableName: "user_credential_type", timestamps: true})
 class UserCredentialTypeModel extends Model<InferAttributes<UserCredentialTypeModel>, InferCreationAttributes<UserCredentialTypeModel>> implements IUserCredentialTypeModel {
     @PrimaryKey
     @AutoIncrement

@@ -1,10 +1,10 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {PasswordHasherSecurity} from "@coreShared/security/passwordHasher.security";
-import { isIP } from 'net';
+import {isIP} from 'net';
 import {PasswordValidatorUtil} from "@coreShared/utils/passwordValidator.util";
 
 
-export interface UserCredentialProps{
+export interface UserCredentialProps {
     id?: number;
     password?: string;
     loginAttempts: number;
@@ -16,7 +16,7 @@ export interface UserCredentialProps{
     statusId: number;
 }
 
-export class UserCredentialEntity extends EntityBase<UserCredentialProps>{
+export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
     private readonly _id: number | undefined;
     private readonly _password: string | undefined;
     private readonly _loginAttempts: number;
@@ -102,40 +102,44 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps>{
     public static async createWithPassword(plainPassword: string, props: Omit<UserCredentialProps, 'password'>): Promise<UserCredentialEntity> {
         PasswordValidatorUtil.validate(plainPassword);
         const password: string = await PasswordHasherSecurity.hash(plainPassword);
-        return new UserCredentialEntity({ ...props, password });
+        return new UserCredentialEntity({...props, password});
     }
 
     public updatePassword(newPassword: string): this {
         PasswordValidatorUtil.validate(newPassword);
-        return this.cloneWith({ password: newPassword });
+        return this.cloneWith({password: newPassword});
     }
 
     public updateLoginAttempts(newLoginAttempts: number): this {
-        return this.cloneWith({ loginAttempts: newLoginAttempts });
+        return this.cloneWith({loginAttempts: newLoginAttempts});
     }
 
     public activateTwoFactorStatus(): this {
-        return this.cloneWith({ isTwoFactorEnabled: true });
+        return this.cloneWith({isTwoFactorEnabled: true});
     }
 
     public deactivateTwoFactorStatus(): this {
-        return this.cloneWith({ isTwoFactorEnabled: false });
+        return this.cloneWith({isTwoFactorEnabled: false});
     }
 
     public verifyEmail(): this {
-        return this.cloneWith({ isEmailVerified: true });
+        return this.cloneWith({isEmailVerified: true});
     }
 
     public updateLastLoginIP(ip: string): this {
-        return this.cloneWith({ lastLoginIP: ip, lastLoginAt: new Date() });
+        return this.cloneWith({lastLoginIP: ip, lastLoginAt: new Date()});
     }
 
     public updateUserCredentialTypeId(userCredentialTypeId: number): this {
-        return this.cloneWith({ userCredentialTypeId });
+        return this.cloneWith({userCredentialTypeId});
     }
 
     public updateStatusId(statusId: number): this {
-        return this.cloneWith({ statusId });
+        return this.cloneWith({statusId});
+    }
+
+    public update(props: Partial<UserCredentialProps>): this {
+        return this.cloneWith(props);
     }
 
     public toJSON(): Record<string, unknown> {

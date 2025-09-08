@@ -25,6 +25,12 @@ export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any
     findOneByFilter(filter: T["Filter"]): Promise<ResultType<T["Entity"]>>;
 
     /**
+     * Finds a single exactly entity by filter.
+     * @param filter - Filter criteria to apply when searching for entity.
+     */
+    findOneExactByFilter(filter?: T["Filter"]): Promise<ResultType<T["Entity"]>>;
+
+    /**
      * @param limit - The maximum number of statuses to return.
      * @param offset - The number of statuses to skip before starting to collect the result set.
      * @param filter - Optional filter criteria to apply when searching for entity.

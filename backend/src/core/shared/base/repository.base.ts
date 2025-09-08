@@ -20,7 +20,6 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
         return ResultType.success(restored);
     }
 
-
     async findById(id: number): Promise<ResultType<T["Entity"]>> {
         const model: T["Model"] | null = await this.model.findByPk(id);
         return model ? ResultType.success(this.toEntity(model)) : ResultType.none();
@@ -28,6 +27,13 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
 
     async findOneByFilter(filter?: T["Filter"]): Promise<ResultType<T["Entity"]>> {
         const where: WhereOptions = this.makeFilter(filter).build()
+
+        const model: T["Model"] | null = await this.model.findOne({where}) as T["Model"];
+        return model ? ResultType.success(this.toEntity(model)) : ResultType.none();
+    }
+
+    async findOneExactByFilter(filter?: T["Filter"]): Promise<ResultType<T["Entity"]>> {
+        const where: WhereOptions = this.makeExactFilter(filter).build()
 
         const model: T["Model"] | null = await this.model.findOne({where}) as T["Model"];
         return model ? ResultType.success(this.toEntity(model)) : ResultType.none();
@@ -97,4 +103,18 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
     protected abstract toPersistence(entity: T["Entity"]): T["Persistence"]
 
     protected abstract toEntity(model: T["Model"]): T["Entity"];
+
+    private makeExactFilter(filters?: T["Filter"]): SequelizeWhereBuilderUtil<T["Filter"]> {
+        const where: Partial<Record<keyof T["Filter"], any>> = {};
+
+        if (filters) {
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    where[key as keyof T["Filter"]] = value;
+                }
+            });
+        }
+
+        return new SequelizeWhereBuilderUtil<T["Filter"]>(filters);
+    };
 }

@@ -15,7 +15,7 @@ import {DbColumn} from "@coreShared/decorators/dbColumn";
 import {IUserTypeModel} from "@user/infrastructure/models/interfaces/IUserType.model";
 import {StatusModel} from "@status/infrastructure/models/status.model";
 
-@Table({tableName: "USER_TYPE", timestamps: true})
+@Table({tableName: "user_type", timestamps: true})
 class UserTypeModel extends Model<InferAttributes<UserTypeModel>, InferCreationAttributes<UserTypeModel>> implements IUserTypeModel {
     @PrimaryKey
     @AutoIncrement

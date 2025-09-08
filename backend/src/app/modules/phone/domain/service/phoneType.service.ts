@@ -37,7 +37,7 @@ export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTyp
     //#endregion
 
     @LogError()
-    protected createEntity(data: PhoneTypeDtoBaseType["CreateDTO"], statusId: number): PhoneTypeEntity {
+    protected async createEntity(data: PhoneTypeDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneTypeEntity> {
         return PhoneTypeEntity.create({
             description: data.description,
             statusId

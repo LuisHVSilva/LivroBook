@@ -5,7 +5,7 @@ export interface IUserCredentialModel {
     id?: number;
     password?: string;
     loginAttempts: number;
-    isTwoFactorEnabled: boolean;
+    isTwoFactorEnable: boolean;
     isEmailVerified: boolean;
     lastLoginIp?: string;
     lastLoginAt?: Date;

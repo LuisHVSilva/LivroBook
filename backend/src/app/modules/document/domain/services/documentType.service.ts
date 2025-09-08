@@ -11,7 +11,6 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {DocumentTypeDTO} from "@document/adapters/dto/documentType.dto";
 import {LogError} from "@coreShared/decorators/LogError";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
@@ -43,7 +42,7 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
 
     //#region HELPERS
     @LogError()
-    protected createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], statusId: number): DocumentTypeEntity {
+    protected async createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], statusId: number): Promise<DocumentTypeEntity> {
         return DocumentTypeEntity.create({
             description: data.description,
             countryId: data.countryId,
@@ -76,9 +75,9 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
     }
 
     @LogError()
-    protected async validateForeignKeys(data: Partial<DocumentTypeDTO>): Promise<void> {
+    protected async validateForeignKeys(data: Partial<DocumentTypeDtoBaseType["DTO"]>): Promise<void> {
         const validateExistence = async <T>(
-            field: keyof DocumentTypeDTO,
+            field: keyof DocumentTypeDtoBaseType["DTO"],
             id: number | undefined,
             service: { getById: (id: number) => Promise<T | null> }
         ): Promise<void> => {

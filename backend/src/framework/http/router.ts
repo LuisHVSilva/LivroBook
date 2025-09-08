@@ -6,6 +6,7 @@ import {statusRoutes} from "@status/adapters/routes/status.route";
 import {locationRouter} from "@location/adapters/routes/location.route";
 import {documentTypeRouter} from "@document/adapters/rountes/documentType.route";
 import {phoneRoute} from "@phone/adapters/routes/phone.route";
+import {userRouter} from "@user/adapters/routes/user.route";
 
 
 const router: Router = Router();
@@ -16,5 +17,6 @@ router.use('/admin/status', statusRoutes);
 router.use('/admin/location', locationRouter);
 router.use('/admin/documentType', documentTypeRouter);
 router.use('/admin/phone', phoneRoute)
+router.use('/admin/user', userRouter)
 
 export {router};

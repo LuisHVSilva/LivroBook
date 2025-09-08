@@ -19,7 +19,7 @@ import {UserCredentialModel} from "@user/infrastructure/models/userCredential.mo
 import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 
-@Table({tableName: "USER", timestamps: true})
+@Table({tableName: "user", timestamps: true})
 class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> implements IUserModel {
     @PrimaryKey
     @AutoIncrement

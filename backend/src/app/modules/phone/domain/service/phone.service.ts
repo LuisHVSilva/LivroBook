@@ -15,6 +15,7 @@ import {
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {ServiceBase} from "@coreShared/base/service.base";
+import {ResultType} from "@coreShared/types/result.type";
 
 @injectable()
 export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> implements IPhoneService {
@@ -38,7 +39,16 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
     //#endregion
 
     @LogError()
-    protected createEntity(data: PhoneDtoBaseType["CreateDTO"], statusId: number): PhoneEntity {
+    public async findPhoneByNumber(number: string): Promise<PhoneEntity | null> {
+        const filter: PhoneDtoBaseType["FilterDTO"] = {
+            number,
+        }
+        const founded: ResultType<PhoneEntity> = await this.repo.findOneExactByFilter(filter);
+        return founded.unwrapOrNull();
+    }
+
+    @LogError()
+    protected async createEntity(data: PhoneDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneEntity> {
         return PhoneEntity.create({
             number: data.number,
             phoneCodeId: data.phoneCodeId,

@@ -12,5 +12,5 @@ export type PhoneDtoBaseType = DtoBaseType<
 >
 
 export interface IPhoneService extends IServiceBase<PhoneDtoBaseType, PhoneEntity> {
-
+    findPhoneByNumber(number: string): Promise<PhoneEntity | null>;
 }

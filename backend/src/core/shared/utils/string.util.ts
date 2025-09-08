@@ -51,19 +51,18 @@ export class StringUtil {
         return value.split(',').map(v => parser(v.trim()));
     }
 
-    // static parseCsvFilter<T = string>(
-    //     value: string | undefined,
-    //     parser: (v: string) => T
-    // ): T[] | undefined {
-    //     if (!value) return undefined;
-    //     const result = value.split(',').map(v => parser(v.trim()));
-    //     if(result.length === 0) return undefined;
-    //     return result;
-    // }
-
     static parseBoolean(str: string): boolean {
         return str.trim().toLowerCase() === 'true';
     }
+
+    static parseDate(str: string): Date {
+        const d = new Date(str.trim());
+        if (isNaN(d.getTime())) {
+            throw new Error(`Invalid date: "${str}"`);
+        }
+        return d;
+    }
+
 
     static toArray<T>(input: T | T[] | undefined): T[] {
         if (input === undefined) return [];

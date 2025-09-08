@@ -188,6 +188,10 @@ export class UserEntity extends EntityBase<UserProps> {
         return this.cloneWith(updatedProps);
     }
 
+    public update(props: Partial<UserProps>): this {
+        return this.cloneWith(props);
+    }
+
     public toJSON(): Record<string, unknown> {
         return {
             id: this._id,

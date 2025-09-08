@@ -1,3 +1,5 @@
+import {ValidationError} from "@coreShared/errors/domain.error";
+
 export abstract class EntityBase<T extends { id?: unknown }> {
     protected readonly props: T;
 
@@ -17,7 +19,7 @@ export abstract class EntityBase<T extends { id?: unknown }> {
             const isNullOrUndefined = value === null || value === undefined;
 
             if (isEmptyString || isNullOrUndefined) {
-                throw new Error(`Field "${String(field)}" is required.`);
+                throw new ValidationError(`Field "${String(field)}" is required.`);
             }
         }
     }

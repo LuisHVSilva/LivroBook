@@ -58,7 +58,7 @@ export abstract class ServiceBase<
         const limitValue: number = limit ?? 20;
         const offset: number = (pageValue - 1) * limitValue;
 
-        const filterTransformed: T['FilterDTO'] = this.filterTransform(filter);
+        const filterTransformed: T['FilterDTO'] = await this.filterTransform(filter);
 
         const found: ResultType<FindAllType<TEntity>> = await this.repo.findMany(limitValue, offset, filterTransformed);
 
@@ -78,7 +78,6 @@ export abstract class ServiceBase<
 
         let updatedEntity: TEntity = entity.update(newData);
 
-        // validações específicas do service
         await this.validateForeignKeys(updatedEntity);
 
         if (updatedEntity.isEqual(entity)) {
@@ -153,7 +152,7 @@ export abstract class ServiceBase<
 
     protected abstract uniquenessValidatorEntity(entity: TEntity): Promise<void>;
 
-    protected abstract createEntity(data: T["CreateDTO"], statusId: number): TEntity;
+    protected abstract createEntity(data: T["CreateDTO"], statusId: number): Promise<TEntity>;
 
     protected abstract filterTransform(input: T['FilterDTO']): T['FilterDTO'];
 

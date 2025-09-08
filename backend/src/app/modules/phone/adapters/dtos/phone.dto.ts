@@ -1,7 +1,3 @@
-import {BaseRepositoryType} from "@coreShared/types/entity.type";
-import {PhoneModel} from "@phone/infrastructure/models/phone.model";
-import {PhoneEntity} from "@phone/domain/entities/phone.entity";
-
 export type PhoneDTO = {
     id?: number;
     number?: string;

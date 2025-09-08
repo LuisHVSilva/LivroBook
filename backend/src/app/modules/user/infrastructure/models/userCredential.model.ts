@@ -17,7 +17,7 @@ import {IUserCredentialModel} from "@user/infrastructure/models/interfaces/IUser
 import {StatusModel} from "@status/infrastructure/models/status.model";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
 
-@Table({tableName: "USER_CREDENTIAL", timestamps: true})
+@Table({tableName: "user_credential", timestamps: true})
 class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, InferCreationAttributes<UserCredentialModel>> implements IUserCredentialModel {
     @PrimaryKey
     @AutoIncrement
@@ -26,7 +26,7 @@ class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, In
     declare id: CreationOptional<number>;
 
     @AllowNull(true)
-    @DbColumn(DataType.STRING(50))
+    @DbColumn(DataType.STRING)
     declare password?: string;
 
     @AllowNull(false)
@@ -37,7 +37,7 @@ class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, In
     @AllowNull(false)
     @Default(false)
     @DbColumn(DataType.BOOLEAN)
-    declare isTwoFactorEnabled: boolean;
+    declare isTwoFactorEnable: boolean;
 
     @AllowNull(false)
     @Default(false)

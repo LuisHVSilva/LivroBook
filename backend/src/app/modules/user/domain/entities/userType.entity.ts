@@ -1,5 +1,6 @@
 import {EntityBase} from "@coreShared/base/entity.base";
-import {StringUtil} from "@coreShared/utils/string.util";
+import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
+import {UserTypeValidator} from "@user/domain/validators/userType.validator";
 
 export interface UserTypeProps {
     id?: number;
@@ -8,68 +9,55 @@ export interface UserTypeProps {
 }
 
 export class UserTypeEntity extends EntityBase<UserTypeProps> {
-    private readonly _id: number | undefined;
-    private readonly _description: string ;
-    private readonly _status: number;
+    //#region PROPS
+    public static readonly MIN_DESC: number = 5;
+    public static readonly MAX_DESC: number = 50;
+    //#endregion
 
-    private constructor(props: UserTypeProps) {
-        super(props);
-
+    //#region CONSTRUCTOR
+    constructor(props: UserTypeProps) {
+        const normalizedProps: UserTypeProps = {
+            ...props,
+            description: UserTypeTransform.normalizeDescription(props.description),
+        };
+        super(normalizedProps);
         this.validateRequiredFields(['description', 'statusId']);
-
-        this._id = props.id;
-        this._description = StringUtil.transformCapitalLetterWithoutAccent(props.description);
-        this._status = props.statusId;
-
         this.validate();
     }
+    //#endregion
 
+    //#region GET
     get id(): number | undefined {
-        return this._id;
+        return this.props.id;
     }
 
     get description(): string {
-        return this._description;
+        return this.props.description;
     }
 
     get statusId(): number {
-        return this._status;
+        return this.props.statusId;
     }
 
+    //#endregion
+
+    //#region VALIDATIONS
     private validate(): void {
-        this.validateDescriptionLength();
+        UserTypeValidator.validateDescriptionLength(this.props.description, UserTypeEntity.MIN_DESC, UserTypeEntity.MAX_DESC);
     }
+    //#endregion
 
-    private validateDescriptionLength(): void {
-        if (this._description.length <= 5) {
-            throw new Error("Description length must be at least 5 characters long");
-        }
-
-        if (this._description.length > 50) {
-            throw new Error("Description length must not exceed 50 characters");
-        }
-    }
-
+    //#region CREATE
     public static create(props: UserTypeProps): UserTypeEntity {
         return new UserTypeEntity(props);
     }
 
-    public updateDescription(description: string): this {
-        const updatedProps: Partial<UserTypeProps> = {description};
-        return this.cloneWith(updatedProps);
+    //#endregion
+
+    //#region UPDATES
+    public update(props: Partial<UserTypeProps>): this {
+        return this.cloneWith(props);
     }
 
-    public updateStatusId(statusId: number): this {
-        const updatedProps: Partial<UserTypeProps> = {statusId};
-        return this.cloneWith(updatedProps);
-    }
-
-    public toJSON(): Record<string, unknown> {
-        return {
-            id: this._id,
-            description: this._description,
-            statusId: this._status
-        };
-    }
-
+    //#endregion
 }

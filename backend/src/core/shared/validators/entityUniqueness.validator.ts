@@ -34,11 +34,11 @@ export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, an
 
     @LogError()
     async validateFields(
-        fields: Partial<T["Filter"]>,
+        filter: Partial<T["Filter"]>,
         idField: keyof T["Entity"] = "id" as keyof T["Entity"],
         excludeId?: string
     ): Promise<boolean> {
-        const result = await this.repository.findOneByFilter(fields as T["Filter"]);
+        const result: ResultType<T["Entity"]> = await this.repository.findOneByFilter(filter as T["Filter"]);
 
         if (result.isFailure()) {
             throw new ValidationError("Erro ao validar unicidade.");
@@ -46,7 +46,7 @@ export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, an
 
         const entity: T["Entity"] = result.unwrapOrThrow();
 
-        const isSameRecord = excludeId === (entity?.[idField] as unknown as string);
+        const isSameRecord: boolean = excludeId === (entity?.[idField] as unknown as string);
 
         return !(!isSameRecord);
     }
