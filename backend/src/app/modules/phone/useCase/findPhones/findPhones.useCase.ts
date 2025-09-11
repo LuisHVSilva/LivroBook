@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
-import {FindPhonesDTO, FindPhonesResponseDTO, PhoneDTO, PhoneFilterDTO} from "@phone/adapters/dtos/phone.dto";
+import {FindPhonesRawDTO, FindPhonesResponseDTO, PhoneDTO, PhoneFilterDTO} from "@phone/adapters/dtos/phone.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {StringUtil} from "@coreShared/utils/string.util";
@@ -16,7 +16,7 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindPhonesDTO): Promise<ResultType<FindPhonesResponseDTO>> {
+    async execute(input: FindPhonesRawDTO): Promise<ResultType<FindPhonesResponseDTO>> {
         try {
             const filter: PhoneFilterDTO = this.mapPhoneFilter(input);
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -35,7 +35,7 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
         }
     }
 
-    private mapPhoneFilter(input: FindPhonesDTO): PhoneFilterDTO {
+    private mapPhoneFilter(input: FindPhonesRawDTO): PhoneFilterDTO {
         return {
             id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             number: StringUtil.parseCsvFilter(input.number?.toString(), String),

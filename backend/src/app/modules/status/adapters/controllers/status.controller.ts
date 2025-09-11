@@ -13,13 +13,12 @@ import {IDeleteStatusUseCase} from "@status/useCases/deleteStatus/IDeleteStatus.
 import {
     CreateStatusDTO,
     CreateStatusResponseDTO,
-    FindStatusesDTO,
+    FindStatusesRawDTO,
     FindStatusesResponseDTO,
-    UpdateStatusDTO
+    UpdateStatusDTO, UpdateStatusResponseDTO
 } from "@status/adapters/dtos/status.dto";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {StatusEntity} from "@status/domain/entities/status.entity";
 
 @injectable()
 export class StatusController implements IStatusController {
@@ -45,7 +44,7 @@ export class StatusController implements IStatusController {
 
     @LogExecution()
     async findStatuses(req: Request, res: Response): Promise<Response> {
-        const input: FindStatusesDTO = req.query as FindStatusesDTO;
+        const input: FindStatusesRawDTO = req.query as FindStatusesRawDTO;
         const result: ResultType<FindStatusesResponseDTO> = await this.findStatusesUseCase.execute(input);
         if (result.isSuccess()) {
             return ApiResponseUtil.success<FindStatusesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
@@ -57,10 +56,10 @@ export class StatusController implements IStatusController {
     @LogExecution()
     async updateStatus(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateStatusDTO;
-        const result: ResultType<UpdateResultType<StatusEntity>> = await this.updateStatusUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateStatusResponseDTO>> = await this.updateStatusUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.handleUpdateResult<StatusEntity>(res, result.unwrap());
+            return ApiResponseUtil.handleUpdateResult<UpdateStatusResponseDTO>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());

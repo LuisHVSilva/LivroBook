@@ -65,7 +65,6 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
         return ResultType.success({entities: entities, total: total});
     }
 
-
     async update(entity: T["Entity"], transaction?: Transaction): Promise<ResultType<T["Entity"]>> {
         const modelToUpdate: T["Model"] | null = await this.model.findByPk(entity.id, { transaction }) as T["Model"];
 
@@ -82,9 +81,8 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
         return ResultType.success(updatedEntity);
     }
 
-
     protected makeFilter(filters?: T["Filter"], config?: Partial<Record<keyof T["Filter"], {
-        in?: boolean;
+        in?: boolean ;
         like?: boolean
     }>>): SequelizeWhereBuilderUtil<T["Filter"]> {
         const where: Partial<Record<keyof T["Filter"], any>> = {};

@@ -58,7 +58,7 @@ export class StatusEntity extends EntityBase<StatusProps> {
 
     //#region UPDATES
     public update(props: Partial<StatusProps>): this {
-        let updated = this;
+        let updated = this.cloneWith(props);
 
         if (props.description !== undefined) {
             updated = updated.updateDescription(props.description);

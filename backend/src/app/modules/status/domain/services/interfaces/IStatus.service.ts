@@ -1,4 +1,9 @@
-import {CreateStatusDTO, FilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
+import {
+    CreateStatusDTO,
+    FilterStatusDTO,
+    UpdateStatusDTO,
+    UpdateStatusResponseDTO
+} from "@status/adapters/dtos/status.dto";
 import {Transaction} from "sequelize";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {StatusEntity} from "@status/domain/entities/status.entity";
@@ -25,7 +30,7 @@ export interface IStatusService {
 
     getStatusForInactiveEntities(): Promise<StatusEntity>;
 
-    update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<StatusEntity>>;
+    update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<UpdateStatusResponseDTO>>;
 
     delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
 

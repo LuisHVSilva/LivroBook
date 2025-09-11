@@ -1,5 +1,5 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {FindStatusesDTO, FindStatusesResponseDTO} from "@status/adapters/dtos/status.dto";
+import {FindStatusesRawDTO, FindStatusesResponseDTO} from "@status/adapters/dtos/status.dto";
 
-export interface IFindStatusesUseCase extends IUseCase<FindStatusesDTO, FindStatusesResponseDTO> {
+export interface IFindStatusesUseCase extends IUseCase<FindStatusesRawDTO, FindStatusesResponseDTO> {
 }

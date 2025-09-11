@@ -1,40 +1,40 @@
-import {DtoBaseType} from "@coreShared/types/entity.type";
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {UserTypeModel} from "@user/infrastructure/models/userType.model";
+import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 
+// ---------- BASE ------------
 export type UserTypeDTO = {
     id?: number;
-    description?: string;
-    statusId?: number;
+    description: string;
+    statusId: number;
 };
 
+// --------- FILTER -----------
 export type UserTypeFilterDTO = {
-    id?: number[] | number,
-    description?: string[] | string;
-    statusId?: number[] | number;
+    id?: number[],
+    description?: string[];
+    statusId?: number[];
 }
 
-export type UserTypePersistenceDTO = {
-    description: string;
-    statusId: number;
-};
+// ------- PERSISTENCE --------
+export type UserTypePersistenceDTO = Omit<UserTypeDTO, "id">;
 
-export type CreateUserTypeDTO = {
-    description: string;
-};
+// ---------- CREATE ----------
+export type CreateUserTypeDTO = Pick<UserTypeDTO, "description">;
+export type CreateUserTypeResponseDTO = UserTypeDTO;
 
-export type CreateUserTypeResponseDTO = {
-    id: number;
-    description: string;
-    statusId: number;
-};
+// ---------- UPDATE ----------
+export type UpdateUserTypeDTO = Partial<Omit<UserTypeDTO, "id">> & { id: number };
+export type UpdateUserTypeResponseDTO = UserTypeDTO;
 
-export type FindUserTypesDTO = {
+// ---------- FIND ------------
+export type FindUserTypesRawDTO = {
     id?: string;
     description?: string;
     statusId?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindUserTypesResponseDTO = {
     page?: number;
     limit?: number;
@@ -42,16 +42,19 @@ export type FindUserTypesResponseDTO = {
     data: UserTypeDTO[];
 };
 
-export type UpdateUserTypeDTO = {
-    id: number;
-    description?: string;
-    statusId?: number;
-};
-
+// ------ DTO BASE TYPE -------
 export type UserTypeDtoBaseType = DtoBaseType<
     UserTypeDTO,
     CreateUserTypeDTO,
-    FindUserTypesDTO,
+    FindUserTypesRawDTO,
     UpdateUserTypeDTO,
     UserTypeFilterDTO
 >
+
+// ------ BASE REPOSITORY TYPE -------
+export type UserTypeBaseRepositoryType = BaseRepositoryType<
+    UserTypeModel,
+    UserTypeEntity,
+    UserTypeFilterDTO,
+    UserTypePersistenceDTO
+>;

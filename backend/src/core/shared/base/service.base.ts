@@ -92,7 +92,7 @@ export abstract class ServiceBase<
         }
 
         const updated: ResultType<TEntity> = await this.repo.update(updatedEntity, transaction);
-        return {entity: updated.unwrapOrThrow(), updated: true};
+        return {entity: updated.unwrapOrThrow().toJSON(), updated: true};
     }
 
     //#endregion

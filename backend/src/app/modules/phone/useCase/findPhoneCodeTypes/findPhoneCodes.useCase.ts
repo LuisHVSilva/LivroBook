@@ -3,7 +3,7 @@ import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPho
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {
-    FindPhoneCodesDTO,
+    FindPhoneCodesRawDTO,
     FindPhoneCodesResponseDTO,
     PhoneCodeDTO,
     PhoneCodeFilterDTO
@@ -21,7 +21,7 @@ export class FindPhoneCodesUseCase implements IFindPhoneCodesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindPhoneCodesDTO): Promise<ResultType<FindPhoneCodesResponseDTO>> {
+    async execute(input: FindPhoneCodesRawDTO): Promise<ResultType<FindPhoneCodesResponseDTO>> {
         try {
             const filter: PhoneCodeFilterDTO = this.mapPhoneCodesFilter(input);
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -41,7 +41,7 @@ export class FindPhoneCodesUseCase implements IFindPhoneCodesUseCase {
         }
     }
 
-    private mapPhoneCodesFilter(input: FindPhoneCodesDTO): PhoneCodeFilterDTO {
+    private mapPhoneCodesFilter(input: FindPhoneCodesRawDTO): PhoneCodeFilterDTO {
         return {
             id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             ddiCode: StringUtil.parseCsvFilter(input.ddiCode?.toString(), Number),

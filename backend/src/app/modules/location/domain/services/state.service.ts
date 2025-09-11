@@ -1,8 +1,5 @@
 import {inject, injectable} from "tsyringe";
-import {
-    IStateRepository,
-    StateBaseRepositoryType
-} from "@location/infrastructure/repositories/interfaces/IState.repository";
+import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
@@ -10,11 +7,12 @@ import {StateEntity} from "@location/domain/entities/state.entity";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {IStateService, StateDtoBaseType} from "@location/domain/services/interfaces/IState.service";
+import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {StateTransformer} from "@location/domain/transformers/state.transform";
+import {StateBaseRepositoryType, StateDtoBaseType} from "@location/adapters/dtos/state.dto";
 
 @injectable()
 export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> implements IStateService {
@@ -59,13 +57,9 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
         const transformedFilter: StateDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    StateTransformer.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = StateTransformer.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                StateTransformer.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

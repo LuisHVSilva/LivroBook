@@ -7,12 +7,13 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {UserCredentialTypeDtoBaseType} from "@user/adapters/dtos/userCredentialType.dto";
+import {
+    UserCredentialTypeBaseRepositoryType,
+    UserCredentialTypeDtoBaseType
+} from "@user/adapters/dtos/userCredentialType.dto";
 import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
-import {
-    IUserCredentialTypeRepository, UserCredentialTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
+import {IUserCredentialTypeRepository} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
 import {UserCredentialTypeTransform} from "@user/domain/transformers/userCredentialType.transformer";
 import {ResultType} from "@coreShared/types/result.type";
 
@@ -37,11 +38,10 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
 
     async getExactByDescription(description: string): Promise<UserCredentialTypeEntity> {
         const filter: UserCredentialTypeDtoBaseType["FilterDTO"] = {
-             description: UserCredentialTypeTransform.normalizeDescription(description),
+            description: [UserCredentialTypeTransform.normalizeDescription(description)],
         }
 
         const founded: ResultType<UserCredentialTypeEntity> = await this.repo.findOneExactByFilter(filter);
-
         const entity: UserCredentialTypeEntity | null = founded.unwrapOrNull();
 
         if (!entity) {
@@ -72,13 +72,9 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
         const transformedFilter: UserCredentialTypeDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    UserCredentialTypeTransform.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = UserCredentialTypeTransform.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                UserCredentialTypeTransform.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

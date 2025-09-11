@@ -1,42 +1,40 @@
-import {DtoBaseType} from "@coreShared/types/entity.type";
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
+import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
 
+// ---------- BASE ------------
 export type UserCredentialTypeDTO = {
     id?: number;
-    description?: string;
-    statusId?: number;
+    description: string;
+    statusId: number;
 };
 
+// --------- FILTER -----------
 export type UserCredentialTypeFilterDTO = {
-    id?: number[] | number,
-    description?: string[] | string;
-    statusId?: number[] | number;
+    id?: number[],
+    description?: string[];
+    statusId?: number[];
 }
 
-export type UserCredentialTypePersistenceDTO = {
-    description: string;
-    statusId: number
-};
+// ------- PERSISTENCE --------
+export type UserCredentialTypePersistenceDTO = Omit<UserCredentialTypeDTO, "id">;
 
+// ---------- CREATE ----------
+export type CreateUserCredentialTypeDTO = Pick<UserCredentialTypeDTO, "description">;
+export type CreateUserCredentialTypeResponseDTO = UserCredentialTypeDTO;
 
-export type CreateUserCredentialTypeDTO = {
-    description: string;
-};
+// ---------- UPDATE ----------
+export type UpdateUserCredentialTypeDTO = Partial<Omit<UserCredentialTypeDTO, "id">> & { id: number };
+export type UpdateUserCredentialTypeResponseDTO = UserCredentialTypeDTO;
 
-
-export type CreateUserCredentialTypeResponseDTO = {
-    id: number;
-    description: string;
-    statusId: number
-};
-
-export type FindUserCredentialTypesDTO = {
-    id?: string[],
-    description?: string[];
-    statusId?: string[];
+// ---------- FIND ------------
+export type FindUserCredentialTypesRawDTO = {
+    id?: string,
+    description?: string;
+    statusId?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindUserCredentialTypesResponseDTO = {
     page?: number;
     limit?: number;
@@ -44,16 +42,19 @@ export type FindUserCredentialTypesResponseDTO = {
     data: UserCredentialTypeDTO[];
 };
 
-export type UpdateUserCredentialTypeDTO = {
-    id: number;
-    description?: string;
-    statusId?: number
-};
-
+// ------ DTO BASE TYPE -------
 export type UserCredentialTypeDtoBaseType = DtoBaseType<
     UserCredentialTypeDTO,
     CreateUserCredentialTypeDTO,
-    FindUserCredentialTypesDTO,
+    FindUserCredentialTypesRawDTO,
     UpdateUserCredentialTypeDTO,
     UserCredentialTypeFilterDTO
 >
+
+// ------ BASE REPOSITORY TYPE -------
+export type UserCredentialTypeBaseRepositoryType = BaseRepositoryType<
+    UserCredentialTypeModel,
+    UserCredentialTypeEntity,
+    UserCredentialTypeFilterDTO,
+    UserCredentialTypePersistenceDTO
+>;

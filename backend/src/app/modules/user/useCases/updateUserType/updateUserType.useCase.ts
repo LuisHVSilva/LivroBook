@@ -8,8 +8,8 @@ import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateUserTypeUseCase} from "@user/useCases/updateUserType/IUpdateUserType.useCase";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
-import {UpdateUserTypeDTO} from "@user/adapters/dtos/userType.dto";
-import {UserTypeEntity} from "@user/domain/entities/userType.entity";
+import {UpdateUserTypeDTO, UpdateUserTypeResponseDTO} from "@user/adapters/dtos/userType.dto";
+
 
 @injectable()
 export class UpdateUserTypeUseCase implements IUpdateUserTypeUseCase {
@@ -20,13 +20,13 @@ export class UpdateUserTypeUseCase implements IUpdateUserTypeUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(input: UpdateUserTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UserTypeEntity>>> {
+    async execute(input: UpdateUserTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateUserTypeResponseDTO>>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
 
         try {
-            const updatedEntity: UpdateResultType<UserTypeEntity> = await this.service.update(input, transaction);
+            const updatedEntity: UpdateResultType<UpdateUserTypeResponseDTO> = await this.service.update(input, transaction);
 
             return ResultType.success(updatedEntity);
         } catch (error) {

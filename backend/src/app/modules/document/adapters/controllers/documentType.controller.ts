@@ -8,7 +8,7 @@ import {StatusCodes} from "http-status-codes";
 import {
     CreateDocumentTypeDTO,
     CreateDocumentTypeResponseDTO,
-    FindDocumentTypesDTO, FindDocumentTypesResponseDTO, UpdateDocumentTypeDTO
+    FindDocumentTypesRawDTO, FindDocumentTypesResponseDTO, UpdateDocumentTypeDTO, UpdateDocumentTypeResponseDTO
 } from "@document/adapters/dto/documentType.dto";
 import {IFindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/IFindDocumentTypes.useCase";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
@@ -40,7 +40,7 @@ export class DocumentTypeController implements IDocumentTypeController {
     }
 
     async findDocumentTypes(req: Request, res: Response): Promise<Response> {
-        const input: FindDocumentTypesDTO = req.query as FindDocumentTypesDTO;
+        const input: FindDocumentTypesRawDTO = req.query as FindDocumentTypesRawDTO;
         const result: ResultType<FindDocumentTypesResponseDTO> = await this.findDocumentTypesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -56,7 +56,7 @@ export class DocumentTypeController implements IDocumentTypeController {
 
     async updateDocumentType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateDocumentTypeDTO;
-        const result: ResultType<UpdateResultType<DocumentTypeEntity>> = await this.updateDocumentTypeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateDocumentTypeResponseDTO>> = await this.updateDocumentTypeUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }

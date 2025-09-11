@@ -1,44 +1,43 @@
+// ---------- BASE ----------
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {StateModel} from "@location/infrastructure/models/state.model";
+import {StateEntity} from "@location/domain/entities/state.entity";
+
 export type StateDTO = {
     id?: number;
-    description?: string;
-    statusId?: number;
-    countryId?: number;
-};
-
-export type StateFilterDTO = {
-    id?: number[] | number;
-    description?: string[] | string;
-    countryId?: number[] | number;
-    statusId?: number[] | number;
-}
-
-export type StatePersistenceDTO = {
     description: string;
     statusId: number;
     countryId: number;
 };
 
-export type CreateStateDTO = {
-    description: string;
-    countryId: number;
-}
-
-export type CreateStateResponseDTO = {
-    id: number;
-    description: string;
-    countryId: number;
-    statusId: number
-}
-
-export type FindStatesDTO = {
-    id?: string[];
+// --------- FILTER ---------
+export type StateFilterDTO = {
+    id?: number[];
     description?: string[];
-    countryId?: string[];
-    statusId?: string[];
+    countryId?: number[];
+    statusId?: number[];
+}
+
+// ------- PERSISTENCE ------
+export type StatePersistenceDTO = Omit<StateDTO, "id">;
+
+// ---------- CREATE ----------
+export type CreateStateDTO = Pick<StateDTO, "description" | "countryId">;
+export type CreateStateResponseDTO = StateDTO;
+
+// ---------- UPDATE ----------
+export type UpdateStateDTO = Partial<Omit<StateDTO, "id">> & { id: number };
+export type UpdateStateResponseDTO = StateDTO;
+
+// ---------- FIND ----------
+export type FindStatesRawDTO = {
+    id?: string;
+    description?: string;
+    countryId?: string;
+    statusId?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindStatesResponseDTO = {
     page?: number;
     limit?: number;
@@ -46,9 +45,14 @@ export type FindStatesResponseDTO = {
     data: StateDTO[];
 };
 
-export type UpdateStateDTO = {
-    id: number;
-    description?: string;
-    countryId?: number;
-    statusId?: number;
-}
+// ------ DTO BASE TYPE -------
+export type StateDtoBaseType = DtoBaseType<
+    StateDTO,
+    CreateStateDTO,
+    FindStatesRawDTO,
+    UpdateStateDTO,
+    StateFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type StateBaseRepositoryType = BaseRepositoryType<StateModel, StateEntity, StateFilterDTO, StatePersistenceDTO>

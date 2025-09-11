@@ -1,42 +1,42 @@
+// ---------- BASE ----------
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
+import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
+
 export type PhoneTypeDTO = {
     id?: number;
-    description?: string;
-    statusId?: number;
+    description: string;
+    statusId: number;
 };
 
+// --------- FILTER ---------
 export type PhoneTypeFilterDTO = {
-    id?: number[] | number;
-    description?: string[] | string;
-    statusId?: number[] | number;
+    id?: number[];
+    description?: string[];
+    statusId?: number[];
     page?: number;
     limit?: number;
 }
 
-export type PhoneTypePersistenceDTO = {
-    description: string;
-    statusId: number;
-};
+// ------- PERSISTENCE ------
+export type PhoneTypePersistenceDTO = Omit<PhoneTypeDTO, "id">;
 
+// ---------- CREATE ----------
+export type CreatePhoneTypeDTO = Pick<PhoneTypeDTO, "description">;
+export type CreatePhoneTypeResponseDTO = PhoneTypeDTO;
 
-export type CreatePhoneTypeDTO = {
-    description: string;
-    statusId: number;
-}
+// ---------- UPDATE ----------
+export type UpdatePhoneTypeDTO = Partial<Omit<PhoneTypeDTO, "id">> & { id: number };
+export type UpdatePhoneTypeResponseDTO = PhoneTypeDTO;
 
-export type CreatePhoneTypeResponseDTO = {
-    id: number;
-    description: string;
-    statusId: number;
-}
-
-export type FindPhoneTypesDTO = {
-    id?: string[];
-    description?: string[];
-    statusId?: string[];
+// ---------- FIND ----------
+export type FindPhoneTypesRawDTO = {
+    id?: string;
+    description?: string;
+    statusId?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindPhoneTypesResponseDTO = {
     page?: number;
     limit?: number;
@@ -44,8 +44,19 @@ export type FindPhoneTypesResponseDTO = {
     data: PhoneTypeDTO[];
 }
 
-export type UpdatePhoneTypeDTO = {
-    id: number;
-    description?: string;
-    statusId?: number;
-}
+// ------ DTO BASE TYPE -------
+export type PhoneTypeDtoBaseType = DtoBaseType<
+    PhoneTypeDTO,
+    CreatePhoneTypeDTO,
+    FindPhoneTypesRawDTO,
+    UpdatePhoneTypeDTO,
+    PhoneTypeFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type PhoneTypeBaseRepositoryType = BaseRepositoryType<
+    PhoneTypeModel,
+    PhoneTypeEntity,
+    PhoneTypeFilterDTO,
+    PhoneTypePersistenceDTO
+>;

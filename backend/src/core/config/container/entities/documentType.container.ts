@@ -8,10 +8,7 @@ import {CreateDocumentTypeUseCase} from "@document/useCases/createDocumentType/c
 import {IDocumentTypeController} from "@document/adapters/controllers/IDocumentType.controller";
 import {DocumentTypeController} from "@document/adapters/controllers/documentType.controller";
 import {DocumentTypeRepository} from "@document/infrastructure/repositories/documentType.repository";
-import {
-    DocumentTypeBaseRepositoryType,
-    IDocumentTypeRepository
-} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
+import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {IFindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/IFindDocumentTypes.useCase";
 import {FindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/findDocumentTypes.useCase";
 import {IUpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/IUpdateDocumentType.useCase";
@@ -20,6 +17,7 @@ import {IDeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentType
 import {DeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentTypes/deleteDocumentTypes.useCase";
 import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
 import {ModelStatic} from "sequelize";
+import {DocumentTypeBaseRepositoryType} from "@document/adapters/dto/documentType.dto";
 
 //#region Services
 container.registerSingleton<IDocumentTypeService>("IDocumentTypeService", DocumentTypeService);

@@ -1,52 +1,48 @@
+// ---------- BASE ----------
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {PhoneCodeModel} from "@phone/infrastructure/models/phoneCode.model";
+import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
+
 export type PhoneCodeDTO = {
     id?: number;
-    ddiCode?: number;
-    dddCode?: number;
-    stateId?: number;
-    statusId?: number;
+    ddiCode: number;
+    dddCode: number;
+    stateId: number;
+    statusId: number;
 }
 
+// --------- FILTER ---------
 export type PhoneCodeFilterDTO = {
-    id?: number[] | number;
-    ddiCode?: number[] | number;
-    dddCode?: number[] | number;
-    stateId?: number[] | number;
-    statusId?: number[] | number;
+    id?: number[];
+    ddiCode?: number[];
+    dddCode?: number[];
+    stateId?: number[];
+    statusId?: number[];
     page?: number;
     limit?: number;
 }
 
-export type PhoneCodePersistenceDTO = {
-    ddiCode: number;
-    dddCode: number;
-    stateId: number;
-    statusId: number;
-};
+// ------- PERSISTENCE -----
+export type PhoneCodePersistenceDTO = Omit<PhoneCodeDTO, "id">;
 
-export type CreatePhoneCodeDTO = {
-    ddiCode: number;
-    dddCode: number;
-    stateId: number;
-}
+// ---------- CREATE ----------
+export type CreatePhoneCodeDTO = Pick<PhoneCodeDTO,"ddiCode" | "dddCode" | "stateId">;
+export type CreatePhoneCodeResponseDTO = PhoneCodeDTO;
 
-export type CreatePhoneCodeResponseDTO = {
-    id: number;
-    ddiCode: number;
-    dddCode: number;
-    stateId: number;
-    statusId: number;
-}
+// ---------- UPDATE ----------
+export type UpdatePhoneCodeDTO = Partial<Omit<PhoneCodeDTO, "id">> & { id: number };
+export type UpdatePhoneCodeResponseDTO = PhoneCodeDTO;
 
-export type FindPhoneCodesDTO = {
-    id?: string[];
-    ddiCode?: string[];
-    dddCode?: string[];
-    stateId?: string[];
-    statusId?: string[];
+// ---------- FIND ----------
+export type FindPhoneCodesRawDTO = {
+    id?: string;
+    ddiCode?: string;
+    dddCode?: string;
+    stateId?: string;
+    statusId?: string;
     page?: string;
     limit?: string;
 }
-
 export type FindPhoneCodesResponseDTO = {
     page: number;
     limit: number;
@@ -54,10 +50,14 @@ export type FindPhoneCodesResponseDTO = {
     data: PhoneCodeDTO[];
 }
 
-export type UpdatePhoneCodeDTO = {
-    id: number;
-    ddiCode?: number;
-    dddCode?: number;
-    stateId?: number;
-    statusId?: number;
-}
+// ------ DTO BASE TYPE -------
+export type PhoneCodeDtoBaseType = DtoBaseType<
+    PhoneCodeDTO,
+    CreatePhoneCodeDTO,
+    FindPhoneCodesRawDTO,
+    UpdatePhoneCodeDTO,
+    PhoneCodeFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type PhoneCodeBaseRepository = BaseRepositoryType<PhoneCodeModel, PhoneCodeEntity, PhoneCodeFilterDTO, PhoneCodePersistenceDTO>;

@@ -1,12 +1,9 @@
 import {inject, injectable} from "tsyringe";
 import {RepositoryBase} from "@coreShared/base/repository.base";
-import {
-    IUserTypeRepository,
-    UserTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserType.repository";
+import {IUserTypeRepository} from "@user/infrastructure/repositories/interface/IUserType.repository";
 import {UserTypeModel} from "@user/infrastructure/models/userType.model";
 import {ModelStatic} from "sequelize";
-import {UserTypeFilterDTO, UserTypePersistenceDTO} from "@user/adapters/dtos/userType.dto";
+import {UserTypeBaseRepositoryType} from "@user/adapters/dtos/userType.dto";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
 import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 
@@ -19,7 +16,7 @@ export class UserTypeRepository extends RepositoryBase<UserTypeBaseRepositoryTyp
         super(model);
     }
 
-    protected override makeFilter(filters?: UserTypeFilterDTO): SequelizeWhereBuilderUtil<UserTypeFilterDTO> {
+    protected override makeFilter(filters?: UserTypeBaseRepositoryType["Filter"]): SequelizeWhereBuilderUtil<UserTypeBaseRepositoryType["Filter"]> {
         return super.makeFilter(filters, {
             id: { in: true },
             description: { like: true },
@@ -27,16 +24,14 @@ export class UserTypeRepository extends RepositoryBase<UserTypeBaseRepositoryTyp
         });
     }
 
-
-
-    protected toPersistence(entity: UserTypeEntity): UserTypePersistenceDTO {
+    protected toPersistence(entity: UserTypeBaseRepositoryType["Entity"]): UserTypeBaseRepositoryType["Persistence"] {
         return {
             description: entity.description,
             statusId: entity.statusId,
         };
     }
 
-    protected toEntity(model: UserTypeModel): UserTypeEntity {
+    protected toEntity(model: UserTypeBaseRepositoryType["Model"]): UserTypeBaseRepositoryType["Entity"] {
         return UserTypeEntity.create({
             id: model.id,
             description: model.description,

@@ -1,14 +1,19 @@
 import {inject, injectable} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {StatusEntity} from "@status/domain/entities/status.entity";
-import {CreateStatusDTO, FilterStatusDTO, UpdateStatusDTO} from "@status/adapters/dtos/status.dto";
+import {
+    CreateStatusDTO,
+    FilterStatusDTO,
+    StatusBaseRepositoryType,
+    UpdateStatusDTO, UpdateStatusResponseDTO
+} from "@status/adapters/dtos/status.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {Transaction} from "sequelize";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError, ValidationError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {IStatusRepository, StatusBaseRepositoryType} from "@status/infrastructure/repositories/IStatusRepository";
+import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
 import {ServiceError} from "@coreShared/errors/service.error";
@@ -17,6 +22,7 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
+import {StatusEnum} from "@status/domain/enum/status.enum";
 
 @injectable()
 export class StatusService implements IStatusService {
@@ -24,9 +30,6 @@ export class StatusService implements IStatusService {
     private readonly uniquenessValidator: EntityUniquenessValidator<StatusBaseRepositoryType>;
     private readonly STATUS: string = StatusEntity.ENTITY_NAME;
     private readonly DESCRIPTION: string = 'description';
-    private readonly NEW_ENTITIES_STATUS: string = "PENDENTE DE APROVACAO";
-    private readonly UPDATED_ENTITIES_STATUS: string = "PENDENTE DE APROVACAO";
-    private readonly INACTIVE_ENTITIES_STATUS: string = "INATIVO";
     //#endregion
 
     //#region CONSTRUCTOR
@@ -114,24 +117,24 @@ export class StatusService implements IStatusService {
 
     @LogError()
     async getStatusForNewEntities(): Promise<StatusEntity> {
-        return this.getStausActiveByDescription(this.NEW_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(StatusEnum.PENDING_APPROVAL);
     }
 
     @LogError()
     async getStatusForUpdateEntities(): Promise<StatusEntity> {
-        return this.getStausActiveByDescription(this.UPDATED_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(StatusEnum.PENDING_APPROVAL);
     }
 
     @LogError()
     async getStatusForInactiveEntities(): Promise<StatusEntity> {
-        return this.getStausActiveByDescription(this.INACTIVE_ENTITIES_STATUS);
+        return this.getStausActiveByDescription(StatusEnum.INACTIVE);
     }
 
     //#endregion
 
     //#region UPDATE
     @LogError()
-    async update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<StatusEntity>> {
+    async update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<UpdateStatusResponseDTO>> {
         const entity: StatusEntity | null = await this.getById(newData.id);
 
         if (!entity) throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
@@ -153,7 +156,7 @@ export class StatusService implements IStatusService {
 
         if (!updated.isSuccess()) throw new ServiceError(EntitiesMessage.error.failure.update(this.STATUS));
 
-        return {entity: updatedEntity, updated: true};
+        return {entity: updated.unwrapOrThrow().toJSON(), updated: true};
     }
 
     //#endregion

@@ -5,10 +5,7 @@ import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.ser
 import {PhoneTypeService} from "@phone/domain/service/phoneType.service";
 import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
 import {CreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/createPhoneType.useCase";
-import {
-    IPhoneTypeRepository,
-    PhoneTypeBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {PhoneTypeRepository} from "@phone/infrastructure/repositories/phoneType.repository";
 import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
 import {PhoneController} from "@phone/adapters/controllers/phone.controller";
@@ -32,10 +29,7 @@ import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePh
 import {DeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/deletePhoneCodes.useCase";
 import {PhoneService} from "@phone/domain/service/phone.service";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {
-    IPhoneRepository,
-    PhoneBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
 import {PhoneRepository} from "@phone/infrastructure/repositories/phone.repository";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
 import {CreatePhoneUseCase} from "@phone/useCase/createPhone/createPhone.useCase";
@@ -49,6 +43,8 @@ import {ModelStatic} from "sequelize";
 import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
 import {PhoneCodeModel} from "@phone/infrastructure/models/phoneCode.model";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
+import {PhoneTypeBaseRepositoryType} from "@phone/adapters/dtos/phoneType.dto";
+import {PhoneBaseRepositoryType} from "@phone/adapters/dtos/phone.dto";
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);

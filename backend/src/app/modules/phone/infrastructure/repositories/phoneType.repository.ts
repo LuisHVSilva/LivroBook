@@ -1,12 +1,9 @@
 import {inject, injectable} from "tsyringe";
-import {
-    IPhoneTypeRepository,
-    PhoneTypeBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 import {ModelStatic} from "sequelize";
 import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
-import {PhoneTypeFilterDTO, PhoneTypePersistenceDTO} from "@phone/adapters/dtos/phoneType.dto";
+import {PhoneTypeBaseRepositoryType} from "@phone/adapters/dtos/phoneType.dto";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 
@@ -19,7 +16,7 @@ export class PhoneTypeRepository extends RepositoryBase<PhoneTypeBaseRepositoryT
         super(model);
     }
 
-    protected override makeFilter(filters?: PhoneTypeFilterDTO): SequelizeWhereBuilderUtil<PhoneTypeFilterDTO> {
+    protected override makeFilter(filters?: PhoneTypeBaseRepositoryType["Filter"]): SequelizeWhereBuilderUtil<PhoneTypeBaseRepositoryType["Filter"]> {
         return super.makeFilter(filters, {
             id: {in: true},
             description: {like: true},
@@ -27,14 +24,14 @@ export class PhoneTypeRepository extends RepositoryBase<PhoneTypeBaseRepositoryT
         });
     }
 
-    toPersistence(entity: PhoneTypeEntity): PhoneTypePersistenceDTO {
+    toPersistence(entity: PhoneTypeBaseRepositoryType["Entity"]): PhoneTypeBaseRepositoryType["Persistence"] {
         return {
             description: entity.description,
             statusId: entity.statusId,
         };
     }
 
-    toEntity(model: PhoneTypeModel): PhoneTypeEntity {
+    toEntity(model: PhoneTypeBaseRepositoryType["Model"]): PhoneTypeBaseRepositoryType["Entity"] {
         return PhoneTypeEntity.create({
             id: model.id,
             description: model.description,

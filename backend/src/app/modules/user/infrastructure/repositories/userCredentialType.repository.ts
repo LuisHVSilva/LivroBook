@@ -2,11 +2,10 @@ import {inject, injectable} from "tsyringe";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 import {ModelStatic} from "sequelize";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
-import {
-    IUserCredentialTypeRepository, UserCredentialTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
+import {IUserCredentialTypeRepository} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
 import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
+import {UserCredentialTypeBaseRepositoryType} from "@user/adapters/dtos/userCredentialType.dto";
 
 
 @injectable()

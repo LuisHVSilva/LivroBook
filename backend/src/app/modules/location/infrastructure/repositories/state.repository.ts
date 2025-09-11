@@ -1,12 +1,9 @@
 import {inject, injectable} from "tsyringe";
-import {
-    IStateRepository,
-    StateBaseRepositoryType
-} from "@location/infrastructure/repositories/interfaces/IState.repository";
+import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
 import {ModelStatic} from "sequelize";
 import {StateEntity} from "@location/domain/entities/state.entity";
 import {StateModel} from "@location/infrastructure/models/state.model";
-import {StateFilterDTO, StatePersistenceDTO} from "@location/adapters/dtos/state.dto";
+import {StateBaseRepositoryType} from "@location/adapters/dtos/state.dto";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 
@@ -19,7 +16,7 @@ export class StateRepository extends RepositoryBase<StateBaseRepositoryType> imp
         super(model);
     }
 
-    protected makeFilter(filters?: StateFilterDTO): SequelizeWhereBuilderUtil<StateFilterDTO> {
+    protected makeFilter(filters?: StateBaseRepositoryType["Filter"]): SequelizeWhereBuilderUtil<StateBaseRepositoryType["Filter"]> {
         return super.makeFilter(filters, {
             id: {in: true},
             description: {like: true},
@@ -28,7 +25,7 @@ export class StateRepository extends RepositoryBase<StateBaseRepositoryType> imp
         });
     }
 
-    protected toPersistence(entity: StateEntity): StatePersistenceDTO {
+    protected toPersistence(entity: StateBaseRepositoryType["Entity"]): StateBaseRepositoryType["Persistence"] {
         return {
             description: entity.description,
             statusId: entity.statusId,
@@ -36,7 +33,7 @@ export class StateRepository extends RepositoryBase<StateBaseRepositoryType> imp
         };
     }
 
-    protected toEntity(model: StateModel): StateEntity {
+    protected toEntity(model: StateBaseRepositoryType["Model"]): StateBaseRepositoryType["Entity"] {
         return StateEntity.create({
             id: model.id,
             description: model.description,

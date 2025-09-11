@@ -1,12 +1,6 @@
 import {inject, injectable} from "tsyringe";
-import {
-    DocumentTypeDtoBaseType,
-    IDocumentTypeService
-} from "@document/domain/services/interfaces/IDocumentType.service";
-import {
-    DocumentTypeBaseRepositoryType,
-    IDocumentTypeRepository
-} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
+import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
+import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
@@ -18,6 +12,7 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {ServiceBase} from "@coreShared/base/service.base";
+import {DocumentTypeBaseRepositoryType, DocumentTypeDtoBaseType} from "@document/adapters/dto/documentType.dto";
 
 @injectable()
 export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, DocumentTypeEntity> implements IDocumentTypeService {
@@ -62,13 +57,9 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
         const transformedFilter: DocumentTypeDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    DocumentTypeTransform.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = DocumentTypeTransform.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                DocumentTypeTransform.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

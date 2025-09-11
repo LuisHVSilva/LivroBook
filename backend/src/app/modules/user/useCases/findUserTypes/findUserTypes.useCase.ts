@@ -6,7 +6,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {IFindUserTypesUseCase} from "@user/useCases/findUserTypes/IFindUserTypes.useCase";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
-import {FindUserTypesDTO, FindUserTypesResponseDTO, UserTypeFilterDTO} from "@user/adapters/dtos/userType.dto";
+import {FindUserTypesRawDTO, FindUserTypesResponseDTO, UserTypeFilterDTO} from "@user/adapters/dtos/userType.dto";
 import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 
 @injectable()
@@ -17,7 +17,7 @@ export class FindUserTypesUseCase implements IFindUserTypesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindUserTypesDTO): Promise<ResultType<FindUserTypesResponseDTO>> {
+    async execute(input: FindUserTypesRawDTO): Promise<ResultType<FindUserTypesResponseDTO>> {
         try {
             const filter: UserTypeFilterDTO = this.mapLocationFilter(input);
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -37,7 +37,7 @@ export class FindUserTypesUseCase implements IFindUserTypesUseCase {
         }
     }
 
-    private mapLocationFilter(input: FindUserTypesDTO): UserTypeFilterDTO {
+    private mapLocationFilter(input: FindUserTypesRawDTO): UserTypeFilterDTO {
         return {
             description: StringUtil.parseCsvFilter(input.description?.toString(), String),
             statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),

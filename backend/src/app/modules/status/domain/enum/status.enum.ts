@@ -1,0 +1,4 @@
+export enum StatusEnum {
+    PENDING_APPROVAL = "PENDING APPROVAL",
+    INACTIVE = "INACTIVE"
+}

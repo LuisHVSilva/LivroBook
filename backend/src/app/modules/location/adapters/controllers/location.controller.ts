@@ -11,20 +11,20 @@ import {StatusCodes} from "http-status-codes";
 import {
     CreateCountryDTO,
     CreateCountryResponseDTO,
-    FindCountriesDTO,
-    FindCountriesResponseDTO, UpdateCountryDTO
+    FindCountriesRawDTO,
+    FindCountriesResponseDTO, UpdateCountryDTO, UpdateCountryResponseDTO
 } from "@location/adapters/dtos/country.dto";
 import {
     CreateCityDTO,
     CreateCityResponseDTO,
-    FindCitiesDTO,
-    FindCitiesResponseDTO, UpdateCityDTO
+    FindCitiesRawDTO,
+    FindCitiesResponseDTO, UpdateCityDTO, UpdateCityResponseDTO
 } from "@location/adapters/dtos/city.dto";
 import {
     CreateStateDTO,
     CreateStateResponseDTO,
-    FindStatesDTO,
-    FindStatesResponseDTO, UpdateStateDTO
+    FindStatesRawDTO,
+    FindStatesResponseDTO, UpdateStateDTO, UpdateStateResponseDTO
 } from "@location/adapters/dtos/state.dto";
 import {IFindCitiesUseCase} from "@location/useCases/findCities/IFindCities.useCase";
 import {IFindStatesUseCase} from "@location/useCases/findStates/IFindStates.useCase";
@@ -33,8 +33,6 @@ import {IUpdateCityUseCase} from "@location/useCases/updateCity/IUpdateCity.useC
 import {IUpdateCountryUseCase} from "@location/useCases/updateCountry/IUpdateCountry.UseCase";
 import {IUpdateStateUseCase} from "@location/useCases/updateState/IUpdateState.useCase";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {CountryEntity} from "@location/domain/entities/country.entity";
-import {StateEntity} from "@location/domain/entities/state.entity";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {IDeleteStateUseCase} from "@location/useCases/deleteState/IDeleteState.useCase";
 import {IDeleteCountryUseCase} from "@location/useCases/deleteCountry/IDeleteCountry.useCase";
@@ -74,7 +72,7 @@ export class LocationController implements ILocationController {
 
     @LogExecution()
     async findCountries(req: Request, res: Response): Promise<Response> {
-        const input: FindCountriesDTO = req.query as FindCountriesDTO;
+        const input: FindCountriesRawDTO = req.query as FindCountriesRawDTO;
         const result: ResultType<FindCountriesResponseDTO> = await this.findCountriesUseCase.execute(input);
         if (result.isSuccess()) {
             return ApiResponseUtil.success<FindCountriesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
@@ -86,12 +84,12 @@ export class LocationController implements ILocationController {
     @LogExecution()
     async updateCountry(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateCountryDTO;
-        const result: ResultType<UpdateResultType<CountryEntity>> = await this.updateCountryUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateCountryResponseDTO>> = await this.updateCountryUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleUpdateResult<CountryEntity>(res, result.unwrap());
+        return ApiResponseUtil.handleUpdateResult<UpdateCountryResponseDTO>(res, result.unwrap());
     }
 
     @LogExecution()
@@ -122,7 +120,7 @@ export class LocationController implements ILocationController {
 
     @LogExecution()
     async findStates(req: Request, res: Response): Promise<Response> {
-        const input: FindStatesDTO = req.query as FindStatesDTO;
+        const input: FindStatesRawDTO = req.query as FindStatesRawDTO;
         const result: ResultType<FindStatesResponseDTO> = await this.findStatesUseCase.execute(input);
         if (result.isSuccess()) {
             return ApiResponseUtil.success<FindStatesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
@@ -134,12 +132,12 @@ export class LocationController implements ILocationController {
     @LogExecution()
     async updateState(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateStateDTO;
-        const result: ResultType<UpdateResultType<StateEntity>> = await this.updateStateUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateStateResponseDTO>> = await this.updateStateUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleUpdateResult<StateEntity>(res, result.unwrap());
+        return ApiResponseUtil.handleUpdateResult<UpdateStateResponseDTO>(res, result.unwrap());
     }
 
     @LogExecution()
@@ -170,7 +168,7 @@ export class LocationController implements ILocationController {
 
     @LogExecution()
     async findCities(req: Request, res: Response): Promise<Response> {
-        const input: FindCitiesDTO = req.query as FindCitiesDTO;
+        const input: FindCitiesRawDTO = req.query as FindCitiesRawDTO;
         const result: ResultType<FindCitiesResponseDTO> = await this.findCitiesUseCase.execute(input);
         if (result.isSuccess()) {
             return ApiResponseUtil.success<FindCitiesResponseDTO>(res, result.unwrap(), StatusCodes.OK);
@@ -182,7 +180,7 @@ export class LocationController implements ILocationController {
     @LogExecution()
     async updateCity(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateCityDTO;
-        const result: ResultType<UpdateResultType<CityEntity>> = await this.updateCityUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateCityResponseDTO>> = await this.updateCityUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }

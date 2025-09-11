@@ -9,8 +9,10 @@ import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {
     IUpdateUserCredentialTypeUseCase
 } from "@user/useCases/updateUserCredentialType/IUpdateUserCredentialType.useCase";
-import {UpdateUserCredentialTypeDTO} from "@user/adapters/dtos/userCredentialType.dto";
-import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
+import {
+    UpdateUserCredentialTypeDTO,
+    UpdateUserCredentialTypeResponseDTO
+} from "@user/adapters/dtos/userCredentialType.dto";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
 
 @injectable()
@@ -22,13 +24,13 @@ export class UpdateUserCredentialTypeUseCase implements IUpdateUserCredentialTyp
 
     @LogExecution()
     @Transactional()
-    async execute(input: UpdateUserCredentialTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UserCredentialTypeEntity>>> {
+    async execute(input: UpdateUserCredentialTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateUserCredentialTypeResponseDTO>>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
 
         try {
-            const updatedEntity: UpdateResultType<UserCredentialTypeEntity> = await this.service.update(input, transaction);
+            const updatedEntity: UpdateResultType<UpdateUserCredentialTypeResponseDTO> = await this.service.update(input, transaction);
 
             return ResultType.success(updatedEntity);
         } catch (error) {

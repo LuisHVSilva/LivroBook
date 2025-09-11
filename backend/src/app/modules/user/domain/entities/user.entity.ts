@@ -191,20 +191,4 @@ export class UserEntity extends EntityBase<UserProps> {
     public update(props: Partial<UserProps>): this {
         return this.cloneWith(props);
     }
-
-    public toJSON(): Record<string, unknown> {
-        return {
-            id: this._id,
-            userTypeId: this._userTypeId,
-            name: this._name,
-            email: this._email,
-            birthday: this._birthday,
-            document: this._document,
-            documentTypeId: this._documentTypeId,
-            cityId: this._cityId,
-            phoneId: this._phoneId,
-            statusId: this._statusId
-        };
-    }
-
 }

@@ -3,10 +3,7 @@ import {ServiceBase} from "@coreShared/base/service.base";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
 import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {
-    IUserTypeRepository,
-    UserTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserType.repository";
+import {IUserTypeRepository} from "@user/infrastructure/repositories/interface/IUserType.repository";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
@@ -14,7 +11,7 @@ import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
-import {UserTypeDtoBaseType} from "@user/adapters/dtos/userType.dto";
+import {UserTypeBaseRepositoryType, UserTypeDtoBaseType} from "@user/adapters/dtos/userType.dto";
 
 @injectable()
 export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEntity> implements IUserTypeService {
@@ -32,6 +29,7 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
         super(repo, UserTypeEntity, statusService);
         this.uniquenessValidator = this.validatorFactory(this.userTypeRepo);
     }
+
     //#endregion
 
     //#region HELPERS
@@ -55,13 +53,8 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
         const transformedFilter: UserTypeDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    UserTypeTransform.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = UserTypeTransform.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                UserTypeTransform.normalizeDescription(desc))
         }
 
         return transformedFilter;
@@ -91,5 +84,6 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
             await this.uniquenessValidatorEntity(newEntity);
         }
     }
+
     //#endregion
 }

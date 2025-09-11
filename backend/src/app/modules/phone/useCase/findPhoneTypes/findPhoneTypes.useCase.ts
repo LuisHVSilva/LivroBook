@@ -3,7 +3,7 @@ import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTy
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {
-    FindPhoneTypesDTO,
+    FindPhoneTypesRawDTO,
     FindPhoneTypesResponseDTO,
     PhoneTypeDTO,
     PhoneTypeFilterDTO
@@ -21,7 +21,7 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindPhoneTypesDTO): Promise<ResultType<FindPhoneTypesResponseDTO>> {
+    async execute(input: FindPhoneTypesRawDTO): Promise<ResultType<FindPhoneTypesResponseDTO>> {
         try {
             const filter: PhoneTypeFilterDTO = this.mapPhoneTypesFilter(input);
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -40,7 +40,7 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
         }
     }
 
-    private mapPhoneTypesFilter(input: FindPhoneTypesDTO): PhoneTypeFilterDTO {
+    private mapPhoneTypesFilter(input: FindPhoneTypesRawDTO): PhoneTypeFilterDTO {
         return {
             id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             description: StringUtil.parseCsvFilter(input.description?.toString(), String),

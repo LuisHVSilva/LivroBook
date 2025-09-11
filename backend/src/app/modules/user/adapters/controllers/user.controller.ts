@@ -8,14 +8,13 @@ import {ICreateUserTypeUseCase} from "@user/useCases/createUserType/ICreateUserT
 import {
     CreateUserTypeDTO,
     CreateUserTypeResponseDTO,
-    FindUserTypesDTO,
-    FindUserTypesResponseDTO, UpdateUserTypeDTO
+    FindUserTypesRawDTO,
+    FindUserTypesResponseDTO, UpdateUserTypeDTO, UpdateUserTypeResponseDTO
 } from "@user/adapters/dtos/userType.dto";
 import {IFindUserTypesUseCase} from "@user/useCases/findUserTypes/IFindUserTypes.useCase";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IUpdateUserTypeUseCase} from "@user/useCases/updateUserType/IUpdateUserType.useCase";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 import {IDeleteUserTypeUseCase} from "@user/useCases/deleteUserTypes/IDeleteUserType.useCase";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {
@@ -30,10 +29,9 @@ import {
 } from "@user/useCases/deleteUserCredentialTypes/IDeleteUserCredentialTypes.useCase";
 import {
     CreateUserCredentialTypeDTO,
-    CreateUserCredentialTypeResponseDTO, FindUserCredentialTypesDTO, FindUserCredentialTypesResponseDTO,
-    UpdateUserCredentialTypeDTO
+    CreateUserCredentialTypeResponseDTO, FindUserCredentialTypesRawDTO, FindUserCredentialTypesResponseDTO,
+    UpdateUserCredentialTypeDTO, UpdateUserCredentialTypeResponseDTO
 } from "@user/adapters/dtos/userCredentialType.dto";
-import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
 
 @injectable()
 export class UserController implements IUserController {
@@ -65,7 +63,7 @@ export class UserController implements IUserController {
     }
 
     async findUserTypes(req: Request, res: Response): Promise<Response> {
-        const input: FindUserTypesDTO = req.query;
+        const input: FindUserTypesRawDTO = req.query;
         const result: ResultType<FindUserTypesResponseDTO> = await this.findUserTypesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -81,12 +79,12 @@ export class UserController implements IUserController {
 
     async updateUserType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateUserTypeDTO;
-        const result: ResultType<UpdateResultType<UserTypeEntity>> = await this.updateUserTypeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateUserTypeResponseDTO>> = await this.updateUserTypeUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleUpdateResult<UserTypeEntity>(res, result.unwrap());
+        return ApiResponseUtil.handleUpdateResult<UpdateUserTypeResponseDTO>(res, result.unwrap());
     }
 
     async deleteUserTypes(req: Request, res: Response): Promise<Response> {
@@ -115,7 +113,7 @@ export class UserController implements IUserController {
     }
 
     async findUserCredentialType(req: Request, res: Response): Promise<Response> {
-        const input: FindUserCredentialTypesDTO = req.query as FindUserCredentialTypesDTO;
+        const input: FindUserCredentialTypesRawDTO = req.query as FindUserCredentialTypesRawDTO;
         const result: ResultType<FindUserCredentialTypesResponseDTO> = await this.findUserCredentialTypesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -131,12 +129,12 @@ export class UserController implements IUserController {
 
     async updateUserCredentialType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdateUserCredentialTypeDTO;
-        const result: ResultType<UpdateResultType<UserCredentialTypeEntity>> = await this.updateUserCredentialTypeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdateUserCredentialTypeResponseDTO>> = await this.updateUserCredentialTypeUseCase.execute(input);
         if (!result.isSuccess()) {
             return ApiResponseUtil.handleResultError(res, result.getError());
         }
 
-        return ApiResponseUtil.handleUpdateResult<UserCredentialTypeEntity>(res, result.unwrap());
+        return ApiResponseUtil.handleUpdateResult<UpdateUserCredentialTypeResponseDTO>(res, result.unwrap());
     }
 
     async deleteUserCredentialType(req: Request, res: Response): Promise<Response> {

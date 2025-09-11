@@ -11,6 +11,14 @@ export abstract class EntityBase<T extends { id?: unknown }> {
         return this.props;
     }
 
+    public toObject(): T {
+        return { ...this.props };
+    }
+
+    public toJSON(): T {
+        return this.toObject();
+    }
+
     protected validateRequiredFields(fields: (keyof T)[]): void {
         for (const field of fields) {
             const value = this.getProps()[field]; // <-- pegando dos props corretos

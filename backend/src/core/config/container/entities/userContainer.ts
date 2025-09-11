@@ -7,10 +7,7 @@ import {UserTypeService} from "@user/domain/services/userType.service";
 import {ICreateUserTypeUseCase} from "@user/useCases/createUserType/ICreateUserType.useCase";
 import {CreateUserTypeUseCase} from "@user/useCases/createUserType/createUserType.useCase";
 import {UserTypeModel} from "@user/infrastructure/models/userType.model";
-import {
-    IUserTypeRepository,
-    UserTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserType.repository";
+import {IUserTypeRepository} from "@user/infrastructure/repositories/interface/IUserType.repository";
 import {UserTypeRepository} from "@user/infrastructure/repositories/userType.repository";
 import {IUserController} from "@user/adapters/controllers/IUser.controller";
 import {UserController} from "@user/adapters/controllers/user.controller";
@@ -41,12 +38,12 @@ import {
     DeleteUserCredentialTypesUseCase
 } from "@user/useCases/deleteUserCredentialTypes/deleteUserCredentialTypes.useCase";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
-import {
-    IUserCredentialTypeRepository, UserCredentialTypeBaseRepositoryType
-} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
+import {IUserCredentialTypeRepository} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
 import {UserCredentialTypeRepository} from "@user/infrastructure/repositories/userCredentialType.repository";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
 import {UserCredentialTypeService} from "@user/domain/services/userCredentialType.service";
+import {UserTypeBaseRepositoryType} from "@user/adapters/dtos/userType.dto";
+import {UserCredentialTypeBaseRepositoryType} from "@user/adapters/dtos/userCredentialType.dto";
 
 //#region Services
 container.registerSingleton<IUserTypeService>("IUserTypeService", UserTypeService);

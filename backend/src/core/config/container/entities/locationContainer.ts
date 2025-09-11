@@ -8,22 +8,13 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {CountryService} from "@location/domain/services/country.service";
 import {StateService} from "@location/domain/services/state.service";
 import {CityService} from "@location/domain/services/city.service";
-import {
-    CityBaseRepositoryType,
-    ICityRepository
-} from "@location/infrastructure/repositories/interfaces/ICity.repository";
+import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {CityRepository} from "@location/infrastructure/repositories/city.repository";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
-import {
-    IStateRepository,
-    StateBaseRepositoryType
-} from "@location/infrastructure/repositories/interfaces/IState.repository";
-import {
-    CountryBaseRepositoryType,
-    ICountryRepository
-} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
+import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
+import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
 import {ICreateCountryUseCase} from "@location/useCases/createCountry/ICreateCountry.useCase";
 import {CreateCountryUseCase} from "@location/useCases/createCountry/createCountry.useCase";
 import {ICreateStateUseCase} from "@location/useCases/createState/ICreateState.useCase";
@@ -52,6 +43,9 @@ import {CountryModel} from "@location/infrastructure/models/country.model";
 import {ModelStatic} from "sequelize";
 import {StateModel} from "@location/infrastructure/models/state.model";
 import {CityModel} from "@location/infrastructure/models/city.model";
+import {CountryBaseRepositoryType} from "@location/adapters/dtos/country.dto";
+import {StateBaseRepositoryType} from "@location/adapters/dtos/state.dto";
+import {CityBaseRepositoryType} from "@location/adapters/dtos/city.dto";
 
 //#region Domain
 container.registerSingleton<ICountryService>("ICountryService", CountryService);

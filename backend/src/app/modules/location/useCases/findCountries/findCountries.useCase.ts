@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {IFindCountriesUseCase} from "@location/useCases/findCountries/IFindCountries.useCase";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
-import {CountryFilterDTO, FindCountriesDTO, FindCountriesResponseDTO} from "@location/adapters/dtos/country.dto";
+import {CountryFilterDTO, FindCountriesRawDTO, FindCountriesResponseDTO} from "@location/adapters/dtos/country.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
@@ -17,7 +17,7 @@ export class FindCountriesUseCase implements IFindCountriesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindCountriesDTO): Promise<ResultType<FindCountriesResponseDTO>> {
+    async execute(input: FindCountriesRawDTO): Promise<ResultType<FindCountriesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;

@@ -1,6 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IFindStatusesUseCase} from "@status/useCases/findStatus/IFindStatuses.useCase";
-import {FindStatusesDTO, FindStatusesResponseDTO, FilterStatusDTO} from "@status/adapters/dtos/status.dto";
+import {FindStatusesRawDTO, FindStatusesResponseDTO, FilterStatusDTO} from "@status/adapters/dtos/status.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {StringUtil} from "@coreShared/utils/string.util";
@@ -17,15 +17,15 @@ export class FindStatusesUseCase implements IFindStatusesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindStatusesDTO): Promise<ResultType<FindStatusesResponseDTO>> {
+    async execute(input: FindStatusesRawDTO): Promise<ResultType<FindStatusesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
             const filter: FilterStatusDTO = {
-                id: StringUtil.parseCsvFilter(input.id, Number),
-                description: StringUtil.parseCsvFilter(input.description, String),
-                active: StringUtil.parseCsvFilter(input.active, StringUtil.parseBoolean),
+                id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
+                description: StringUtil.parseCsvFilter(input.description?.toString(), String),
+                active: StringUtil.parseCsvFilter(input.active?.toString(), StringUtil.parseBoolean),
             };
 
             const {entities, total}: FindAllType<StatusEntity> = await this.statusService.findMany(filter, page, limit);

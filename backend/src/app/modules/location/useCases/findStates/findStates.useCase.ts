@@ -1,4 +1,4 @@
-import {FindStatesDTO, FindStatesResponseDTO, StateFilterDTO} from "@location/adapters/dtos/state.dto";
+import {FindStatesRawDTO, FindStatesResponseDTO, StateFilterDTO} from "@location/adapters/dtos/state.dto";
 import {IFindStatesUseCase} from "@location/useCases/findStates/IFindStates.useCase";
 import {inject, injectable} from "tsyringe";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
@@ -18,7 +18,7 @@ export class FindStatesUseCase implements IFindStatesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindStatesDTO): Promise<ResultType<FindStatesResponseDTO>> {
+    async execute(input: FindStatesRawDTO): Promise<ResultType<FindStatesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
@@ -36,11 +36,7 @@ export class FindStatesUseCase implements IFindStatesUseCase {
                 page,
                 limit,
                 totalPages: Math.ceil(total / limit),
-                data: entities.map(status => ({
-                    id: status.id,
-                    description: status.description,
-                    statusId: status.statusId,
-                })),
+                data: entities,
             };
 
             return ResultType.success(response);

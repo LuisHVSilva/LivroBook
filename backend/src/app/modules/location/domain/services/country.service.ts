@@ -1,8 +1,5 @@
 import {inject, injectable} from "tsyringe";
-import {
-    CountryBaseRepositoryType,
-    ICountryRepository
-} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
+import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CountryEntity} from "@location/domain/entities/country.entity";
@@ -10,10 +7,11 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {CountryDtoBaseType, ICountryService} from "@location/domain/services/interfaces/ICountry.service";
+import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {CountryTransformer} from "@location/domain/transformers/country.transform";
+import {CountryBaseRepositoryType, CountryDtoBaseType} from "@location/adapters/dtos/country.dto";
 
 
 @injectable()
@@ -58,13 +56,9 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
         const transformedFilter: CountryDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    CountryTransformer.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = CountryTransformer.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                CountryTransformer.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

@@ -1,9 +1,10 @@
 import {inject, injectable} from "tsyringe";
+import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {
-    DocumentTypeBaseRepositoryType, DocumentTypePersistenceDTO,
-    IDocumentTypeRepository
-} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
-import {DocumentTypeFilterDTO} from "@document/adapters/dto/documentType.dto";
+    DocumentTypeBaseRepositoryType,
+    DocumentTypeFilterDTO,
+    DocumentTypePersistenceDTO
+} from "@document/adapters/dto/documentType.dto";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 import {ModelStatic} from "sequelize";
 import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
@@ -20,11 +21,10 @@ export class DocumentTypeRepository extends RepositoryBase<DocumentTypeBaseRepos
 
     protected override makeFilter(filters?: DocumentTypeFilterDTO): SequelizeWhereBuilderUtil<DocumentTypeFilterDTO> {
         return super.makeFilter(filters, {
-            id: { in: true },
-            description: { like: true },
+            id: {in: true},
+            description: {like: true},
         });
     }
-
 
 
     protected toPersistence(entity: DocumentTypeEntity): DocumentTypePersistenceDTO {

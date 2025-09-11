@@ -1,7 +1,8 @@
 import {inject, injectable} from "tsyringe";
-import {IPhoneCodeService, PhoneCodeDtoBaseType} from "@phone/domain/service/interfaces/IPhoneCode.service";
+import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {
+    PhoneCodeDtoBaseType,
     PhoneCodeFilterDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
 import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
@@ -12,6 +13,7 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {ServiceBase} from "@coreShared/base/service.base";
+import {StringUtil} from "@coreShared/utils/string.util";
 
 @injectable()
 export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCodeEntity> implements IPhoneCodeService {
@@ -39,9 +41,9 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
     @LogError()
     protected async uniquenessValidatorEntity(entity: PhoneCodeEntity): Promise<void> {
         const filter: PhoneCodeFilterDTO = {
-            ddiCode: entity.ddiCode ?? undefined,
-            dddCode: entity.dddCode ?? undefined,
-            stateId: entity.stateId ?? undefined,
+            ddiCode: StringUtil.parseCsvFilter(entity.ddiCode?.toString(), Number),
+            dddCode: StringUtil.parseCsvFilter(entity.dddCode?.toString(), Number),
+            stateId: StringUtil.parseCsvFilter(entity.stateId?.toString(), Number)
         }
 
         const result: FindAllType<PhoneCodeEntity> = await this.findMany(filter);
@@ -77,7 +79,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
     }
 
     @LogError()
-    protected async handleBusinessRules(oldEntity: PhoneCodeEntity, newEntity: PhoneCodeEntity): Promise<void> {
+    protected async handleBusinessRules(newEntity: PhoneCodeEntity): Promise<void> {
         await this.uniquenessValidatorEntity(newEntity);
     }
 }

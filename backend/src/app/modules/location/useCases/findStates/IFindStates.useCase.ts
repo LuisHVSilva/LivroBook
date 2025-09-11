@@ -1,6 +1,6 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {FindStatesDTO, FindStatesResponseDTO} from "@location/adapters/dtos/state.dto";
+import {FindStatesRawDTO, FindStatesResponseDTO} from "@location/adapters/dtos/state.dto";
 
-export interface IFindStatesUseCase extends IUseCase<FindStatesDTO, FindStatesResponseDTO> {
+export interface IFindStatesUseCase extends IUseCase<FindStatesRawDTO, FindStatesResponseDTO> {
 
 }

@@ -21,7 +21,7 @@ export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, an
         excludeId?: string
     ): Promise<boolean> {
         const filters = {[fieldName]: value} as T["Filter"];
-        const result: ResultType<T["Entity"]> = await this.repository.findOneByFilter(filters);
+        const result: ResultType<T["Entity"]> = await this.repository.findOneExactByFilter(filters);
 
         if (result.isFailure()) {
             throw new ValidationError("Erro ao validar unicidade.");

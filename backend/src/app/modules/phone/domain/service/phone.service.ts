@@ -7,15 +7,12 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
-import {IPhoneService, PhoneDtoBaseType} from "@phone/domain/service/interfaces/IPhone.service";
-import {
-    IPhoneRepository,
-    PhoneBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
+import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {ServiceBase} from "@coreShared/base/service.base";
-import {ResultType} from "@coreShared/types/result.type";
+import {PhoneBaseRepositoryType, PhoneDtoBaseType} from "@phone/adapters/dtos/phone.dto";
 
 @injectable()
 export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> implements IPhoneService {
@@ -38,15 +35,7 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
 
     //#endregion
 
-    @LogError()
-    public async findPhoneByNumber(number: string): Promise<PhoneEntity | null> {
-        const filter: PhoneDtoBaseType["FilterDTO"] = {
-            number,
-        }
-        const founded: ResultType<PhoneEntity> = await this.repo.findOneExactByFilter(filter);
-        return founded.unwrapOrNull();
-    }
-
+    //#region HELPERS
     @LogError()
     protected async createEntity(data: PhoneDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneEntity> {
         return PhoneEntity.create({
@@ -96,4 +85,5 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
             await this.uniquenessValidatorEntity(newEntity);
         }
     }
+    //#endregion
 }

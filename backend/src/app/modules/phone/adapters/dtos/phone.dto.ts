@@ -1,52 +1,48 @@
+// ---------- BASE ----------
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {PhoneModel} from "@phone/infrastructure/models/phone.model";
+import {PhoneEntity} from "@phone/domain/entities/phone.entity";
+
 export type PhoneDTO = {
     id?: number;
-    number?: string;
-    phoneCodeId?: number;
-    phoneTypeId?: number;
-    statusId?: number;
+    number: string;
+    phoneCodeId: number;
+    phoneTypeId: number;
+    statusId: number;
 }
 
+// --------- FILTER ---------
 export type PhoneFilterDTO = {
-    id?: number[] | number;
-    number?: string | string[];
-    phoneCodeId?: number[] | number;
-    phoneTypeId?: number[] | number;
-    statusId?: number[] | number;
+    id?: number[];
+    number?: string[];
+    phoneCodeId?: number[];
+    phoneTypeId?: number[];
+    statusId?: number[];
     page?: number;
     limit?: number;
 }
 
-export type PhonePersistenceDTO = {
-    number: string;
-    phoneCodeId: number;
-    phoneTypeId: number;
-    statusId: number;
-};
+// ------- PERSISTENCE -----
+export type PhonePersistenceDTO = Omit<PhoneDTO, "id">;
 
-export type CreatePhoneDTO = {
-    number: string;
-    phoneCodeId: number;
-    phoneTypeId: number;
-}
+// ---------- CREATE ----------
+export type CreatePhoneDTO = Pick<PhoneDTO, "number" | "phoneCodeId" |"phoneTypeId">;
+export type CreatePhoneResponseDTO = PhoneDTO;
 
-export type CreatePhoneResponseDTO = {
-    id: number;
-    number: string;
-    phoneCodeId: number;
-    phoneTypeId: number;
-    statusId: number;
-}
+// ---------- UPDATE ----------
+export type UpdatePhoneDTO = Partial<Omit<PhoneDTO, "id">> & { id: number };
+export type UpdatePhoneResponseDTO = PhoneDTO;
 
-export type FindPhonesDTO = {
-    id: string[];
-    number: string[];
-    phoneCodeId: string[];
-    phoneTypeId: string[];
-    statusId: string[];
+// ---------- FIND ----------
+export type FindPhonesRawDTO = {
+    id: string;
+    number: string;
+    phoneCodeId: string;
+    phoneTypeId: string;
+    statusId: string;
     page?: string;
     limit?: string;
 }
-
 export type FindPhonesResponseDTO = {
     page: number;
     limit: number;
@@ -54,10 +50,14 @@ export type FindPhonesResponseDTO = {
     data: PhoneDTO[];
 }
 
-export type UpdatePhoneDTO = {
-    id: number;
-    number?: string;
-    phoneCodeId?: number;
-    phoneTypeId?: number;
-    statusId?: number;
-}
+// ------ DTO BASE TYPE -------
+export type PhoneDtoBaseType = DtoBaseType<
+    PhoneDTO,
+    CreatePhoneDTO,
+    FindPhonesRawDTO,
+    UpdatePhoneDTO,
+    PhoneFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type PhoneBaseRepositoryType = BaseRepositoryType<PhoneModel, PhoneEntity, PhoneFilterDTO, PhonePersistenceDTO>;

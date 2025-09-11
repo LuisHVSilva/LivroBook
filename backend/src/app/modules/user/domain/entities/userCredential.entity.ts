@@ -141,19 +141,4 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
     public update(props: Partial<UserCredentialProps>): this {
         return this.cloneWith(props);
     }
-
-    public toJSON(): Record<string, unknown> {
-        return {
-            id: this._id,
-            userCredentialTypeId: this._userCredentialType,
-            //password: this._password,
-            loginAttempts: this._loginAttempts,
-            isTwoFactorEnabled: this._isTwoFactorEnabled,
-            isEmailVerified: this._isEmailVerified,
-            lastLoginIP: this._lastLoginIP,
-            lastLoginAt: this._lastLoginAt,
-            statusId: this._status,
-        }
-    }
-
 }

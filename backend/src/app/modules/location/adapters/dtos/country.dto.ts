@@ -1,39 +1,40 @@
+// ---------- BASE ----------
+import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
+import {CountryModel} from "@location/infrastructure/models/country.model";
+import {CountryEntity} from "@location/domain/entities/country.entity";
+
 export type CountryDTO = {
     id?: number;
-    description?: string;
-    statusId?: number;
-};
-
-export type CountryFilterDTO = {
-    id?: number[] | number;
-    description?: string[] | string;
-    statusId?: number[] | number;
-}
-
-export type CountryPersistenceDTO = {
     description: string;
     statusId: number;
 };
 
-
-export type CreateCountryDTO = {
-    description: string;
-}
-
-export type CreateCountryResponseDTO = {
-    id: number;
-    description: string;
-    statusId: number
-}
-
-export type FindCountriesDTO = {
-    id?: string[];
+// --------- FILTER ---------
+export type CountryFilterDTO = {
+    id?: number[];
     description?: string[];
-    statusId?: string[];
+    statusId?: number[];
+}
+
+// ------- PERSISTENCE ------
+export type CountryPersistenceDTO = Omit<CountryDTO, "id">;
+
+// ---------- CREATE ----------
+export type CreateCountryDTO = Pick<CountryDTO, "description">;
+export type CreateCountryResponseDTO = CountryDTO
+
+// ---------- UPDATE ----------
+export type UpdateCountryDTO = Partial<Omit<CountryDTO, "id">> & { id: number };
+export type UpdateCountryResponseDTO = CountryDTO;
+
+// ---------- FIND ----------
+export type FindCountriesRawDTO = {
+    id?: string;
+    description?: string;
+    statusId?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindCountriesResponseDTO = {
     page?: number;
     limit?: number;
@@ -41,8 +42,14 @@ export type FindCountriesResponseDTO = {
     data: CountryDTO[];
 };
 
-export type UpdateCountryDTO = {
-    id: number;
-    description?: string;
-    statusId?: number;
-}
+// ------ DTO BASE TYPE -------
+export type CountryDtoBaseType = DtoBaseType<
+    CountryDTO,
+    CreateCountryDTO,
+    FindCountriesRawDTO,
+    UpdateCountryDTO,
+    CountryFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type CountryBaseRepositoryType = BaseRepositoryType<CountryModel, CountryEntity, CountryFilterDTO, CountryPersistenceDTO>;

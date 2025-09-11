@@ -1,5 +1,5 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {FindDocumentTypesDTO, FindDocumentTypesResponseDTO} from "@document/adapters/dto/documentType.dto";
+import {FindDocumentTypesRawDTO, FindDocumentTypesResponseDTO} from "@document/adapters/dto/documentType.dto";
 
-export interface IFindDocumentTypesUseCase extends IUseCase<FindDocumentTypesDTO, FindDocumentTypesResponseDTO> {
+export interface IFindDocumentTypesUseCase extends IUseCase<FindDocumentTypesRawDTO, FindDocumentTypesResponseDTO> {
 }

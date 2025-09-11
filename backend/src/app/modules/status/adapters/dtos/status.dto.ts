@@ -1,35 +1,40 @@
-// import {DtoBaseType} from "@coreShared/types/entity.type";
+// ---------- BASE ----------
+import {BaseRepositoryType} from "@coreShared/types/entity.type";
+import {StatusModel} from "@status/infrastructure/models/status.model";
+import {StatusEntity} from "@status/domain/entities/status.entity";
 
 export type StatusDto = {
     id?: number;
-    description?: string;
-    active?: boolean;
+    description: string;
+    active: boolean;
 };
 
+// --------- FILTER -----------
 export type FilterStatusDTO = {
     id?: number[],
     description?: string[]
     active?: boolean[]
 }
 
-export type CreateStatusDTO = {
-    description: string;
-};
+// ------- PERSISTENCE --------
+export type StatusPersistenceDTO = Omit<StatusDto, "id">;
 
-export type CreateStatusResponseDTO = {
-    id: number;
-    description: string;
-    active: boolean;
-};
+// ---------- CREATE ----------
+export type CreateStatusDTO = Pick<StatusDto, "description">;
+export type CreateStatusResponseDTO = StatusDto;
 
-export type FindStatusesDTO = {
+// ---------- UPDATE ----------
+export type UpdateStatusDTO = Partial<Omit<StatusDto, "id">> & { id: number };
+export type UpdateStatusResponseDTO = StatusDto;
+
+// ---------- FIND ------------
+export type FindStatusesRawDTO = {
     id?: string;
     description?: string;
     active?: string;
     page?: string;
     limit?: string;
 };
-
 export type FindStatusesResponseDTO = {
     page?: number;
     limit?: number;
@@ -37,16 +42,5 @@ export type FindStatusesResponseDTO = {
     data: StatusDto[];
 };
 
-export type UpdateStatusDTO = {
-    id: number;
-    description?: string;
-    active?: boolean;
-};
-
-// export type dtoBaseType = DtoBaseType<
-//     StatusDto,
-//     CreateStatusDTO,
-//     FindStatusesDTO,
-//     UpdateStatusDTO,
-//     FilterStatusDTO
-// >
+// ------ BASE REPOSITORY TYPE -------
+export type StatusBaseRepositoryType = BaseRepositoryType<StatusModel, StatusEntity, FilterStatusDTO, StatusPersistenceDTO>;

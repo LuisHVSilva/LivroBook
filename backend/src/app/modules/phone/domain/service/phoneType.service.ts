@@ -1,20 +1,18 @@
 import {inject, injectable} from "tsyringe";
-import {IPhoneTypeService, PhoneTypeDtoBaseType} from "@phone/domain/service/interfaces/IPhoneType.service";
+import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
-import {
-    IPhoneTypeRepository,
-    PhoneTypeBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ServiceBase} from "@coreShared/base/service.base";
-import {CityDtoBaseType} from "@location/domain/services/interfaces/ICity.service";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
+import {PhoneTypeBaseRepositoryType, PhoneTypeDtoBaseType} from "@phone/adapters/dtos/phoneType.dto";
+import {CityDtoBaseType} from "@location/adapters/dtos/city.dto";
 
 @injectable()
 export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTypeEntity> implements IPhoneTypeService {
@@ -58,13 +56,9 @@ export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTyp
         const transformedFilter: CityDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    PhoneTypeTransformer.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = PhoneTypeTransformer.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                PhoneTypeTransformer.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

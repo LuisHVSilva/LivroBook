@@ -6,8 +6,8 @@ import {StatusCodes} from "http-status-codes";
 import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
 import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
 import {
-    CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO, FindPhoneTypesDTO,
-    FindPhoneTypesResponseDTO, UpdatePhoneTypeDTO
+    CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO, FindPhoneTypesRawDTO,
+    FindPhoneTypesResponseDTO, UpdatePhoneTypeDTO, UpdatePhoneTypeResponseDTO
 } from "@phone/adapters/dtos/phoneType.dto";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTypes.useCase";
@@ -15,24 +15,21 @@ import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePho
 import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
 import {
-    CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO, FindPhoneCodesDTO,
-    FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO
+    CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO, FindPhoneCodesRawDTO,
+    FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO, UpdatePhoneCodeResponseDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
 import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
 import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
 import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
 import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
 import {
-    CreatePhoneDTO, CreatePhoneResponseDTO, FindPhonesDTO,
-    FindPhonesResponseDTO, UpdatePhoneDTO
+    CreatePhoneDTO, CreatePhoneResponseDTO, FindPhonesRawDTO,
+    FindPhonesResponseDTO, UpdatePhoneDTO, UpdatePhoneResponseDTO
 } from "@phone/adapters/dtos/phone.dto";
 import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
 import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCase";
 import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
-import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
-import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
-import {PhoneEntity} from "@phone/domain/entities/phone.entity";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 
 @injectable()
@@ -66,7 +63,7 @@ export class PhoneController implements IPhoneController {
     }
 
     async findPhoneTypes(req: Request, res: Response): Promise<Response> {
-        const input: FindPhoneTypesDTO = req.query as FindPhoneTypesDTO;
+        const input: FindPhoneTypesRawDTO = req.query as FindPhoneTypesRawDTO;
         const result: ResultType<FindPhoneTypesResponseDTO> = await this.findPhoneTypesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -82,10 +79,10 @@ export class PhoneController implements IPhoneController {
 
     async updatePhoneType(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneTypeDTO;
-        const result: ResultType<UpdateResultType<PhoneTypeEntity>> = await this.updatePhoneTypeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdatePhoneTypeResponseDTO>> = await this.updatePhoneTypeUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.handleUpdateResult<PhoneTypeEntity>(res, result.unwrap());
+            return ApiResponseUtil.handleUpdateResult<UpdatePhoneTypeResponseDTO>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
@@ -117,7 +114,7 @@ export class PhoneController implements IPhoneController {
     }
 
     async findPhoneCodes(req: Request, res: Response): Promise<Response> {
-        const input: FindPhoneCodesDTO = req.query as FindPhoneCodesDTO;
+        const input: FindPhoneCodesRawDTO = req.query as FindPhoneCodesRawDTO;
         const result: ResultType<FindPhoneCodesResponseDTO> = await this.findPhoneCodesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -133,10 +130,10 @@ export class PhoneController implements IPhoneController {
 
     async updatePhoneCode(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneCodeDTO;
-        const result: ResultType<UpdateResultType<PhoneCodeEntity>> = await this.updatePhoneCodeUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdatePhoneCodeResponseDTO>> = await this.updatePhoneCodeUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.handleUpdateResult<PhoneCodeEntity>(res, result.unwrap());
+            return ApiResponseUtil.handleUpdateResult<UpdatePhoneCodeResponseDTO>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());
@@ -168,7 +165,7 @@ export class PhoneController implements IPhoneController {
     }
 
     async findPhones(req: Request, res: Response): Promise<Response> {
-        const input: FindPhonesDTO = req.query as FindPhonesDTO;
+        const input: FindPhonesRawDTO = req.query as FindPhonesRawDTO;
         const result: ResultType<FindPhonesResponseDTO> = await this.findPhonesUseCase.execute(input);
 
         if (result.isSuccess()) {
@@ -184,10 +181,10 @@ export class PhoneController implements IPhoneController {
 
     async updatePhone(req: Request, res: Response): Promise<Response> {
         const input = req.body as UpdatePhoneDTO;
-        const result: ResultType<UpdateResultType<PhoneEntity>> = await this.updatePhoneUseCase.execute(input);
+        const result: ResultType<UpdateResultType<UpdatePhoneResponseDTO>> = await this.updatePhoneUseCase.execute(input);
 
         if (result.isSuccess()) {
-            return ApiResponseUtil.handleUpdateResult<PhoneEntity>(res, result.unwrap());
+            return ApiResponseUtil.handleUpdateResult<UpdatePhoneResponseDTO>(res, result.unwrap());
         }
 
         return ApiResponseUtil.handleResultError(res, result.getError());

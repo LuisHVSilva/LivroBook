@@ -5,7 +5,7 @@ import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {IFindCitiesUseCase} from "@location/useCases/findCities/IFindCities.useCase";
-import {CityFilterDTO, FindCitiesDTO, FindCitiesResponseDTO} from "@location/adapters/dtos/city.dto";
+import {CityFilterDTO, FindCitiesRawDTO, FindCitiesResponseDTO} from "@location/adapters/dtos/city.dto";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {CityEntity} from "@location/domain/entities/city.entity";
 
@@ -18,7 +18,7 @@ export class FindCitiesUseCase implements IFindCitiesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindCitiesDTO): Promise<ResultType<FindCitiesResponseDTO>> {
+    async execute(input: FindCitiesRawDTO): Promise<ResultType<FindCitiesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
@@ -36,11 +36,7 @@ export class FindCitiesUseCase implements IFindCitiesUseCase {
                 page,
                 limit,
                 totalPages: Math.ceil(total / limit),
-                data: entities.map(status => ({
-                    id: status.id,
-                    description: status.description,
-                    statusId: status.statusId,
-                })),
+                data: entities,
             };
 
             return ResultType.success(response);

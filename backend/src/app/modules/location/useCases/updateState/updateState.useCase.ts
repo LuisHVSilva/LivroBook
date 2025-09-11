@@ -8,8 +8,7 @@ import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateStateUseCase} from "@location/useCases/updateState/IUpdateState.useCase";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
-import {UpdateStateDTO} from "@location/adapters/dtos/state.dto";
-import {StateEntity} from "@location/domain/entities/state.entity";
+import {UpdateStateDTO, UpdateStateResponseDTO} from "@location/adapters/dtos/state.dto";
 
 @injectable()
 export class UpdateStateUseCase implements IUpdateStateUseCase {
@@ -20,13 +19,13 @@ export class UpdateStateUseCase implements IUpdateStateUseCase {
 
     @LogExecution()
     @Transactional()
-    async execute(input: UpdateStateDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<StateEntity>>> {
+    async execute(input: UpdateStateDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateStateResponseDTO>>> {
         if (!transaction) {
             return ResultType.failure(new Error(ErrorMessages.failure.transactionCreation));
         }
 
         try {
-            const updatedEntity: UpdateResultType<StateEntity> = await this.service.update(input, transaction);
+            const updatedEntity: UpdateResultType<UpdateStateResponseDTO> = await this.service.update(input, transaction);
 
             return ResultType.success(updatedEntity);
         } catch (error) {

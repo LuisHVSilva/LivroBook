@@ -1,8 +1,8 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
 import {
-    FindUserCredentialTypesDTO,
+    FindUserCredentialTypesRawDTO,
     FindUserCredentialTypesResponseDTO
 } from "@user/adapters/dtos/userCredentialType.dto";
 
-export interface IFindUserCredentialTypesUseCase extends IUseCase<FindUserCredentialTypesDTO, FindUserCredentialTypesResponseDTO> {
+export interface IFindUserCredentialTypesUseCase extends IUseCase<FindUserCredentialTypesRawDTO, FindUserCredentialTypesResponseDTO> {
 }

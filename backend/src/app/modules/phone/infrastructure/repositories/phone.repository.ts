@@ -1,11 +1,8 @@
 import {inject, injectable} from "tsyringe";
 import {ModelStatic} from "sequelize";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
-import {
-    IPhoneRepository,
-    PhoneBaseRepositoryType
-} from "@phone/infrastructure/repositories/interface/IPhone.repository";
-import {PhonePersistenceDTO} from "@phone/adapters/dtos/phone.dto";
+import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {PhoneBaseRepositoryType} from "@phone/adapters/dtos/phone.dto";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
@@ -27,7 +24,7 @@ export class PhoneRepository extends RepositoryBase<PhoneBaseRepositoryType> imp
         });
     }
 
-    protected toPersistence(entity: PhoneEntity): PhonePersistenceDTO {
+    protected toPersistence(entity: PhoneBaseRepositoryType["Entity"]): PhoneBaseRepositoryType["Persistence"] {
         return {
             number: entity.number,
             phoneCodeId: entity.phoneCodeId,
@@ -36,7 +33,7 @@ export class PhoneRepository extends RepositoryBase<PhoneBaseRepositoryType> imp
         };
     }
 
-    protected toEntity(model: PhoneModel): PhoneEntity {
+    protected toEntity(model: PhoneBaseRepositoryType["Model"]): PhoneBaseRepositoryType["Entity"] {
         return PhoneEntity.create({
             id: model.id,
             number: model.number,

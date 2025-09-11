@@ -1,5 +1,5 @@
 import {container} from "tsyringe";
-import {IStatusRepository, StatusBaseRepositoryType} from "@status/infrastructure/repositories/IStatusRepository";
+import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {IStatusController} from "@status/adapters/controllers/IStatus.controller";
 import {StatusController} from "@status/adapters/controllers/status.controller";
 import {StatusRepository} from "@status/infrastructure/repositories/status.repository";
@@ -17,6 +17,7 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {StatusModel} from "@status/infrastructure/models/status.model";
 import {ModelStatic} from "sequelize";
+import {StatusBaseRepositoryType} from "@status/adapters/dtos/status.dto";
 
 //#region Services
 container.registerSingleton<IStatusService>("IStatusService", StatusService);

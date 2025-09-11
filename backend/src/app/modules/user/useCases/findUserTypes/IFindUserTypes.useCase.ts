@@ -1,5 +1,5 @@
 import {IUseCase} from "@coreShared/interfaces/IUseCase";
-import {FindUserTypesDTO, FindUserTypesResponseDTO} from "@user/adapters/dtos/userType.dto";
+import {FindUserTypesRawDTO, FindUserTypesResponseDTO} from "@user/adapters/dtos/userType.dto";
 
-export interface IFindUserTypesUseCase extends IUseCase<FindUserTypesDTO, FindUserTypesResponseDTO> {
+export interface IFindUserTypesUseCase extends IUseCase<FindUserTypesRawDTO, FindUserTypesResponseDTO> {
 }

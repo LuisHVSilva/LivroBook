@@ -1,8 +1,5 @@
 import {inject, injectable} from "tsyringe";
-import {
-    CityBaseRepositoryType,
-    ICityRepository
-} from "@location/infrastructure/repositories/interfaces/ICity.repository";
+import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
@@ -10,11 +7,12 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
 import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {CityDtoBaseType, ICityService} from "@location/domain/services/interfaces/ICity.service";
+import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {CityTransformer} from "@location/domain/transformers/city.transform";
+import {CityBaseRepositoryType, CityDtoBaseType} from "@location/adapters/dtos/city.dto";
 
 @injectable()
 export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implements ICityService {
@@ -61,13 +59,9 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
         const transformedFilter: CityDtoBaseType['FilterDTO'] = {...input};
 
         if (input.description !== undefined) {
-            if (Array.isArray(input.description)) {
-                transformedFilter.description = input.description.map(desc =>
-                    CityTransformer.normalizeDescription(desc)
-                );
-            } else {
-                transformedFilter.description = CityTransformer.normalizeDescription(input.description);
-            }
+            transformedFilter.description = input.description.map(desc =>
+                CityTransformer.normalizeDescription(desc)
+            );
         }
 
         return transformedFilter;

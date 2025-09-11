@@ -4,7 +4,7 @@ import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocume
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {
     DocumentTypeFilterDTO,
-    FindDocumentTypesDTO,
+    FindDocumentTypesRawDTO,
     FindDocumentTypesResponseDTO
 } from "@document/adapters/dto/documentType.dto";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -21,7 +21,7 @@ export class FindDocumentTypesUseCase implements IFindDocumentTypesUseCase {
     }
 
     @LogExecution()
-    async execute(input: FindDocumentTypesDTO): Promise<ResultType<FindDocumentTypesResponseDTO>> {
+    async execute(input: FindDocumentTypesRawDTO): Promise<ResultType<FindDocumentTypesResponseDTO>> {
         try {
             const filter: DocumentTypeFilterDTO = this.mapLocationFilter(input);
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -41,7 +41,7 @@ export class FindDocumentTypesUseCase implements IFindDocumentTypesUseCase {
         }
     }
 
-    private mapLocationFilter(input: FindDocumentTypesDTO): DocumentTypeFilterDTO {
+    private mapLocationFilter(input: FindDocumentTypesRawDTO): DocumentTypeFilterDTO {
         return {
             description: StringUtil.parseCsvFilter(input.description?.toString(), String),
             countryId: StringUtil.parseCsvFilter(input.countryId?.toString(), Number),

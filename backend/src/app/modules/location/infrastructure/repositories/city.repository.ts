@@ -1,12 +1,9 @@
 import {inject, injectable} from "tsyringe";
 import {ModelStatic} from "sequelize";
-import {
-    CityBaseRepositoryType,
-    ICityRepository
-} from "@location/infrastructure/repositories/interfaces/ICity.repository";
+import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {CityModel} from "@location/infrastructure/models/city.model";
-import {CityFilterDTO, CityPersistenceDTO} from "@location/adapters/dtos/city.dto";
+import {CityBaseRepositoryType} from "@location/adapters/dtos/city.dto";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 
@@ -19,7 +16,7 @@ export class CityRepository extends RepositoryBase<CityBaseRepositoryType> imple
         super(model);
     }
 
-    protected makeFilter(filters?: CityFilterDTO): SequelizeWhereBuilderUtil<CityFilterDTO> {
+    protected makeFilter(filters?: CityBaseRepositoryType["Filter"]): SequelizeWhereBuilderUtil<CityBaseRepositoryType["Filter"]> {
         return super.makeFilter(filters, {
             id: {in: true},
             description: {like: true},
@@ -28,7 +25,7 @@ export class CityRepository extends RepositoryBase<CityBaseRepositoryType> imple
         });
     }
 
-    protected toPersistence(entity: CityEntity): CityPersistenceDTO {
+    protected toPersistence(entity: CityBaseRepositoryType["Entity"]): CityBaseRepositoryType["Persistence"] {
         return {
             description: entity.description,
             stateId: entity.stateId,
@@ -36,7 +33,7 @@ export class CityRepository extends RepositoryBase<CityBaseRepositoryType> imple
         };
     }
 
-    protected toEntity(model: CityModel): CityEntity {
+    protected toEntity(model: CityBaseRepositoryType["Model"]): CityBaseRepositoryType["Entity"] {
         return CityEntity.create({
             id: model.id,
             description: model.description,
