@@ -8,7 +8,7 @@ import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniq
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
 import {UserTypeBaseRepositoryType, UserTypeDtoBaseType} from "@user/adapters/dtos/userType.dto";
@@ -62,27 +62,7 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
 
     @LogError()
     protected async validateForeignKeys(data: Partial<UserTypeDtoBaseType["DTO"]>): Promise<void> {
-        const validateExistence = async <T>(
-            field: keyof UserTypeDtoBaseType["DTO"],
-            id: number | undefined,
-            service: { getById: (id: number) => Promise<T | null> }
-        ): Promise<void> => {
-            if (id == null) return;
-            if (!(await service.getById(id))) {
-                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
-            }
-        };
-
-        await Promise.all([
-            validateExistence("statusId", data.statusId, this.statusService)
-        ]);
-    }
-
-    @LogError()
-    protected async handleBusinessRules(oldEntity: UserTypeEntity, newEntity: UserTypeEntity): Promise<void> {
-        if (newEntity.description !== oldEntity.description) {
-            await this.uniquenessValidatorEntity(newEntity);
-        }
+        await this.validateStatusExistence(data.statusId);
     }
 
     //#endregion

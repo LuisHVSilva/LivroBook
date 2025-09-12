@@ -68,17 +68,9 @@ export class StatusService implements IStatusService {
     }
 
     @LogError()
-    async getStatusActiveById(id: number): Promise<StatusEntity> {
-        const foundedStatus: StatusEntity = await this.getById(id);
-        if (foundedStatus?.active) throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
-
-        return foundedStatus;
-    }
-
-    @LogError()
-    async getByDescription(description: string): Promise<StatusEntity> {
+    private async getByDescription(description: string): Promise<StatusEntity> {
         const normalizedDescription: string = StatusTransformer.normalizeDescription(description);
-        const result: ResultType<StatusEntity> = await this.repo.findByDescription(normalizedDescription);
+        const result: ResultType<StatusEntity> = await this.repo.findOneExactByFilter({description: [normalizedDescription]});
 
         const entity: StatusEntity | null = result.unwrapOrNull();
         if (!entity) {
@@ -89,7 +81,7 @@ export class StatusService implements IStatusService {
     }
 
     @LogError()
-    async getStausActiveByDescription(description: string): Promise<StatusEntity> {
+    private async getStausActiveByDescription(description: string): Promise<StatusEntity> {
         const foundedStatus: StatusEntity = await this.getByDescription(description);
         if (!foundedStatus.active) throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
 
@@ -122,12 +114,17 @@ export class StatusService implements IStatusService {
 
     @LogError()
     async getStatusForUpdateEntities(): Promise<StatusEntity> {
-        return this.getStausActiveByDescription(StatusEnum.PENDING_APPROVAL);
+        return this.getStatusForNewEntities();
     }
 
     @LogError()
     async getStatusForInactiveEntities(): Promise<StatusEntity> {
         return this.getStausActiveByDescription(StatusEnum.INACTIVE);
+    }
+
+    @LogError()
+    async getStatusForActiveEntities(): Promise<StatusEntity> {
+        return this.getStausActiveByDescription(StatusEnum.ACTIVE)
     }
 
     //#endregion
@@ -142,7 +139,7 @@ export class StatusService implements IStatusService {
         let updatedEntity: StatusEntity = entity.update(newData);
 
         if (updatedEntity.isEqual(entity)) {
-            return { entity: entity, updated: false };
+            return {entity: entity, updated: false};
         }
 
         if (newData.description) {
@@ -211,4 +208,9 @@ export class StatusService implements IStatusService {
     }
 
     //#endregion
+
+    async isActive(id: number): Promise<boolean> {
+        const status: StatusEntity = await this.getById(id);
+        return status.active;
+    }
 }

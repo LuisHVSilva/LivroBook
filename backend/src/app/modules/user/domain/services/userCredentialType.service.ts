@@ -82,28 +82,7 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
 
     @LogError()
     protected async validateForeignKeys(data: Partial<UserCredentialTypeDtoBaseType["DTO"]>): Promise<void> {
-        const validateExistence = async <T>(
-            field: keyof UserCredentialTypeDtoBaseType["DTO"],
-            id: number | undefined,
-            service: { getById: (id: number) => Promise<T | null> }
-        ): Promise<void> => {
-            if (id == null) return;
-            if (!(await service.getById(id))) {
-                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
-            }
-        };
-
-        await Promise.all([
-            validateExistence("statusId", data.statusId, this.statusService)
-        ]);
+        await this.validateStatusExistence(data.statusId);
     }
-
-    @LogError()
-    protected async handleBusinessRules(oldEntity: UserCredentialTypeEntity, newEntity: UserCredentialTypeEntity): Promise<void> {
-        if (newEntity.description !== oldEntity.description) {
-            await this.uniquenessValidatorEntity(newEntity);
-        }
-    }
-
     //#endregion
 }

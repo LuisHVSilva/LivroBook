@@ -7,7 +7,7 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
 import {LogError} from "@coreShared/decorators/LogError";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
-import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
@@ -67,29 +67,10 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
 
     @LogError()
     protected async validateForeignKeys(data: Partial<DocumentTypeDtoBaseType["DTO"]>): Promise<void> {
-        const validateExistence = async <T>(
-            field: keyof DocumentTypeDtoBaseType["DTO"],
-            id: number | undefined,
-            service: { getById: (id: number) => Promise<T | null> }
-        ): Promise<void> => {
-            if (id == null) return;
-            if (!(await service.getById(id))) {
-                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
-            }
-        };
-
         await Promise.all([
-            validateExistence("countryId", data.countryId, this.countryService),
-            validateExistence("statusId", data.statusId, this.statusService)
+            this.validateExistence("countryId", data.countryId, this.countryService),
+            this.validateStatusExistence(data.statusId)
         ]);
     }
-
-    @LogError()
-    protected async handleBusinessRules(oldEntity: DocumentTypeEntity, newEntity: DocumentTypeEntity): Promise<void> {
-        if (newEntity.description !== oldEntity.description) {
-            await this.uniquenessValidatorEntity(newEntity);
-        }
-    }
-
     //#endregion
 }

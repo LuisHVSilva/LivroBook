@@ -33,6 +33,7 @@ export abstract class ServiceBase<
         const statusId: number = status.id!;
 
         const entity: TEntity = await this.createEntity(data, statusId);
+
         await this.validateForeignKeys(entity);
         await this.uniquenessValidatorEntity(entity);
 
@@ -68,7 +69,6 @@ export abstract class ServiceBase<
 
         return found.unwrap();
     }
-
     //#endregion
 
     //#region UPDATE
@@ -85,7 +85,7 @@ export abstract class ServiceBase<
         }
 
         if (updatedEntity.hasDifferencesExceptStatus(entity)) {
-            await this.handleBusinessRules(entity, updatedEntity);
+            await this.validateForeignKeys(entity);
 
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
             updatedEntity = updatedEntity.update({statusId: updatedStatusId} as any);
@@ -94,7 +94,6 @@ export abstract class ServiceBase<
         const updated: ResultType<TEntity> = await this.repo.update(updatedEntity, transaction);
         return {entity: updated.unwrapOrThrow().toJSON(), updated: true};
     }
-
     //#endregion
 
     //#region DELETE
@@ -147,16 +146,66 @@ export abstract class ServiceBase<
 
         return {deleted, alreadyInactive, notFound};
     }
+    //#endregion
 
+    //#region VALIDATIONS
+    /**
+     * Validates existence + asset for generic child entities
+     * @param field -> child field ID description.
+     * @param id -> child field ID value.
+     * @param service -> child field service
+     * @protected
+     */
+    protected async validateExistence<T extends { statusId: number }>(
+        field: string,
+        id: number | undefined,
+        service: { getById: (id: number) => Promise<T | null> }
+    ): Promise<void> {
+        if (!id) {
+            throw new ServiceError(EntitiesMessage.error.validation.idRequired);
+        }
+
+        const entity = await service.getById(id);
+
+        if (!entity) {
+            throw new NotFoundError(
+                EntitiesMessage.error.retrieval.notFoundForeignKey(field, id)
+            );
+        }
+
+        const activeStatusId: number = (await this.statusService.getStatusForActiveEntities()).id!;
+        if (entity.statusId !== activeStatusId) {
+            throw new ServiceError(
+                EntitiesMessage.error.validation.inactiveEntity((entity as any).constructor.name)
+            );
+        }
+    }
+
+    /**
+     * Validates the existence of the status and whether it is active (active === true)
+     * @protected
+     * @param id -> status id value
+     */
+
+    protected async validateStatusExistence(
+        id: number | undefined,
+    ): Promise<void> {
+        if (!id) {
+            throw new ServiceError(EntitiesMessage.error.validation.idRequired);
+        }
+
+        const isStatusActive: boolean = await this.statusService.isActive(id);
+
+        if (!isStatusActive) {
+            throw new ServiceError(
+                EntitiesMessage.error.validation.inactiveEntity(StatusEntity.name)
+            );
+        }
+    }
     //#endregion
 
     protected abstract uniquenessValidatorEntity(entity: TEntity): Promise<void>;
-
     protected abstract createEntity(data: T["CreateDTO"], statusId: number): Promise<TEntity>;
-
     protected abstract filterTransform(input: T['FilterDTO']): T['FilterDTO'];
-
     protected abstract validateForeignKeys(newEntity: Partial<TEntity>): Promise<void>;
-
-    protected abstract handleBusinessRules(oldEntity: TEntity, newEntity: TEntity): Promise<void>;
 }

@@ -1,7 +1,7 @@
 import {inject, injectable} from "tsyringe";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
@@ -61,29 +61,11 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
 
     @LogError()
     protected async validateForeignKeys(data: Partial<PhoneDtoBaseType["DTO"]>): Promise<void> {
-        const validateExistence = async <T>(
-            field: keyof PhoneDtoBaseType["DTO"],
-            id: number | undefined,
-            service: { getById: (id: number) => Promise<T | null> }
-        ): Promise<void> => {
-            if (id == null) return;
-            if (!(await service.getById(id))) {
-                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
-            }
-        };
-
         await Promise.all([
-            validateExistence("phoneCodeId", data.phoneCodeId, this.phoneCodeService),
-            validateExistence("phoneTypeId", data.phoneTypeId, this.phoneTypeService),
-            validateExistence("statusId", data.statusId, this.statusService)
+            this.validateExistence("phoneCodeId", data.phoneCodeId, this.phoneCodeService),
+            this.validateExistence("phoneTypeId", data.phoneTypeId, this.phoneTypeService),
+            this.validateStatusExistence(data.statusId),
         ]);
-    }
-
-    @LogError()
-    protected async handleBusinessRules(oldEntity: PhoneEntity, newEntity: PhoneEntity): Promise<void> {
-        if (newEntity.number !== oldEntity.number) {
-            await this.uniquenessValidatorEntity(newEntity);
-        }
     }
     //#endregion
 }

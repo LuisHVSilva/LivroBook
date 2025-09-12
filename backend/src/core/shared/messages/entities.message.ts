@@ -36,6 +36,7 @@ export const EntitiesMessage = {
             passwordSpecialCharacter: "A senha deve ter ao menos um caracter especial.",
             oldPasswordWrong: "A senha antiga não está correta.",
             oldPasswordNull: "A senha antiga não pode ser vazia.",
+            inactiveEntity: (entity: string): string => `A entidade ${entity.toUpperCase()} não está ativa.`,
             invalidLen: (field: string, minLen: number, maxLen: number): string => `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
             invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,
             invalidMaxLen: (field: string, max: string) => `O campo '${field}' deve ter até ${max} caracteres.`,

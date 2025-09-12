@@ -7,7 +7,7 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
@@ -66,26 +66,7 @@ export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTyp
 
     @LogError()
     protected async validateForeignKeys(data: Partial<PhoneTypeDtoBaseType["DTO"]>): Promise<void> {
-        const validateExistence = async <T>(
-            field: keyof PhoneTypeDtoBaseType["DTO"],
-            id: number | undefined,
-            service: { getById: (id: number) => Promise<T | null> }
-        ): Promise<void> => {
-            if (id == null) return;
-            if (!(await service.getById(id))) {
-                throw new NotFoundError(EntitiesMessage.error.retrieval.notFoundForeignKey(field, id));
-            }
-        };
-
-        await Promise.all([
-            validateExistence("statusId", data.statusId, this.statusService)
-        ]);
+        await this.validateStatusExistence(data.statusId)
     }
 
-    @LogError()
-    protected async handleBusinessRules(oldEntity: PhoneTypeEntity, newEntity: PhoneTypeEntity): Promise<void> {
-        if (newEntity.description !== oldEntity.description) {
-            await this.uniquenessValidatorEntity(newEntity);
-        }
-    }
 }
