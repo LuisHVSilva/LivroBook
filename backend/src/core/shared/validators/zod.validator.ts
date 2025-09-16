@@ -1,4 +1,4 @@
-import {z, ZodBoolean, ZodNumber, ZodOptional, ZodString} from "zod";
+import {output, z, ZodBoolean, ZodDate, ZodNumber, ZodOptional, ZodPipe, ZodString, ZodTransform} from "zod";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 
 export class ZodValidator {
@@ -56,6 +56,24 @@ export class ZodValidator {
             .transform((values) => values?.map((v) => v === "true"));
     }
 
+    static dateArrayFromString() {
+        return z
+            .string()
+            .optional()
+            .transform((val) =>
+                val
+                    ? val.split(",").map((v) => {
+                        const date = new Date(v.trim());
+                        return isNaN(date.getTime()) ? null : date;
+                    })
+                    : undefined
+            )
+            .refine(
+                (values) => !values || values.every((d) => d instanceof Date && !isNaN(d.getTime())),
+                {message: "Formato de data inválido"}
+            );
+    }
+
     static intInputValue(min?: number, max?: number, optional: boolean = false, positive: boolean = true): ZodNumber | ZodOptional<ZodNumber> {
         let schema: ZodNumber | ZodOptional<ZodNumber> = z.number();
 
@@ -103,4 +121,25 @@ export class ZodValidator {
 
         return schema;
     }
+
+    static dateInputValue(optional: boolean = false) {
+        let schema: ZodPipe<ZodString, ZodTransform<Awaited<Date>, output<ZodString>>> | ZodOptional<ZodPipe<ZodString, ZodTransform<Awaited<Date>, output<ZodString>>>> = z.string().transform((val, ctx) => {
+            const date = new Date(val);
+            if (isNaN(date.getTime())) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Data inválida. Use o formato yyyy-MM-dd.",
+                });
+                return z.NEVER;
+            }
+            return date;
+        });
+
+        if (optional) {
+            schema = schema.optional();
+        }
+
+        return schema;
+    }
+
 }

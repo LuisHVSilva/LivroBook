@@ -10,6 +10,13 @@ import {CreateUserCredentialTypeSchema} from "@user/schemas/createUserCredential
 import {FindUserCredentialTypesSchema} from "@user/schemas/findUserCredentialTypes.schema";
 import {UpdateUserCredentialTypeSchema} from "@user/schemas/updateUserCredentialType.schema";
 import {DeleteUserCredentialTypeSchema} from "@user/schemas/deleteUserCredentialType.schema";
+import {CreateUserCredentialSchema} from "@user/schemas/createUserCredential.schema";
+import {UpdateUserCredentialSchema} from "@user/schemas/updateUserCredential.schema";
+import {DeleteUserCredentialSchema} from "@user/schemas/deleteUserCredential.schema";
+import {CreateUserSchema} from "@user/schemas/createUser.schema";
+import {FindUserSchema} from "@user/schemas/findUser.schema";
+import {UpdateUserSchema} from "@user/schemas/updateUser.schema";
+import {DeleteUserSchema} from "@user/schemas/deleteUser.schema";
 
 const userController = makeUserController()
 const router = Router();
@@ -66,5 +73,51 @@ router.delete(
 )
 //#endregion
 
+//#region USER CREDENTIAL
+router.post(
+    "/userCredential/create",
+    validateRequest(CreateUserCredentialSchema),
+    asyncHandler((req, res) => userController.createUserCredential(req, res))
+);
+
+router.patch(
+    "/userCredential/update",
+    validateRequest(UpdateUserCredentialSchema),
+    asyncHandler((req, res) => userController.updateUserCredential(req, res))
+)
+
+
+router.delete(
+    "/userCredential/delete",
+    validateRequest(DeleteUserCredentialSchema, 'query'),
+    asyncHandler((req, res) => userController.deleteUserCredential(req, res))
+)
+//#endregion
+
+//#region USER
+router.post(
+    "/user/create",
+    validateRequest(CreateUserSchema),
+    asyncHandler((req, res) => userController.createUser(req, res))
+);
+
+router.get(
+    "/user/findAll",
+    validateRequest(FindUserSchema, 'query'),
+    asyncHandler((req, res) => userController.findUsers(req, res))
+)
+
+router.patch(
+    "/user/update",
+    validateRequest(UpdateUserSchema),
+    asyncHandler((req, res) => userController.updateUser(req, res))
+)
+
+
+router.delete(
+    "/user/delete",
+    validateRequest(DeleteUserSchema, 'query'),
+    asyncHandler((req, res) => userController.deleteUser(req, res))
+)
 //#endregion
 export {router as userRouter};

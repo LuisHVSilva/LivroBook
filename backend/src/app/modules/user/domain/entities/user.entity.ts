@@ -1,4 +1,5 @@
 import {EntityBase} from "@coreShared/base/entity.base";
+import {UserValidator} from "@user/domain/validators/user.validator";
 
 export interface UserProps {
     id?: number;
@@ -11,23 +12,22 @@ export interface UserProps {
     userCredentialId: number;
     documentTypeId: number;
     phoneId?: number;
-    statusId: number
+    statusId: number;
 }
 
 export class UserEntity extends EntityBase<UserProps> {
-    private readonly _id: number | undefined;
-    private readonly _name: string;
-    private readonly _email: string;
-    private readonly _document: string;
-    private readonly _birthday: Date;
-    private readonly _userTypeId: number;
-    private readonly _cityId: number;
-    private readonly _userCredentialId: number;
-    private readonly _documentTypeId: number;
-    private readonly _phoneId: number | undefined;
-    private readonly _statusId: number;
 
-    private constructor(props: UserProps) {
+    //#region PROPS
+    public static readonly MIN_NAME: number = 4;
+    public static readonly MAX_NAME: number = 100;
+    public static readonly MIN_EMAIL: number = 6;
+    public static readonly MAX_EMAIL: number = 100;
+    public static readonly MIN_DOC: number = 6;
+    public static readonly MAX_DOC: number = 100;
+    //#endregion
+
+    //#region CONSTRUCTOR
+    constructor(props: UserProps) {
         super(props);
 
         this.validateRequiredFields([
@@ -42,153 +42,73 @@ export class UserEntity extends EntityBase<UserProps> {
             'statusId',
         ]);
 
-        this._id = props.id;
-        this._name = props.name.toUpperCase();
-        this._email = props.email;
-        this._document = props.document;
-        this._birthday = props.birthday;
-        this._userTypeId = props.userTypeId;
-        this._cityId = props.cityId;
-        this._userCredentialId = props.userCredentialId;
-        this._documentTypeId = props.documentTypeId;
-        this._phoneId = props.phoneId;
-        this._statusId = props.statusId;
-
         this.validate();
     }
+    //#endregion
 
+    //#region GET
     get id(): number | undefined {
-        return this._id;
+        return this.props.id;
     }
 
     get name(): string {
-        return this._name;
+        return this.props.name;
     }
 
     get email(): string {
-        return this._email;
+        return this.props.email;
     }
 
     get document(): string {
-        return this._document;
+        return this.props.document;
     }
 
     get birthday(): Date {
-        return this._birthday;
+        return this.props.birthday;
     }
 
     get userTypeId(): number {
-        return this._userTypeId;
+        return this.props.userTypeId;
     }
 
     get cityId(): number {
-        return this._cityId;
+        return this.props.cityId;
     }
 
     get userCredentialId(): number {
-        return this._userCredentialId;
+        return this.props.userCredentialId;
     }
 
     get documentTypeId(): number {
-        return this._documentTypeId;
+        return this.props.documentTypeId;
     }
 
     get phoneId(): number | undefined {
-        return this._phoneId;
+        return this.props.phoneId;
     }
 
     get statusId(): number {
-        return this._statusId;
+        return this.props.statusId;
     }
+    //#endregion
 
+    //#region VALIDATION
     private validate(): void {
-        this.validateName();
-        this.validateEmail();
-        this.validateIsUnder18();
+        UserValidator.validateName(this.props.name, UserEntity.MIN_NAME, UserEntity.MAX_NAME);
+        UserValidator.validateEmail(this.props.email);
+        //this.validateIsUnder18();
     }
+    //#endregion
 
-    private validateName(): void {
-        if (!this._name || this._name.length <= 3 || this._name.length > 100) {
-            throw new Error("Description must be between 3 and 100 characters long.");
-        }
-    }
-
-    private validateEmail(): void {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!this._email || !emailRegex.test(this._email)) {
-            throw new Error("Invalid email format.");
-        }
-    }
-
-    private validateIsUnder18(): void {
-        const today = new Date();
-        let age: number = today.getFullYear() - this._birthday.getFullYear();
-        const month: number = today.getMonth() - this._birthday.getMonth();
-
-        if(month < 0 || (month === 0 && today.getDate() < this._birthday.getDate())) {
-            age--;
-        }
-
-        if(age < 18) {
-            throw new Error("User must be at least 18 years old.");
-        }
-    }
-
+    //#region CREATE
     public static create(props: UserProps): UserEntity {
         return new UserEntity(props);
     }
+    //#endregion
 
-    public updateName(name: string): this {
-        const updatedProps: Partial<UserProps> = { name };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateEmail(email: string): this {
-        const updatedProps: Partial<UserProps> = { email };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateDocument(document: string): this {
-        const updatedProps: Partial<UserProps> = { document };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateBirthday(birthday: Date): this {
-        const updatedProps: Partial<UserProps> = { birthday };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateUserTypeId(userTypeId: number): this {
-        const updatedProps: Partial<UserProps> = { userTypeId };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateCityId(cityId: number): this {
-        const updatedProps: Partial<UserProps> = { cityId };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateUserCredentialId(userCredentialId: number): this {
-        const updatedProps: Partial<UserProps> = { userCredentialId };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateDocumentTypeId(documentTypeId: number): this {
-        const updatedProps: Partial<UserProps> = { documentTypeId };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updatePhoneId(phoneId: number | undefined): this {
-        const updatedProps: Partial<UserProps> = { phoneId };
-        return this.cloneWith(updatedProps);
-    }
-
-    public updateStatusId(statusId: number): this {
-        const updatedProps: Partial<UserProps> = { statusId };
-        return this.cloneWith(updatedProps);
-    }
-
+    //#region UPDATE
     public update(props: Partial<UserProps>): this {
         return this.cloneWith(props);
     }
+    //#endregion
 }

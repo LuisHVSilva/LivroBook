@@ -15,7 +15,13 @@ export function Transactional(): MethodDecorator {
 
             try {
                 const result = await originalMethod.apply(this, [...args, transaction]);
-                await transaction.commit();
+
+                if (!result.isSuccess()) {
+                    await transaction.rollback();
+                } else {
+                    await transaction.commit();
+                }
+
                 return result;
             } catch (error) {
                 await transaction.rollback();

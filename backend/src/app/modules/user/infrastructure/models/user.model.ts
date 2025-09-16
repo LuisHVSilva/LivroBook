@@ -92,10 +92,12 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     status?: StatusModel;
 
     @CreatedAt
-    declare createdAt: CreationOptional<Date>;
+    @DbColumn(DataType.DATE)
+    declare createdAt?: Date;
 
     @UpdatedAt
-    declare updatedAt: CreationOptional<Date>;
+    @DbColumn(DataType.DATE)
+    declare updatedAt?: Date;
 }
 
 export {UserModel};

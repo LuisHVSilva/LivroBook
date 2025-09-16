@@ -44,10 +44,37 @@ import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserC
 import {UserCredentialTypeService} from "@user/domain/services/userCredentialType.service";
 import {UserTypeBaseRepositoryType} from "@user/adapters/dtos/userType.dto";
 import {UserCredentialTypeBaseRepositoryType} from "@user/adapters/dtos/userCredentialType.dto";
+import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
+import {UserCredentialService} from "@user/domain/services/userCredential.service";
+import {IUpdateUserCredentialUseCase} from "@user/useCases/updateUserCredential/IUpdateUserCredential.useCase";
+import {UpdateUserCredentialUseCase} from "@user/useCases/updateUserCredential/updateUserCredential.useCase";
+import {UserCredentialRepository} from "@user/infrastructure/repositories/userCredential.repository";
+import {UserCredentialModel} from "@user/infrastructure/models/userCredential.model";
+import {IUserCredentialRepository} from "@user/infrastructure/repositories/interface/IUserCredential.repository";
+import {CreateUserCredentialUseCase} from "@user/useCases/createUserCredential/createUserCredential.useCase";
+import {ICreateUserCredentialUseCase} from "@user/useCases/createUserCredential/ICreateUserCredential.useCase";
+import {ICreateUserUseCase} from "@user/useCases/createUser/ICreateUser.useCase";
+import {CreateUserUseCase} from "@user/useCases/createUser/createUser.useCase";
+import {UserModel} from "@user/infrastructure/models/user.model";
+import {UserRepository} from "@user/infrastructure/repositories/user.repository";
+import {IUserRepository} from "@user/infrastructure/repositories/interface/IUser.repository";
+import {UserBaseRepositoryType} from "@user/adapters/dtos/user.dto";
+import {IUserService} from "@user/domain/services/interface/IUser.service";
+import {UserService} from "@user/domain/services/user.service";
+import {DeleteUserCredentialUseCase} from "@user/useCases/deleteUserCredential/deleteUserCredential.useCase";
+import {IDeleteUserCredentialUseCase} from "@user/useCases/deleteUserCredential/IDeleteUserCredential.useCase";
+import {IFindUsersUseCase} from "@user/useCases/findUsers/IFindUsers.useCase";
+import {IUpdateUserUseCase} from "@user/useCases/updateUser/IUpdateUser.useCase";
+import {IDeleteUserUseCase} from "@user/useCases/deleteUser/IDeleteUser.useCase";
+import {FindUsersUseCase} from "@user/useCases/findUsers/findUsers.useCase";
+import {UpdateUserUseCase} from "@user/useCases/updateUser/updateUser.useCase";
+import {DeleteUserUseCase} from "@user/useCases/deleteUser/deleteUser.useCase";
 
 //#region Services
 container.registerSingleton<IUserTypeService>("IUserTypeService", UserTypeService);
 container.registerSingleton<IUserCredentialTypeService>("IUserCredentialTypeService", UserCredentialTypeService);
+container.registerSingleton<IUserCredentialService>("IUserCredentialService", UserCredentialService);
+container.registerSingleton<IUserService>("IUserService", UserService);
 //#endregion
 
 //#region UseCases
@@ -60,6 +87,15 @@ container.registerSingleton<ICreateUserCredentialTypeUseCase>("ICreateUserCreden
 container.registerSingleton<IFindUserCredentialTypesUseCase>("IFindUserCredentialTypesUseCase", FindUserCredentialTypesUseCase);
 container.registerSingleton<IUpdateUserCredentialTypeUseCase>("IUpdateUserCredentialTypeUseCase", UpdateUserCredentialTypeUseCase);
 container.registerSingleton<IDeleteUserCredentialTypesUseCase>("IDeleteUserCredentialTypesUseCase", DeleteUserCredentialTypesUseCase);
+
+container.registerSingleton<ICreateUserCredentialUseCase>("ICreateUserCredentialUseCase", CreateUserCredentialUseCase);
+container.registerSingleton<IUpdateUserCredentialUseCase>("IUpdateUserCredentialUseCase", UpdateUserCredentialUseCase);
+container.registerSingleton<IDeleteUserCredentialUseCase>("IDeleteUserCredentialUseCase", DeleteUserCredentialUseCase);
+
+container.registerSingleton<ICreateUserUseCase>("ICreateUserUseCase", CreateUserUseCase);
+container.registerSingleton<IFindUsersUseCase>("IFindUsersUseCase", FindUsersUseCase);
+container.registerSingleton<IUpdateUserUseCase>("IUpdateUserUseCase", UpdateUserUseCase);
+container.registerSingleton<IDeleteUserUseCase>("IDeleteUserUseCase", DeleteUserUseCase);
 // #endregion
 
 //#region Infrastructure
@@ -68,6 +104,12 @@ container.registerSingleton<IUserTypeRepository>("IUserTypeRepository", UserType
 
 container.register<ModelStatic<UserCredentialTypeModel>>("UserCredentialTypeModel", {useValue: UserCredentialTypeModel});
 container.registerSingleton<IUserCredentialTypeRepository>("IUserCredentialTypeRepository", UserCredentialTypeRepository);
+
+container.register<ModelStatic<UserCredentialModel>>("UserCredentialModel", {useValue: UserCredentialModel});
+container.registerSingleton<IUserCredentialRepository>("IUserCredentialRepository", UserCredentialRepository);
+
+container.register<ModelStatic<UserModel>>("UserModel", {useValue: UserModel});
+container.registerSingleton<IUserRepository>("IUserRepository", UserRepository);
 //#endregion
 
 //#region Adapters
@@ -80,6 +122,9 @@ container.registerSingleton<IRepositoryBase<UserTypeBaseRepositoryType>>("UserTy
 
 container.registerSingleton<EntityUniquenessValidator<UserCredentialTypeBaseRepositoryType>>("UserCredentialTypeUniquenessValidator", EntityUniquenessValidator);
 container.registerSingleton<IRepositoryBase<UserCredentialTypeBaseRepositoryType>>("UserCredentialTypeRepository", UserCredentialTypeRepository);
+
+container.registerSingleton<EntityUniquenessValidator<UserBaseRepositoryType>>("UserUniquenessValidator", EntityUniquenessValidator);
+container.registerSingleton<IRepositoryBase<UserBaseRepositoryType>>("UserRepository", UserRepository);
 //#endregion
 
 export {container};

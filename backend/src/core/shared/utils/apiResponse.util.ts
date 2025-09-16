@@ -5,6 +5,7 @@ import {ControllerError} from "../errors/controller.error";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {ControllersMessage} from "@coreShared/messages/controllers.message";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
+import {UseCaseError} from "@coreShared/errors/useCase.error";
 
 export class ApiResponseUtil {
     static success<T>(res: Response, data: T, status: number = StatusCodes.OK): Response {
@@ -68,6 +69,10 @@ export class ApiResponseUtil {
 
         if (error instanceof NotFoundError) {
             return this.error(res, error.message, StatusCodes.NOT_FOUND);
+        }
+
+        if (error instanceof UseCaseError) {
+            return this.error(res, error.message, StatusCodes.BAD_REQUEST);
         }
 
         return ControllerError.handleError(res, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -8,10 +8,12 @@ import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniq
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
 import {UserTypeBaseRepositoryType, UserTypeDtoBaseType} from "@user/adapters/dtos/userType.dto";
+import {ResultType} from "@coreShared/types/result.type";
+import {UserTypeDescriptionEnum} from "@user/domain/enums/userType.enum";
 
 @injectable()
 export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEntity> implements IUserTypeService {
@@ -31,8 +33,26 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
     }
 
     //#endregion
+    async getStandardUserType(): Promise<UserTypeEntity> {
+        return this.getExactByDescription(UserTypeDescriptionEnum.STANDARD);
+    }
+
 
     //#region HELPERS
+    @LogError()
+    async getExactByDescription(description: string): Promise<UserTypeEntity> {
+        const descriptionFormatted: string = UserTypeTransform.normalizeDescription(description);
+        const entity: ResultType<UserTypeEntity> = await this.repo.findOneExactByFilter({
+            description: [descriptionFormatted]
+        });
+
+        if (!entity.isSuccess()) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(UserTypeEntity.name));
+        }
+
+        return entity.unwrapOrThrow();
+    }
+
     @LogError()
     protected async createEntity(data: UserTypeDtoBaseType["CreateDTO"], statusId: number): Promise<UserTypeEntity> {
         return UserTypeEntity.create({

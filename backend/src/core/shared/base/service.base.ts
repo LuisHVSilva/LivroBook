@@ -39,6 +39,7 @@ export abstract class ServiceBase<
 
         return (await this.repo.create(entity, transaction)).unwrapOrThrow();
     }
+
     //#endregion
 
     //#region READ
@@ -69,6 +70,7 @@ export abstract class ServiceBase<
 
         return found.unwrap();
     }
+
     //#endregion
 
     //#region UPDATE
@@ -85,8 +87,6 @@ export abstract class ServiceBase<
         }
 
         if (updatedEntity.hasDifferencesExceptStatus(entity)) {
-            await this.validateForeignKeys(entity);
-
             const updatedStatusId: number = (await this.statusService.getStatusForNewEntities()).id!;
             updatedEntity = updatedEntity.update({statusId: updatedStatusId} as any);
         }
@@ -94,6 +94,7 @@ export abstract class ServiceBase<
         const updated: ResultType<TEntity> = await this.repo.update(updatedEntity, transaction);
         return {entity: updated.unwrapOrThrow().toJSON(), updated: true};
     }
+
     //#endregion
 
     //#region DELETE
@@ -146,6 +147,7 @@ export abstract class ServiceBase<
 
         return {deleted, alreadyInactive, notFound};
     }
+
     //#endregion
 
     //#region VALIDATIONS
@@ -202,10 +204,14 @@ export abstract class ServiceBase<
             );
         }
     }
+
     //#endregion
 
     protected abstract uniquenessValidatorEntity(entity: TEntity): Promise<void>;
+
     protected abstract createEntity(data: T["CreateDTO"], statusId: number): Promise<TEntity>;
+
     protected abstract filterTransform(input: T['FilterDTO']): T['FilterDTO'];
+
     protected abstract validateForeignKeys(newEntity: Partial<TEntity>): Promise<void>;
 }
