@@ -25,3 +25,10 @@ export class ValidationError extends DomainError {
         this.name = "ValidationError";
     }
 }
+
+export class InactiveError extends DomainError {
+    constructor(message: string) {
+        super(message);
+        this.name = "InactiveError";
+    }
+}

@@ -12,7 +12,7 @@ import {
 import {UserCredentialEntity} from "@user/domain/entities/userCredential.entity";
 import {Transaction} from "sequelize";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {ValidationError} from "@coreShared/errors/domain.error";
+import {NotFoundError, ValidationError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
 import {UserCredentialTypeEnum} from "@user/domain/enums/userCredentialType.enum";
@@ -61,6 +61,18 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
         return super.update(newData, transaction);
     }
 
+    @LogError()
+    public async isPasswordValid(userCredentialId: number, password: string): Promise<boolean> {
+        const userCredential: UserCredentialEntity = await this.getById(userCredentialId);
+        const storagePassword: string | undefined = userCredential.password;
+
+        if(!storagePassword) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.noPasswordRegister);
+        }
+
+        return await UserCredentialEntity.verifyPassword(storagePassword, password);
+    }
+
     //#region HELPERS
     @LogError()
     private async updatePassword(id: number, oldPassword: string, newPassword: string): Promise<{
@@ -69,7 +81,9 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
     }> {
         const userCredential: UserCredentialEntity = await this.getById(id);
 
-        if (!(await userCredential.verifyPassword(oldPassword))) {
+        const isPasswordValid: boolean = await this.isPasswordValid(id, oldPassword);
+
+        if (!isPasswordValid) {
             throw new ValidationError(EntitiesMessage.error.validation.oldPasswordWrong);
         }
 

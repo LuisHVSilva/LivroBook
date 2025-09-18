@@ -16,7 +16,8 @@ export const EntitiesMessage = {
             notFound: (entity: string) => `Nenhum valor encontrado para ${entity.toUpperCase()}.`,
             notFoundForeignKey: (entity: string, id: number) => `Id ${id.toString()} não encontrado para ${entity.toUpperCase()}.`,
             notFoundGeneric: "Nenhum valor encontrado para os parâmetros passados.",
-            inactiveStatus: 'Status está inativo. Favor entrar em contato com o administrador do sistema'
+            inactiveStatus: 'Status está inativo. Favor entrar em contato com o administrador do sistema',
+            noPasswordRegister: "Não há senha antiga registrada para esse usuário.",
         },
         validation: {
             descriptionRequired: "Descrição é obrigatória.",
@@ -37,6 +38,7 @@ export const EntitiesMessage = {
             passwordSpecialCharacter: "A senha deve ter ao menos um caracter especial.",
             oldPasswordWrong: "A senha antiga não está correta.",
             oldPasswordNull: "A senha antiga não pode ser vazia.",
+            invalidPassword: "A senha informada não está correta.",
             emailFormat: "Formato de email inválido",
             ipInvalid: "IP inválido",
             inactiveEntity: (entity: string): string => `A entidade ${entity.toUpperCase()} não está ativa.`,
@@ -45,6 +47,9 @@ export const EntitiesMessage = {
             invalidMaxLen: (field: string, max: string) => `O campo '${field}' deve ter até ${max} caracteres.`,
             invalidType: (field: string, type: string)=> `O campo '${field}' deve ser do tipo ${type}.`,
         },
+        forbidden: {
+            inactiveUser: 'O usuário está inativo',
+        }
     },
     info: {
         alreadyInactive: "As propriedades já foram apagadas."

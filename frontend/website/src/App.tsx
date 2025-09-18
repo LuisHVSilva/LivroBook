@@ -1,6 +1,8 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 // Styles
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 import './sass/main.sass'
 
 import Login from "./pages/Login";

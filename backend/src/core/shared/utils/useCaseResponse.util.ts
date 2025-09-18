@@ -1,4 +1,10 @@
-import {ConflictError, DomainError, ValidationError, NotFoundError} from "@coreShared/errors/domain.error";
+import {
+    ConflictError,
+    DomainError,
+    ValidationError,
+    NotFoundError,
+    InactiveError
+} from "@coreShared/errors/domain.error";
 import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseError} from "@coreShared/errors/useCase.error";
 
@@ -9,6 +15,7 @@ export class UseCaseResponseUtil {
             DomainError,
             ValidationError,
             NotFoundError,
+            InactiveError,
         ];
 
         for (const ErrType of knownErrors) {
@@ -26,6 +33,7 @@ export class UseCaseResponseUtil {
             DomainError,
             ValidationError,
             NotFoundError,
+            InactiveError,
         ];
 
         for (const ErrType of knownErrors) {

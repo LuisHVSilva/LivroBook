@@ -3,18 +3,20 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError, InactiveError, NotFoundError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {UserEntity} from "@user/domain/entities/user.entity";
 import {IUserService} from "@user/domain/services/interface/IUser.service";
-import {UserBaseRepositoryType,UserDtoBaseType} from "@user/adapters/dtos/user.dto";
+import {UserBaseRepositoryType, UserDtoBaseType, UserFilterDTO} from "@user/adapters/dtos/user.dto";
 import {IUserRepository} from "@user/infrastructure/repositories/interface/IUser.repository";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
+import {ResultType} from "@coreShared/types/result.type";
+import {StatusEntity} from "@status/domain/entities/status.entity";
 
 @injectable()
 export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implements IUserService {
@@ -38,6 +40,24 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
     }
 
     //#endregion
+
+    public async getUserActiveByEmail(email: string): Promise<UserEntity> {
+        const filter: UserFilterDTO = {email: [email]};
+
+        const founded: ResultType<UserEntity> = await this.repo.findOneExactByFilter(filter);
+        const entity: UserEntity | null = founded.unwrapOrNull();
+
+        if (!entity) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.entityClass.name))
+        }
+        const activeStatus: StatusEntity = await this.statusService.getStatusForActiveEntities();
+
+        if (entity.statusId !== activeStatus.id!) {
+            throw new InactiveError(EntitiesMessage.error.forbidden.inactiveUser);
+        }
+
+        return entity;
+    }
 
     //#region HELPERS
     @LogError()

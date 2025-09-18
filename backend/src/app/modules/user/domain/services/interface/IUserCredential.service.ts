@@ -5,5 +5,7 @@ import {Transaction} from "sequelize";
 
 
 export interface IUserCredentialService extends IServiceBase<UserCredentialDtoBaseType, UserCredentialEntity> {
-    create(data: CreateUserCredentialRequestDTO, transaction: Transaction): Promise<UserCredentialEntity>
+    create(data: CreateUserCredentialRequestDTO, transaction: Transaction): Promise<UserCredentialEntity>;
+
+    isPasswordValid(userCredentialId: number, password: string): Promise<boolean>;
 }

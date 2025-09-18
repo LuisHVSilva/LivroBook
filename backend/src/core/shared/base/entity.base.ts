@@ -4,7 +4,7 @@ export abstract class EntityBase<T extends { id?: unknown }> {
     protected readonly props: T;
 
     protected constructor(props: T) {
-        this.props = Object.freeze({ ...props }); // Protege contra mutação
+        this.props = Object.freeze({...props}); // Protege contra mutação
     }
 
     public getProps(): T {
@@ -12,7 +12,7 @@ export abstract class EntityBase<T extends { id?: unknown }> {
     }
 
     public toObject(): T {
-        return { ...this.props };
+        return {...this.props};
     }
 
     public toJSON(): T {
@@ -33,7 +33,7 @@ export abstract class EntityBase<T extends { id?: unknown }> {
     }
 
     protected cloneWith(overrides: Partial<T>): this {
-        const mergedProps = { ...this.props, ...overrides };
+        const mergedProps = {...this.props, ...overrides};
         return new (this.constructor as any)(mergedProps);
     }
 
@@ -48,7 +48,12 @@ export abstract class EntityBase<T extends { id?: unknown }> {
         const keys = Object.keys(this.props) as (keyof T)[];
         return keys
             .filter(key => key !== "statusId")
-            .some(key => this.props[key] !== other.props[key]);
+            .some(key => {
+                if (key === "id") {
+                    return this.props[key] != other.props[key]
+                }
+                return this.props[key] !== other.props[key]
+            });
     }
 
     abstract update(props: Partial<T>): this;

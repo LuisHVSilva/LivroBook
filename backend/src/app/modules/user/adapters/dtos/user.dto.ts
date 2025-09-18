@@ -37,9 +37,29 @@ export type UserFilterDTO = {
 // ------- PERSISTENCE --------
 export type UserPersistenceDTO = Omit<UserDTO, "id">;
 
+
+// ------ DTO BASE TYPE -------
+export type UserDtoBaseType = DtoBaseType<
+    UserDTO,
+    CreateUserDTO,
+    FindUsersRawDTO,
+    UpdateUserDTO,
+    UserFilterDTO
+>
+
+// ------ BASE REPOSITORY TYPE -------
+export type UserBaseRepositoryType = BaseRepositoryType<
+    UserModel,
+    UserEntity,
+    UserFilterDTO,
+    UserPersistenceDTO
+>;
+
 // ---------- CREATE ----------
 export type CreateUserDTO = Pick<UserDTO, "name" | "email" | "document" | "birthday" | "userTypeId" | "cityId" | "userCredentialId" | "documentTypeId" | "phoneId">;
-export type CreateUserRequestDTO = Pick<UserDTO, "name" | "email" | "document" | "birthday" | "cityId" | "documentTypeId"> & {
+export type CreateUserRequestDTO =
+    Pick<UserDTO, "name" | "email" | "document" | "birthday" | "cityId" | "documentTypeId">
+    & {
     userCredential: CreateUserCredentialRequestDTO,
     phone?: CreatePhoneDTO,
 };
@@ -72,19 +92,3 @@ export type FindUsersResponseDTO = {
     data: UserDTO[];
 };
 
-// ------ DTO BASE TYPE -------
-export type UserDtoBaseType = DtoBaseType<
-    UserDTO,
-    CreateUserDTO,
-    FindUsersRawDTO,
-    UpdateUserDTO,
-    UserFilterDTO
->
-
-// ------ BASE REPOSITORY TYPE -------
-export type UserBaseRepositoryType = BaseRepositoryType<
-    UserModel,
-    UserEntity,
-    UserFilterDTO,
-    UserPersistenceDTO
->;

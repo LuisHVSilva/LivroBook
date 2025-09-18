@@ -1,6 +1,6 @@
 import {Response} from "express";
 import {StatusCodes} from "http-status-codes";
-import {ConflictError, DomainError, NotFoundError, ValidationError} from "../errors/domain.error";
+import {ConflictError, DomainError, InactiveError, NotFoundError, ValidationError} from "../errors/domain.error";
 import {ControllerError} from "../errors/controller.error";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {ControllersMessage} from "@coreShared/messages/controllers.message";
@@ -73,6 +73,10 @@ export class ApiResponseUtil {
 
         if (error instanceof UseCaseError) {
             return this.error(res, error.message, StatusCodes.BAD_REQUEST);
+        }
+
+        if (error instanceof InactiveError) {
+            return this.error(res, error.message, StatusCodes.FORBIDDEN);
         }
 
         return ControllerError.handleError(res, StatusCodes.INTERNAL_SERVER_ERROR);

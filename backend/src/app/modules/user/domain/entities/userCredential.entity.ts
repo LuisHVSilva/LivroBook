@@ -133,9 +133,8 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
         return await argon2.hash(password);
     }
 
-    async verifyPassword(oldPassword: string): Promise<boolean> {
-        const hashedOld: string = await UserCredentialEntity.hashPassword(oldPassword);
-        return this.password === hashedOld;
+    public static async verifyPassword(hashedPassword: string, plainPassword: string): Promise<boolean> {
+        return await argon2.verify(hashedPassword, plainPassword);
     }
 
     //#endregion
