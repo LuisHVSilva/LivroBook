@@ -2,7 +2,7 @@
 import {useState} from "react";
 import type {RegisterUserAuthRequest} from "../../core/api/types/auth.types.ts";
 import {formUtil} from "../../core/utils/form.util.ts";
-import {NullFieldError, ValidationError} from "../../core/errors/generic.error.ts";
+import {ConflictError, NullFieldError, ValidationError} from "../../core/errors/generic.error.ts";
 import {authApiService} from "../../core/api/services/auth.api.service.ts";
 import InputField from "../components/InputField.tsx";
 
@@ -11,10 +11,25 @@ const RegisterUser = () => {
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState<string | null>(null);
     const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const [passwordCriteria, setPasswordCriteria] = useState({
+        minLength: false,
+        uppercase: false,
+        specialChar: false,
+    });
 
     const handleConfirmPasswordChange = (value: string) => {
-
         setPasswordsMatch(password === value);
+    };
+
+    const validatePassword = (value: string) => {
+        const criteria = {
+            minLength: value.length >= 6,
+            uppercase: /[A-Z]/.test(value),
+            specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        };
+
+        setPasswordCriteria(criteria);
+        setPassword(value);
     };
 
 
@@ -33,10 +48,11 @@ const RegisterUser = () => {
             // console.log(payload)
             await authApiService.register(payload);
         } catch (e) {
-            if (e instanceof NullFieldError || e instanceof ValidationError) {
+            if (e instanceof NullFieldError || e instanceof ValidationError || e instanceof ConflictError) {
                 setError(e.message);
             }
-            console.error(e);
+            console.clear()
+            console.log(e);
         }
 
     }
@@ -66,8 +82,19 @@ const RegisterUser = () => {
                         type="password"
                         placeHolder="Senha"
                         required={true}
-                        onChangeFunction={setPassword}
+                        onChangeFunction={validatePassword}
                     />
+                    <div id="password-info">
+                        <p className={passwordCriteria.minLength ? "field-not-informed" : "field-wrong"}>
+                            * Mín. 6 letras
+                        </p>
+                        <p className={passwordCriteria.specialChar ? "field-not-informed" : "field-wrong"}>
+                            * 1 caracter especial
+                        </p>
+                        <p className={passwordCriteria.uppercase ? "field-not-informed" : "field-wrong"}>
+                            * 1 letra maiúscula
+                        </p>
+                    </div>
 
                     <InputField
                         name="confirmPassword"

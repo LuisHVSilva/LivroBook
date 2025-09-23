@@ -1,5 +1,5 @@
-import axios, {AxiosError} from "axios";
-import {ValidationError} from "../../errors/generic.error.ts";
+import axios, {AxiosError, HttpStatusCode} from "axios";
+import {ConflictError, ValidationError} from "../../errors/generic.error.ts";
 
 const http = axios.create({
     baseURL: "http://localhost:3000/api",
@@ -24,7 +24,8 @@ http.interceptors.response.use(
             const errorData: responseErrorType = error.response.data as responseErrorType;
             const message = errorData?.message || "Erro inesperado no servidor";
             const errors: [] = errorData.errors;
-            if (status === 400) {
+
+            if (status === HttpStatusCode.BadRequest) {
                 let specificError: string = '';
                 if (errors) {
                     for (const error of errors) {
@@ -36,17 +37,21 @@ http.interceptors.response.use(
                 return Promise.reject(new ValidationError(message || "Dados inválidos"));
             }
 
-            if (status === 401) {
+            if (status === HttpStatusCode.Unauthorized) {
                 // exemplo: token expirado → deslogar usuário
                 localStorage.removeItem("token");
                 return Promise.reject(new Error("Sessão expirada, faça login novamente"));
             }
 
-            if (status === 403) {
+            if (status === HttpStatusCode.Forbidden) {
                 return Promise.reject(new Error("Você não tem permissão para acessar esse recurso"));
             }
 
-            if (status === 500) {
+            if(status === HttpStatusCode.Conflict) {
+                return Promise.reject(new ConflictError(message))
+            }
+
+            if (status === HttpStatusCode.InternalServerError) {
                 return Promise.reject(new Error("Erro interno, tente novamente mais tarde"));
             }
         }

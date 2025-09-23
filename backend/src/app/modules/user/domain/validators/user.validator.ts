@@ -10,7 +10,7 @@ export class UserValidator {
     
     static validateEmail(email: string): void {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(email)) {
+        if (!emailRegex.test(email)) {
             throw new ValidationError(EntitiesMessage.error.validation.emailFormat);
         }
     }
