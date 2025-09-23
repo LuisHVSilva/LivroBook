@@ -76,10 +76,12 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
             throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserEntity.name, 'email'));
         }
 
-        const isUniqueDocument: boolean = await this.uniquenessValidator.validate('document', entity.document);
+        if(entity.document !== undefined) {
+            const isUniqueDocument: boolean = await this.uniquenessValidator.validate('document', entity.document);
 
-        if (!isUniqueDocument) {
-            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserEntity.name, 'document'));
+            if (!isUniqueDocument) {
+                throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserEntity.name, 'document'));
+            }
         }
     }
 
@@ -92,7 +94,7 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
     protected async validateForeignKeys(data: Partial<UserDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
             this.validateExistence("userTypeId", data.userTypeId, this.userTypeService),
-            this.validateExistence("cityId", data.cityId, this.cityService),
+            // this.validateExistence("cityId", data.cityId, this.cityService),
             this.validateStatusExistence(data.statusId),
         ]);
     }

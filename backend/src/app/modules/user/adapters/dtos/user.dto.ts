@@ -1,23 +1,11 @@
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {UserModel} from "@user/infrastructure/models/user.model";
-import {UserEntity} from "@user/domain/entities/user.entity";
+import {UserEntity, UserProps} from "@user/domain/entities/user.entity";
 import {CreateUserCredentialRequestDTO} from "@user/adapters/dtos/userCredential.dto";
 import {CreatePhoneDTO} from "@phone/adapters/dtos/phone.dto";
 
 // ---------- BASE ------------
-export type UserDTO = {
-    id?: number;
-    name: string;
-    email: string;
-    document: string;
-    birthday: Date;
-    userTypeId: number;
-    cityId: number;
-    userCredentialId: number;
-    documentTypeId: number;
-    phoneId?: number;
-    statusId: number;
-};
+export type UserDTO = UserProps;
 
 // --------- FILTER -----------
 export type UserFilterDTO = {

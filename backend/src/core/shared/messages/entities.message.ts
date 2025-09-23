@@ -41,6 +41,7 @@ export const EntitiesMessage = {
             invalidPassword: "A senha informada não está correta.",
             emailFormat: "Formato de email inválido",
             ipInvalid: "IP inválido",
+            nullField: (field: string): string => `${field} não pode estar vazio`,
             inactiveEntity: (entity: string): string => `A entidade ${entity.toUpperCase()} não está ativa.`,
             invalidLen: (field: string, minLen: number, maxLen: number): string => `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
             invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,

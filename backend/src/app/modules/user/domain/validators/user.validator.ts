@@ -10,9 +10,9 @@ export class UserValidator {
     
     static validateEmail(email: string): void {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // if (emailRegex.test(email)) {
-        //     throw new ValidationError(EntitiesMessage.error.validation.emailFormat);
-        // }
+        if (emailRegex.test(email)) {
+            throw new ValidationError(EntitiesMessage.error.validation.emailFormat);
+        }
     }
 
     static validateIsUnder18(birthday: Date): void {
@@ -26,6 +26,16 @@ export class UserValidator {
 
         if(age < 18) {
             throw new Error("User must be at least 18 years old.");
+        }
+    }
+
+    static validateDocumentsFields(document?: string, documentTypeId?: number) {
+        if (document !== undefined && documentTypeId === undefined) {
+            throw new ValidationError(EntitiesMessage.error.validation.nullField('DocumentTypeId'))
+        }
+
+        if(documentTypeId !== undefined && document === undefined) {
+            throw new ValidationError(EntitiesMessage.error.validation.nullField('Document'))
         }
     }
 }

@@ -5,12 +5,12 @@ export interface UserProps {
     id?: number;
     name: string;
     email: string;
-    document: string;
+    document?: string;
     birthday: Date;
     userTypeId: number;
-    cityId: number;
+    cityId?: number;
     userCredentialId: number;
-    documentTypeId: number;
+    documentTypeId?: number;
     phoneId?: number;
     statusId: number;
 }
@@ -30,17 +30,17 @@ export class UserEntity extends EntityBase<UserProps> {
     constructor(props: UserProps) {
         super(props);
 
-        this.validateRequiredFields([
-            'name',
-            'email',
-            'document',
-            'birthday',
-            'userTypeId',
-            'cityId',
-            'userCredentialId',
-            'documentTypeId',
-            'statusId',
-        ]);
+        // this.validateRequiredFields([
+        //     'name',
+        //     'email',
+        //     // 'document',
+        //     'birthday',
+        //     'userTypeId',
+        //     // 'cityId',
+        //     'userCredentialId',
+        //     // 'documentTypeId',
+        //     'statusId',
+        // ]);
 
         this.validate();
     }
@@ -59,7 +59,7 @@ export class UserEntity extends EntityBase<UserProps> {
         return this.props.email;
     }
 
-    get document(): string {
+    get document(): string | undefined {
         return this.props.document;
     }
 
@@ -71,7 +71,7 @@ export class UserEntity extends EntityBase<UserProps> {
         return this.props.userTypeId;
     }
 
-    get cityId(): number {
+    get cityId(): number | undefined {
         return this.props.cityId;
     }
 
@@ -79,7 +79,7 @@ export class UserEntity extends EntityBase<UserProps> {
         return this.props.userCredentialId;
     }
 
-    get documentTypeId(): number {
+    get documentTypeId(): number | undefined{
         return this.props.documentTypeId;
     }
 
@@ -96,6 +96,7 @@ export class UserEntity extends EntityBase<UserProps> {
     private validate(): void {
         UserValidator.validateName(this.props.name, UserEntity.MIN_NAME, UserEntity.MAX_NAME);
         UserValidator.validateEmail(this.props.email);
+        UserValidator.validateDocumentsFields(this.props.document, this.props.documentTypeId);
         //this.validateIsUnder18();
     }
     //#endregion

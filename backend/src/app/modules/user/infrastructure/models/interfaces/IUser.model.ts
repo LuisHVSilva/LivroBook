@@ -9,12 +9,12 @@ export interface IUserModel {
     id?: number;
     name: string;
     email: string;
-    document: string;
+    document?: string;
     birthday: Date;
     userTypeId: number;
     userCredentialId: number;
-    cityId: number;
-    documentTypeId: number;
+    cityId?: number;
+    documentTypeId?: number;
     phoneId?: number;
     statusId: number;
     userType?: UserTypeModel;

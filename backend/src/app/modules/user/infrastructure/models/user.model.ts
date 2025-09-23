@@ -35,7 +35,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     @DbColumn(DataType.STRING(100))
     declare email: string;
 
-    @AllowNull(false)
+    // @AllowNull(false)
     @DbColumn(DataType.STRING(20))
     declare document: string;
 
@@ -49,7 +49,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     declare userTypeId: number;
 
     @ForeignKey(() => CityModel)
-    @AllowNull(false)
+    // @AllowNull(false)
     @DbColumn(DataType.INTEGER)
     declare cityId: number;
 
@@ -59,7 +59,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     declare userCredentialId: number;
 
     @ForeignKey(() => DocumentTypeModel)
-    @AllowNull(false)
+    // @AllowNull(false)
     @DbColumn(DataType.INTEGER)
     declare documentTypeId: number;
 
