@@ -1,4 +1,4 @@
-import {stringUtil} from "../../core/utils/string.util.ts";
+import {stringUtil} from "../../../core/utils/string.util.ts";
 import React, {useState} from "react";
 
 type InputFieldProps = {

@@ -1,14 +1,16 @@
-// import {type NavigateFunction, useNavigate} from "react-router-dom";
-import type {PostLoginAuthRequest} from "../../core/api/types/auth.types.ts";
+import {type NavigateFunction, useNavigate} from "react-router-dom";
+import type {PostLoginAuthRequest} from "../../../core/api/types/auth.types.ts";
 
-import {useState} from "react";
-import {errorMessages} from "../../core/constants/errorMessages.ts";
+import {useEffect, useState} from "react";
+import {errorMessages} from "../../../core/constants/errorMessages.ts";
 import {Link} from "react-router-dom";
-import {authApiService} from "../../core/api/services/auth.api.service.ts";
-import {formUtil} from "../../core/utils/form.util.ts";
+import {authApiService} from "../../../core/api/services/auth.api.service.ts";
+import {formUtil} from "../../../core/utils/form.util.ts";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 const Login = () => {
-    // const navigate: NavigateFunction = useNavigate();
+    const { isAuthenticated } = useAuth();
+    const navigate: NavigateFunction = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState<string>(""); // controla a senha
     const [email, setEmail] = useState<string>("");       // controla o email
@@ -21,14 +23,19 @@ const Login = () => {
             }
 
             await authApiService.login(data);
-            // navigate("/");
+            navigate("/",  { replace: true });
 
         } catch (e) {
             setError(errorMessages.failure.loginError);
             console.error("Erro no login", e);
         }
-
     }
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <>
@@ -61,7 +68,7 @@ const Login = () => {
 
                     <div id="login-options">
                         <a href="#">Esqueceu a senha?</a>
-                        <p>Não tem uma conta? <Link to="/user/register">Novo usuário</Link></p>
+                        <p>Não tem uma conta? <Link to="/register">Novo usuário</Link></p>
                     </div>
 
                 </section>

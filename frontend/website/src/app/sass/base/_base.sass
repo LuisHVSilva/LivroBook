@@ -13,12 +13,16 @@ body
   background-color: #EFF0EA
   //background-color: black
   //color: white
-  padding: 1em 1em
+  padding: 1em
   display: flex
   flex-direction: column
   align-items: center
   justify-content: center
   height: calc(100vh - 2em)
+
+body:has(section#main-layout)
+  display: block
+  height: 100%
 
 // Texts
 p, a

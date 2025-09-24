@@ -8,7 +8,6 @@ export class AuthApiService {
         const { data } = await axios.post(authServiceUrl.login, payload);
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("user", JSON.stringify(data.data.user));
-        console.log(data)
     }
 
     async register(payload: RegisterUserAuthRequest) {

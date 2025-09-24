@@ -1,13 +1,16 @@
-// import {type NavigateFunction, useNavigate} from "react-router-dom";
-import {useState} from "react";
-import type {RegisterUserAuthRequest} from "../../core/api/types/auth.types.ts";
-import {formUtil} from "../../core/utils/form.util.ts";
-import {ConflictError, NullFieldError, ValidationError} from "../../core/errors/generic.error.ts";
-import {authApiService} from "../../core/api/services/auth.api.service.ts";
-import InputField from "../components/InputField.tsx";
+import {type NavigateFunction, useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import type {RegisterUserAuthRequest} from "../../../core/api/types/auth.types.ts";
+import {formUtil} from "../../../core/utils/form.util.ts";
+import {ConflictError, NullFieldError, ValidationError} from "../../../core/errors/generic.error.ts";
+import {authApiService} from "../../../core/api/services/auth.api.service.ts";
+import InputField from "../../components/forms/InputField.tsx";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 const RegisterUser = () => {
     // const [selectedDDDPhone, setSelectedDDDPhone] = useState<number | null>(null);
+    const { isAuthenticated } = useAuth();
+    const navigate: NavigateFunction = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState<string | null>(null);
     const [passwordsMatch, setPasswordsMatch] = useState(true);
@@ -32,7 +35,6 @@ const RegisterUser = () => {
         setPassword(value);
     };
 
-
     async function handleRegister(formData: FormData): Promise<void> {
         try {
 
@@ -47,6 +49,7 @@ const RegisterUser = () => {
 
             // console.log(payload)
             await authApiService.register(payload);
+            navigate("/");
         } catch (e) {
             if (e instanceof NullFieldError || e instanceof ValidationError || e instanceof ConflictError) {
                 setError(e.message);
@@ -56,6 +59,13 @@ const RegisterUser = () => {
         }
 
     }
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
 
     return (
         <>

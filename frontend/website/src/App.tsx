@@ -1,25 +1,25 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Routes} from "react-router-dom";
 
 // Styles
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import './app/sass/main.sass'
 
-import Login from "./app/pages/Login";
-import RegisterUser from "./app/pages/RegisterUser.tsx";
+import {AuthProvider} from "./app/contexts/AuthContext.tsx";
+import {PublicPages} from "./app/pages/PublicPages.tsx";
+import {ProtectedPages} from "./app/pages/ProtectedPages.tsx";
 
-function App() {
+
+export default function App() {
     return (
-        <>
+        <AuthProvider>
             <BrowserRouter>
                 <Routes>
-                    {/* Public URLS */}
-                    <Route path="/user/login" element={<Login/>}/>
-                    <Route path="/user/register" element={<RegisterUser />} />
+                    {PublicPages}
+                    {ProtectedPages}
                 </Routes>
             </BrowserRouter>
-        </>
-    )
+        </AuthProvider>
+    );
 }
 
-export default App
