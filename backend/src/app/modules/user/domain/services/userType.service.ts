@@ -37,6 +37,10 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
         return this.getExactByDescription(UserTypeDescriptionEnum.STANDARD);
     }
 
+    async getAdminUserType(): Promise<UserTypeEntity> {
+        return this.getExactByDescription(UserTypeDescriptionEnum.ADMIN);
+    }
+
 
     //#region HELPERS
     @LogError()

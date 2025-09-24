@@ -14,6 +14,7 @@ import {UpdateCitySchema} from "@location/schemas/updateCity.schema";
 import {DeleteCountrySchema} from "@location/schemas/deleteCountry.schema";
 import {DeleteStateSchema} from "@location/schemas/deleteState.schema";
 import {DeleteCitySchema} from "@location/schemas/deleteCity.schema";
+import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
 
 const locationController = makeLocationController()
 const router = Router();
@@ -22,11 +23,13 @@ const router = Router();
 router.post(
     "/country/create",
     validateRequest(CreateCountrySchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.createCountry(req, res))
 );
 
 router.get(
     "/country/findAll",
+    isAbelToAccessMiddleware(),
     validateRequest(FindCountriesSchema, 'query'),
     asyncHandler((req, res) => locationController.findCountries(req, res))
 )
@@ -34,12 +37,14 @@ router.get(
 router.patch(
     "/country/update",
     validateRequest(UpdateCountrySchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.updateCountry(req, res))
 )
 
 router.delete(
     "/country/delete",
     validateRequest(DeleteCountrySchema, 'query'),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.deleteCountry(req, res))
 )
 //#endregion
@@ -48,6 +53,7 @@ router.delete(
 router.post(
     "/state/create",
     validateRequest(CreateStateSchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.createState(req, res))
 );
 
@@ -60,12 +66,14 @@ router.get(
 router.patch(
     "/state/update",
     validateRequest(UpdateStateSchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.updateState(req, res))
 )
 
 router.delete(
     "/state/delete",
     validateRequest(DeleteStateSchema, 'query'),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.deleteState(req, res))
 )
 //#endregion
@@ -74,6 +82,7 @@ router.delete(
 router.post(
     "/city/create",
     validateRequest(CreateCitySchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.createCity(req, res))
 );
 
@@ -86,12 +95,14 @@ router.get(
 router.patch(
     "/city/update",
     validateRequest(UpdateCitySchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.updateCity(req, res))
 )
 
 router.delete(
-    "/city/delete",
+    "/admin/city/delete",
     validateRequest(DeleteCitySchema, 'query'),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => locationController.deleteCity(req, res))
 )
 //#endregion

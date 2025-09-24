@@ -8,13 +8,16 @@ import {IUserCredentialService} from "@user/domain/services/interface/IUserCrede
 import {ValidationError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import jwt, {Secret, SignOptions} from "jsonwebtoken";
-import {ServiceError} from "@coreShared/errors/service.error";
 
 @injectable()
 export class AuthService implements IAuthService {
     //#region PROPERTIES
-    private readonly SECRET_JWT_KEY: Secret = process.env.SECRET_JWT_KEY || "super-senha";
+    private static readonly SECRET_JWT_KEY: Secret = process.env.SECRET_JWT_KEY || "super-senha";
     private readonly TOKEN_EXPIRES_TIME = "1d";
+
+    static get secretJwtKey(): Secret {
+        return this.SECRET_JWT_KEY;
+    }
 
     //#endregion
 
@@ -33,31 +36,31 @@ export class AuthService implements IAuthService {
             throw new ValidationError(EntitiesMessage.error.validation.invalidPassword);
         }
 
-        const token: string = this.createToken({userId: user.id!, email: user.email});
+        const token: string = this.createToken({userId: user.id!, email: user.email, userTypeId: user.userTypeId});
 
         return {
             token: token,
             user: {
                 email: user.email,
-                userTypeId: user.userTypeId
+                name: user.name,
             }
         }
     }
 
     private createToken(payload: CreateTokenPayloadDTO): string {
         const options: SignOptions = {expiresIn: this.TOKEN_EXPIRES_TIME};
-        return jwt.sign(payload, this.SECRET_JWT_KEY, options);
+        return jwt.sign(payload, AuthService.secretJwtKey, options);
     }
 
-    private verifyToken(token: string): any {
-        try {
-            return jwt.verify(token, this.SECRET_JWT_KEY);
-        } catch (err) {
-            throw new ServiceError("Token inválido ou expirado");
-        }
-    }
-
-    private decodeToken(token: string): any {
-        return jwt.decode(token);
-    }
+    // private verifyToken(token: string): any {
+    //     try {
+    //         return jwt.verify(token, AuthService.secretJwtKey);
+    //     } catch (err) {
+    //         throw new ServiceError("Token inválido ou expirado");
+    //     }
+    // }
+    //
+    // private decodeToken(token: string): any {
+    //     return jwt.decode(token);
+    // }
 }

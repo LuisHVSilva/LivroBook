@@ -12,6 +12,7 @@ import {DeletePhoneCodesSchema} from "@phone/schemas/deletePhoneCodes.schema";
 import {CreatePhoneSchema} from "@phone/schemas/createPhone.schema";
 import {UpdatePhoneSchema} from "@phone/schemas/updatePhone.schema";
 import {DeletePhoneSchema} from "@phone/schemas/deletePhone.schema";
+import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
 
 const phoneController: IPhoneController = makePhoneController()
 const router = Router();
@@ -71,23 +72,27 @@ router.delete(
 router.post(
     "/create",
     validateRequest(CreatePhoneSchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => phoneController.createPhone(req, res))
 )
 
 router.get(
     "/findAll",
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => phoneController.findPhones(req, res))
 )
 
 router.patch(
     "/update",
     validateRequest(UpdatePhoneSchema),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => phoneController.updatePhone(req, res))
 )
 
 router.delete(
     "/delete",
     validateRequest(DeletePhoneSchema, 'query'),
+    isAbelToAccessMiddleware(),
     asyncHandler((req, res) => phoneController.deletePhone(req, res))
 )
 //#endregion

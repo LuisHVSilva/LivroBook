@@ -8,10 +8,13 @@ export type LoginDTO = {
 
 export type LoginResponseDTO = {
     token: string,
-    user: Pick<UserDTO, "email" | "userTypeId">
+    user: Pick<UserDTO, "name" | "email">
 }
 
 export type CreateTokenPayloadDTO = {
     userId: number;
     email: string
+    userTypeId: number;
 }
+
+export type DecodedTokenPayloadDTO = CreateTokenPayloadDTO & {iat: number, exp: number};

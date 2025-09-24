@@ -17,6 +17,7 @@ import {CreateUserSchema} from "@user/schemas/createUser.schema";
 import {FindUserSchema} from "@user/schemas/findUser.schema";
 import {UpdateUserSchema} from "@user/schemas/updateUser.schema";
 import {DeleteUserSchema} from "@user/schemas/deleteUser.schema";
+import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
 
 const userController = makeUserController()
 const router = Router();
@@ -103,12 +104,14 @@ router.post(
 
 router.get(
     "/user/findAll",
+    isAbelToAccessMiddleware(),
     validateRequest(FindUserSchema, 'query'),
     asyncHandler((req, res) => userController.findUsers(req, res))
 )
 
 router.patch(
     "/user/update",
+    isAbelToAccessMiddleware(),
     validateRequest(UpdateUserSchema),
     asyncHandler((req, res) => userController.updateUser(req, res))
 )
@@ -116,6 +119,7 @@ router.patch(
 
 router.delete(
     "/user/delete",
+    isAbelToAccessMiddleware(),
     validateRequest(DeleteUserSchema, 'query'),
     asyncHandler((req, res) => userController.deleteUser(req, res))
 )
