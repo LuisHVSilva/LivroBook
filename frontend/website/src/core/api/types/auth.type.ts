@@ -1,5 +1,4 @@
 //#region USER
-
 export type UserDTO = {
     id?: number;
     name: string;
@@ -30,21 +29,25 @@ export type UserCredentialDTO = {
 export type CreateUserCredentialRequestDTO = Pick<UserCredentialDTO, "password">;
 //#endRegion
 
-export type PostLoginAuthRequest = {
+
+export type UserLocalStorageData = {
+    name: string;
+    email: string;
+    // age: number;
+}
+
+export type LoginRequest = {
     email: string;
     password: string;
 };
 
-export type PostLoginAuthResponse = {
-    access_token: string;
+export type LoginResponse = {
+    token: string;
     refresh_token: string;
-    user: {
-        email: string;
-        userTypeId: number;
-    }
+    user: UserLocalStorageData;
 }
 
-export type RegisterUserAuthRequest =
+export type RegisterAuthRequest =
     Pick<UserDTO, "name" | "email" | "birthday">
     & {
     userCredential: CreateUserCredentialRequestDTO

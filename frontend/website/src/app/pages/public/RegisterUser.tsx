@@ -1,14 +1,14 @@
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import type {RegisterUserAuthRequest} from "../../../core/api/types/auth.types.ts";
+
 import {formUtil} from "../../../core/utils/form.util.ts";
 import {ConflictError, NullFieldError, ValidationError} from "../../../core/errors/generic.error.ts";
 import {authApiService} from "../../../core/api/services/auth.api.service.ts";
 import InputField from "../../components/forms/InputField.tsx";
-import {useAuth} from "../../contexts/AuthContext.tsx";
+import type {RegisterAuthRequest} from "../../../core/api/types/auth.type.ts";
+import {useAuth} from "../../../core/hooks/authHook.ts";
 
 const RegisterUser = () => {
-    // const [selectedDDDPhone, setSelectedDDDPhone] = useState<number | null>(null);
     const { isAuthenticated } = useAuth();
     const navigate: NavigateFunction = useNavigate();
     const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ const RegisterUser = () => {
     async function handleRegister(formData: FormData): Promise<void> {
         try {
 
-            const payload: RegisterUserAuthRequest = {
+            const payload: RegisterAuthRequest = {
                 name: formUtil.getFormValue(formData, "name"),
                 email: formUtil.getFormValue(formData, "email"),
                 birthday: new Date(formData.get("birthday")?.toString() ?? ""),

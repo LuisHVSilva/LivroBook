@@ -1,12 +1,14 @@
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-import type {PostLoginAuthRequest} from "../../../core/api/types/auth.types.ts";
 
 import {useEffect, useState} from "react";
-import {errorMessages} from "../../../core/constants/errorMessages.ts";
+import {errorMessage} from "../../../core/constants/messages/error.message.ts";
 import {Link} from "react-router-dom";
 import {authApiService} from "../../../core/api/services/auth.api.service.ts";
 import {formUtil} from "../../../core/utils/form.util.ts";
-import {useAuth} from "../../contexts/AuthContext.tsx";
+
+import type {LoginRequest} from "../../../core/api/types/auth.type.ts";
+import {t} from "../../../core/constants/messages/translations.ts";
+import {useAuth} from "../../../core/hooks/authHook.ts";
 
 const Login = () => {
     const { isAuthenticated } = useAuth();
@@ -17,7 +19,7 @@ const Login = () => {
 
     async function handleLogin(formData: FormData): Promise<void> {
         try {
-            const data: PostLoginAuthRequest = {
+            const data: LoginRequest = {
                 email: formUtil.getFormValue(formData, "email"),
                 password: formUtil.getFormValue(formData, "password"),
             }
@@ -26,7 +28,7 @@ const Login = () => {
             navigate("/",  { replace: true });
 
         } catch (e) {
-            setError(errorMessages.failure.loginError);
+            setError(t(errorMessage.appError.auth.loginError));
             console.error("Erro no login", e);
         }
     }

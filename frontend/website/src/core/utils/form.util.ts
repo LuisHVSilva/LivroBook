@@ -1,18 +1,20 @@
 import {NullFieldError, ValidationError} from "../errors/generic.error.ts";
+import {errorMessage} from "../constants/messages/error.message.ts";
+import {t} from "../constants/messages/translations.ts";
 
 export class FormUtil {
     public getFormValue(formData: FormData, key: string): string {
-        const value = formData.get(key);
+        const value: FormDataEntryValue | null = formData.get(key);
         if (value === null || value === "") {
-            throw new NullFieldError(`Campo obrigatório: ${key}`);
+            throw new NullFieldError(t(errorMessage.nullFieldError.required, {field: key}));
         }
         return value.toString();
     }
 
     public getFormNumber(formData: FormData, key: string): number {
-        const value = formData.get(key);
+        const value: FormDataEntryValue | null = formData.get(key);
         if (value === null) {
-            throw new NullFieldError(`Campo obrigatório: ${key}`);
+            throw new NullFieldError(t(errorMessage.nullFieldError.required, {field: key}));
         }
         const num = Number(value);
         if (isNaN(num)) {

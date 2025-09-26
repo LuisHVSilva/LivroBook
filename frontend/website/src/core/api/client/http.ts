@@ -1,63 +1,45 @@
-import axios, {AxiosError, HttpStatusCode} from "axios";
-import {ConflictError, ValidationError} from "../../errors/generic.error.ts";
+import axios, {AxiosError, type AxiosInstance} from "axios";
+import {AppError} from "../../errors/generic.error.ts";
+import {authApiService} from "../services/auth.api.service.ts";
+import type {ResponseErrorType} from "../types/http.type.ts";
+import {handleHttpResponse} from "./handleHttpResponse.ts";
+import {errorMessage} from "../../constants/messages/error.message.ts";
+//TODO -> Not finding env file
+// const {VITE_API_URL} = import.meta.env ?? 'http://localhost:3000/api';
 
-const http = axios.create({
-    baseURL: "http://localhost:3000/api",
+const http: AxiosInstance = axios.create({
+    baseURL: 'http://localhost:3000/api',
+    headers: {"Content-Type": "application/json"},
+    timeout: 10000,
 });
 
 http.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token: string | null = authApiService.findTokenKey();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 });
 
-type responseErrorType = { errors: [], message: string, success: false }
 
-// Interceptor de resposta para erros
 http.interceptors.response.use(
-    (response) => response, // deixa passar respostas 2xx
+    (response) => response,
     (error: AxiosError) => {
         if (error.response) {
             const status = error.response.status;
-            const errorData: responseErrorType = error.response.data as responseErrorType;
-            const message = errorData?.message || "Erro inesperado no servidor";
-            const errors: [] = errorData.errors;
+            const data = error.response.data as ResponseErrorType;
 
-            if (status === HttpStatusCode.BadRequest) {
-                let specificError: string = '';
-                if (errors) {
-                    for (const error of errors) {
-                        specificError += `\n${error}\n`;
-                    }
+            // 🔹 Centraliza o tratamento
+            const appError = handleHttpResponse.mapHttpError(status, data);
 
-                    return Promise.reject(new ValidationError(specificError));
-                }
-                return Promise.reject(new ValidationError(message || "Dados inválidos"));
+            if (status === 401) {
+                authApiService.clearStorage();
             }
 
-            if (status === HttpStatusCode.Unauthorized) {
-                // exemplo: token expirado → deslogar usuário
-                localStorage.removeItem("token");
-                return Promise.reject(new Error("Sessão expirada, faça login novamente"));
-            }
-
-            if (status === HttpStatusCode.Forbidden) {
-                return Promise.reject(new Error("Você não tem permissão para acessar esse recurso"));
-            }
-
-            if(status === HttpStatusCode.Conflict) {
-                return Promise.reject(new ConflictError(message))
-            }
-
-            if (status === HttpStatusCode.InternalServerError) {
-                return Promise.reject(new Error("Erro interno, tente novamente mais tarde"));
-            }
+            return Promise.reject(appError);
         }
 
-        // Erro de rede ou sem resposta
-        return Promise.reject(new Error("Falha de conexão, verifique sua internet"));
+        return Promise.reject(new AppError(errorMessage.serviceError.internalServerError));
     }
 );
 
