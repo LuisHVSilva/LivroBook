@@ -14,11 +14,37 @@ import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentia
 import {UserTypeModel} from "@user/infrastructure/models/userType.model";
 import {UserCredentialModel} from "@user/infrastructure/models/userCredential.model";
 import {UserModel} from "@user/infrastructure/models/user.model";
+import {LanguageModel} from "@modules/book/infrastructure/models/language.model";
+import {PublisherModel} from "@modules/book/infrastructure/models/publisher.model";
+import {ModelCtor} from "sequelize-typescript/dist/model/model/model";
+import {BookCategoryModel} from "@modules/book/infrastructure/models/bookCategory.model";
+import {AuthorModel} from "@modules/book/infrastructure/models/author.model";
+import {BookModel} from "@modules/book/infrastructure/models/book.model";
 
 dotenv.config({path: path.resolve(__dirname, '../../../.env')});
 
 export class Database {
     private static instance: Sequelize;
+
+    private static models: ModelCtor[] = [
+        DocumentTypeModel,
+        CityModel,
+        CountryModel,
+        StateModel,
+        PhoneTypeModel,
+        PhoneCodeModel,
+        PhoneModel,
+        StatusModel,
+        UserCredentialTypeModel,
+        UserTypeModel,
+        UserCredentialModel,
+        UserModel,
+        LanguageModel,
+        PublisherModel,
+        BookCategoryModel,
+        AuthorModel,
+        BookModel,
+    ]
 
     //#region Database
 
@@ -30,8 +56,7 @@ export class Database {
             password: process.env.DB_PASSWORD!,
             host: process.env.DB_HOST!,
             port: Number(process.env.DB_PORT),
-            models: [DocumentTypeModel, CityModel, CountryModel, StateModel, PhoneTypeModel, PhoneCodeModel,
-                PhoneModel, StatusModel, UserCredentialTypeModel, UserTypeModel, UserCredentialModel, UserModel]
+            models: this.models
         });
 
         return Database.instance;
