@@ -9,7 +9,7 @@ import type {RegisterAuthRequest} from "../../../core/api/types/auth.type.ts";
 import {useAuth} from "../../../core/hooks/authHook.ts";
 
 const RegisterUser = () => {
-    const { isAuthenticated } = useAuth();
+    const {isAuthenticated} = useAuth();
     const navigate: NavigateFunction = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState<string | null>(null);
@@ -62,7 +62,7 @@ const RegisterUser = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate("/", { replace: true });
+            navigate("/", {replace: true});
         }
     }, [isAuthenticated, navigate]);
 

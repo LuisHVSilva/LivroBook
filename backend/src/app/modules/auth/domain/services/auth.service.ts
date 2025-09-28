@@ -43,6 +43,7 @@ export class AuthService implements IAuthService {
             user: {
                 email: user.email,
                 name: user.name,
+                userTypeId: user.userTypeId,
             }
         }
     }

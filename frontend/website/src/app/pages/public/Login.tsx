@@ -3,7 +3,6 @@ import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {errorMessage} from "../../../core/constants/messages/error.message.ts";
 import {Link} from "react-router-dom";
-import {authApiService} from "../../../core/api/services/auth.api.service.ts";
 import {formUtil} from "../../../core/utils/form.util.ts";
 
 import type {LoginRequest} from "../../../core/api/types/auth.type.ts";
@@ -11,7 +10,7 @@ import {t} from "../../../core/constants/messages/translations.ts";
 import {useAuth} from "../../../core/hooks/authHook.ts";
 
 const Login = () => {
-    const { isAuthenticated } = useAuth();
+    const {isAuthenticated, login} = useAuth();
     const navigate: NavigateFunction = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState<string>(""); // controla a senha
@@ -24,8 +23,8 @@ const Login = () => {
                 password: formUtil.getFormValue(formData, "password"),
             }
 
-            await authApiService.login(data);
-            navigate("/",  { replace: true });
+            await login(data);
+            navigate("/", {replace: true});
 
         } catch (e) {
             setError(t(errorMessage.appError.auth.loginError));
@@ -35,7 +34,7 @@ const Login = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate("/", { replace: true });
+            navigate("/", {replace: true});
         }
     }, [isAuthenticated, navigate]);
 

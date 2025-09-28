@@ -10,7 +10,7 @@ type InputFieldProps = {
     hasError?: boolean;
 }
 
-const InputField = ({name, type, placeHolder, required, onChangeFunction,hasError}: InputFieldProps) => {
+const InputField = ({name, type, placeHolder, required, onChangeFunction, hasError}: InputFieldProps) => {
     const [value, setValue] = useState("");
     const filled: boolean = value.length > 0;
 

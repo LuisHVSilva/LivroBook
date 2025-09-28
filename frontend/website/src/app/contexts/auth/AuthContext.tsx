@@ -1,11 +1,12 @@
 // src/context/AuthContext.tsx
-import { createContext } from "react";
+import {createContext} from "react";
 import type {LoginRequest, RegisterAuthRequest, UserLocalStorageData} from "../../../core/api/types/auth.type.ts";
 
 
 type AuthContextType = {
     user: UserLocalStorageData | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
     login: (payload: LoginRequest) => Promise<void>;
     register: (payload: RegisterAuthRequest) => Promise<void>;
     logout: () => void;

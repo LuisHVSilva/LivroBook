@@ -6,10 +6,16 @@ nav#navbar
   width: 100%
 
   & > div.nav-items
-    background-color: #04BF9D
+    background: rgba(0, 0, 0, 0.2)
+    border-radius: 16px
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
+    backdrop-filter: blur(2.3px)
+    -webkit-backdrop-filter: blur(2.3px)
+    border: 1px solid rgba(231, 214, 214, 0.68)
     padding: 2em
-    border-radius: 10px
-    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px
+
+    &:hover
+      background: rgba(0, 0, 0, 0.3)
 
     & > a.nav-item
       margin: 0 1em
@@ -17,5 +23,5 @@ nav#navbar
       color: white
 
       &:hover
-        color: black
+        color: #027373
 

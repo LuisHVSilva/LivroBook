@@ -20,7 +20,7 @@ const portugueseDictionary = (): Record<string, string> => {
         //#endregion
 
         //#region ConflictError
-        'conflictError.generic':"Conflito nos dados",
+        'conflictError.generic': "Conflito nos dados",
         //#endregion
 
         //#region NotFoudError
@@ -45,7 +45,7 @@ const portugueseDictionary = (): Record<string, string> => {
 //#endregion
 
 //#english
-const englishDictionary = ():  Record<string, string> => {
+const englishDictionary = (): Record<string, string> => {
     return {}
 }
 //#endregion

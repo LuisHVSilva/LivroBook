@@ -1,7 +1,12 @@
 import {type ReactNode, useEffect, useState} from "react";
-import type {LoginRequest, RegisterAuthRequest, UserLocalStorageData} from "../../../core/api/types/auth.type.ts";
+import type {
+    LoginRequest,
+    LoginResponse,
+    RegisterAuthRequest,
+    UserLocalStorageData
+} from "../../../core/api/types/auth.type.ts";
 import {authApiService} from "../../../core/api/services/auth.api.service.ts";
-import { AuthContext } from "./AuthContext.tsx";
+import {AuthContext} from "./AuthContext.tsx";
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -15,10 +20,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     async function login(payload: LoginRequest) {
-        await authApiService.login(payload);
+        const userResponse: LoginResponse = await authApiService.login(payload);
         const storedUser: UserLocalStorageData | null = authApiService.getUserInfo();
+
         if (storedUser) {
-            setUser(storedUser);
+            setUser(userResponse.user);
         }
     }
 
@@ -31,18 +37,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     }
 
+    const isAuthenticated = !!user;
+    const isAdmin: boolean = authApiService.getUserTypeFromToken() === 1;
+
     return (
         <AuthContext.Provider
             value={{
-        user,
-            isAuthenticated: !!user,
-            login,
-            register,
-            logout,
-    }}
->
-    {children}
-    </AuthContext.Provider>
-);
+                user,
+                isAuthenticated,
+                isAdmin,
+                login,
+                register,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
