@@ -7,13 +7,14 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {LogError} from "@coreShared/decorators/LogError";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ServiceError} from "@coreShared/errors/service.error";
-import {Transaction} from "sequelize";
+import {AbstractDataType, ModelAttributeColumnOptions, Transaction} from "sequelize";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {EntityBase} from "@coreShared/base/entity.base";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {DeleteStatusEnum} from "@coreShared/enums/deleteStatus.enum";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {SimplifiedMetadataAttribute} from "@coreShared/types/metadata.type";
 
 export abstract class ServiceBase<
     T extends DtoBaseType<any, any, any, any, any>,
@@ -69,6 +70,27 @@ export abstract class ServiceBase<
         }
 
         return found.unwrap();
+    }
+
+    @LogError()
+    async getMetadata(): Promise<SimplifiedMetadataAttribute[]> {
+        const attributes = await this.repo.getMetadata();
+
+        return Object.entries(attributes).map(([name, options]) => {
+            const column = options as ModelAttributeColumnOptions;
+
+            const typeStr = (column.type as any).key ?? (column.type as AbstractDataType).toSql() ?? String(column.type);
+
+            // const type = typeof column.type !== "object" ? String(column.type) : "column.type.toString()";
+
+            return {
+                columnName: name,
+                dataType: typeStr,
+                allowNull: column.allowNull ?? true,
+                maxLength: (column.validate as any)?.len?.[1],
+                minLength: (column.validate as any)?.len?.[0],
+            };
+        });
     }
 
     //#endregion

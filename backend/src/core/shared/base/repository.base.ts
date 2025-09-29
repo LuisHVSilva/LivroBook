@@ -1,6 +1,13 @@
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {BaseRepositoryType} from "@coreShared/types/entity.type";
-import {FindOptions, ModelStatic, Transaction, WhereOptions} from "sequelize";
+import {
+    Attributes,
+    FindOptions,
+    ModelAttributes,
+    ModelStatic,
+    Transaction,
+    WhereOptions
+} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {SequelizeWhereBuilderUtil} from "@coreShared/utils/sequelizeWhereBuilder.util";
@@ -80,6 +87,11 @@ export abstract class RepositoryBase<T extends BaseRepositoryType<any, any, any,
 
         return ResultType.success(updatedEntity);
     }
+
+    async getMetadata(): Promise<ModelAttributes<T["Model"], Attributes<T["Model"]>>> {
+        return this.model.getAttributes();
+    }
+
 
     protected makeFilter(filters?: T["Filter"], config?: Partial<Record<keyof T["Filter"], {
         in?: boolean ;

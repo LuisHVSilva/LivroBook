@@ -9,13 +9,15 @@ import {phoneRoute} from "@phone/adapters/routes/phone.route";
 import {userRouter} from "@user/adapters/routes/user.route";
 import {authRouter} from "@modules/auth/adapters/routes/auth.route";
 import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
+import {metadataRouter} from "@modules/metadata/adapters/routes/metadata.route";
 
 
 const router: Router = Router();
 
 router.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-router.use('admin/status', isAbelToAccessMiddleware(), statusRoutes);
+router.use('/status', isAbelToAccessMiddleware(), statusRoutes);
+router.use('/metadata', isAbelToAccessMiddleware(), metadataRouter);
 router.use('/location', locationRouter);
 router.use('/documentType', documentTypeRouter);
 router.use('/phone', phoneRoute)

@@ -1,4 +1,4 @@
-import {Transaction} from "sequelize";
+import {Attributes, ModelAttributes, Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {BaseRepositoryType} from "@coreShared/types/entity.type";
@@ -52,4 +52,16 @@ export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any
      * @returns A ResultType containing the updated StatusEntity.
      */
     update(entity: T["Entity"], transaction?: Transaction): Promise<ResultType<T["Entity"]>>;
+
+    /**
+     * Retrieves metadata about the model's attributes.
+     *
+     * Each attribute includes its column definition as defined in Sequelize,
+     * such as data type, primary key, nullability, and constraints.
+     *
+     * @returns A Promise that resolves to the model's attributes metadata,
+     *          where each key corresponds to a column name and its value
+     *          contains the attribute definition (type, allowNull, etc.).
+     */
+    getMetadata():  Promise<ModelAttributes<T["Model"], Attributes<T["Model"]>>> ;
 }

@@ -4,53 +4,53 @@ import {ResultType} from "@coreShared/types/result.type";
 import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
 import {StatusCodes} from "http-status-codes";
 import {IUserController} from "@user/adapters/controllers/IUser.controller";
-import {ICreateUserTypeUseCase} from "@user/useCases/createUserType/ICreateUserType.useCase";
+import {ICreateUserTypeUseCase} from "@user/useCases/create/createUserType/ICreateUserType.useCase";
 import {
     CreateUserTypeDTO,
     CreateUserTypeResponseDTO,
     FindUserTypesRawDTO,
     FindUserTypesResponseDTO, UpdateUserTypeDTO, UpdateUserTypeResponseDTO
 } from "@user/adapters/dtos/userType.dto";
-import {IFindUserTypesUseCase} from "@user/useCases/findUserTypes/IFindUserTypes.useCase";
+import {IFindUserTypesUseCase} from "@user/useCases/read/findUserTypes/IFindUserTypes.useCase";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {IUpdateUserTypeUseCase} from "@user/useCases/updateUserType/IUpdateUserType.useCase";
+import {IUpdateUserTypeUseCase} from "@user/useCases/update/updateUserType/IUpdateUserType.useCase";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {IDeleteUserTypeUseCase} from "@user/useCases/deleteUserTypes/IDeleteUserType.useCase";
+import {IDeleteUserTypeUseCase} from "@user/useCases/delete/deleteUserTypes/IDeleteUserType.useCase";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {
     ICreateUserCredentialTypeUseCase
-} from "@user/useCases/createUserCredentialType/ICreateUserCredentialType.useCase";
-import {IFindUserCredentialTypesUseCase} from "@user/useCases/findUserCredentialTypes/IFindUserCredentialTypes.useCase";
+} from "@user/useCases/create/createUserCredentialType/ICreateUserCredentialType.useCase";
+import {IFindUserCredentialTypesUseCase} from "@user/useCases/read/findUserCredentialTypes/IFindUserCredentialTypes.useCase";
 import {
     IUpdateUserCredentialTypeUseCase
-} from "@user/useCases/updateUserCredentialType/IUpdateUserCredentialType.useCase";
+} from "@user/useCases/update/updateUserCredentialType/IUpdateUserCredentialType.useCase";
 import {
     IDeleteUserCredentialTypesUseCase
-} from "@user/useCases/deleteUserCredentialTypes/IDeleteUserCredentialTypes.useCase";
+} from "@user/useCases/delete/deleteUserCredentialTypes/IDeleteUserCredentialTypes.useCase";
 import {
     CreateUserCredentialTypeDTO,
     CreateUserCredentialTypeResponseDTO, FindUserCredentialTypesRawDTO, FindUserCredentialTypesResponseDTO,
     UpdateUserCredentialTypeDTO, UpdateUserCredentialTypeResponseDTO
 } from "@user/adapters/dtos/userCredentialType.dto";
-import {IUpdateUserCredentialUseCase} from "@user/useCases/updateUserCredential/IUpdateUserCredential.useCase";
+import {IUpdateUserCredentialUseCase} from "@user/useCases/update/updateUserCredential/IUpdateUserCredential.useCase";
 import {
     CreateUserCredentialRequestDTO,
     CreateUserCredentialResponseDTO,
     UpdateUserCredentialDTO,
     UpdateUserCredentialResponseDTO
 } from "@user/adapters/dtos/userCredential.dto";
-import {ICreateUserCredentialUseCase} from "@user/useCases/createUserCredential/ICreateUserCredential.useCase";
-import {ICreateUserUseCase} from "@user/useCases/createUser/ICreateUser.useCase";
+import {ICreateUserCredentialUseCase} from "@user/useCases/create/createUserCredential/ICreateUserCredential.useCase";
+import {ICreateUserUseCase} from "@user/useCases/create/createUser/ICreateUser.useCase";
 import {
     CreateUserRequestDTO,
     CreateUserResponseDTO, FindUsersRawDTO, FindUsersResponseDTO,
     UpdateUserDTO,
     UpdateUserResponseDTO
 } from "@user/adapters/dtos/user.dto";
-import {IUpdateUserUseCase} from "@user/useCases/updateUser/IUpdateUser.useCase";
-import {IFindUsersUseCase} from "@user/useCases/findUsers/IFindUsers.useCase";
-import {IDeleteUserUseCase} from "@user/useCases/deleteUser/IDeleteUser.useCase";
-import {IDeleteUserCredentialUseCase} from "@user/useCases/deleteUserCredential/IDeleteUserCredential.useCase";
+import {IUpdateUserUseCase} from "@user/useCases/update/updateUser/IUpdateUser.useCase";
+import {IFindUsersUseCase} from "@user/useCases/read/findUsers/IFindUsers.useCase";
+import {IDeleteUserUseCase} from "@user/useCases/create/deleteUser/IDeleteUser.useCase";
+import {IDeleteUserCredentialUseCase} from "@user/useCases/delete/deleteUserCredential/IDeleteUserCredential.useCase";
 
 @injectable()
 export class UserController implements IUserController {

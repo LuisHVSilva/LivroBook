@@ -1,6 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IDocumentTypeController} from "@document/adapters/controllers/IDocumentType.controller";
-import {ICreateDocumentTypeUseCase} from "@document/useCases/createDocumentType/ICreateDocumentType.useCase";
+import {ICreateDocumentTypeUseCase} from "@document/useCases/create/createDocumentType/ICreateDocumentType.useCase";
 import {Request, Response} from "express";
 import {ResultType} from "@coreShared/types/result.type";
 import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
@@ -10,10 +10,10 @@ import {
     CreateDocumentTypeResponseDTO,
     FindDocumentTypesRawDTO, FindDocumentTypesResponseDTO, UpdateDocumentTypeDTO, UpdateDocumentTypeResponseDTO
 } from "@document/adapters/dto/documentType.dto";
-import {IFindDocumentTypesUseCase} from "@document/useCases/findDocumentTypes/IFindDocumentTypes.useCase";
+import {IFindDocumentTypesUseCase} from "@document/useCases/read/findDocumentTypes/IFindDocumentTypes.useCase";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {UpdateDocumentTypeUseCase} from "@document/useCases/updateDocumentType/updateDocumentType.useCase";
-import {IDeleteDocumentTypesUseCase} from "@document/useCases/deleteDocumentTypes/IDeleteDocumentTypes.useCase";
+import {UpdateDocumentTypeUseCase} from "@document/useCases/update/updateDocumentType/updateDocumentType.useCase";
+import {IDeleteDocumentTypesUseCase} from "@document/useCases/delete/deleteDocumentTypes/IDeleteDocumentTypes.useCase";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";

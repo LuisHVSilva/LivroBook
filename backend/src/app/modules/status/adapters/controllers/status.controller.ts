@@ -2,14 +2,14 @@ import "reflect-metadata"
 import {Request, Response} from "express";
 import {inject, injectable} from "tsyringe";
 import {StatusCodes} from "http-status-codes";
-import {ICreateStatusUseCase} from "@status/useCases/createStatus/ICreateStatus.useCase";
+import {ICreateStatusUseCase} from "@status/useCases/create/createStatus/ICreateStatus.useCase";
 import {IStatusController} from "@status/adapters/controllers/IStatus.controller";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
 import {ResultType} from "@coreShared/types/result.type";
-import {IFindStatusesUseCase} from "@status/useCases/findStatus/IFindStatuses.useCase";
-import {IUpdateStatusUseCase} from "@status/useCases/updateStatus/IUpdateStatus.useCase";
-import {IDeleteStatusUseCase} from "@status/useCases/deleteStatus/IDeleteStatus.useCase";
+import {IFindStatusesUseCase} from "@status/useCases/read/findStatus/IFindStatuses.useCase";
+import {IUpdateStatusUseCase} from "@status/useCases/update/updateStatus/IUpdateStatus.useCase";
+import {IDeleteStatusUseCase} from "@status/useCases/delete/deleteStatus/IDeleteStatus.useCase";
 import {
     CreateStatusDTO,
     CreateStatusResponseDTO,

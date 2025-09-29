@@ -4,31 +4,31 @@ import {ResultType} from "@coreShared/types/result.type";
 import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
 import {StatusCodes} from "http-status-codes";
 import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
-import {ICreatePhoneTypeUseCase} from "@phone/useCase/createPhoneType/ICreatePhoneType.useCase";
+import {ICreatePhoneTypeUseCase} from "@phone/useCase/create/createPhoneType/ICreatePhoneType.useCase";
 import {
     CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO, FindPhoneTypesRawDTO,
     FindPhoneTypesResponseDTO, UpdatePhoneTypeDTO, UpdatePhoneTypeResponseDTO
 } from "@phone/adapters/dtos/phoneType.dto";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {IFindPhoneTypesUseCase} from "@phone/useCase/findPhoneTypes/IFindPhoneTypes.useCase";
-import {IUpdatePhoneTypeUseCase} from "@phone/useCase/updatePhoneType/IUpdatePhoneType.useCase";
-import {IDeletePhoneTypesUseCase} from "@phone/useCase/deletePhoneTypes/IDeletePhoneTypes.useCase";
-import {ICreatePhoneCodeUseCase} from "@phone/useCase/createPhoneCode/ICreatePhoneCode.useCase";
+import {IFindPhoneTypesUseCase} from "@phone/useCase/read/findPhoneTypes/IFindPhoneTypes.useCase";
+import {IUpdatePhoneTypeUseCase} from "@phone/useCase/upadte/updatePhoneType/IUpdatePhoneType.useCase";
+import {IDeletePhoneTypesUseCase} from "@phone/useCase/delete/deletePhoneTypes/IDeletePhoneTypes.useCase";
+import {ICreatePhoneCodeUseCase} from "@phone/useCase/create/createPhoneCode/ICreatePhoneCode.useCase";
 import {
     CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO, FindPhoneCodesRawDTO,
     FindPhoneCodesResponseDTO, UpdatePhoneCodeDTO, UpdatePhoneCodeResponseDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
-import {IFindPhoneCodesUseCase} from "@phone/useCase/findPhoneCodeTypes/IFindPhoneCodes.useCase";
-import {IUpdatePhoneCodeUseCase} from "@phone/useCase/updatePhoneCode/IUpdatePhoneCode.useCase";
-import {IDeletePhoneCodesUseCase} from "@phone/useCase/deletePhoneCode/IDeletePhoneCodes.useCase";
-import {ICreatePhoneUseCase} from "@phone/useCase/createPhone/ICreatePhone.useCase";
+import {IFindPhoneCodesUseCase} from "@phone/useCase/read/findPhoneCodeTypes/IFindPhoneCodes.useCase";
+import {IUpdatePhoneCodeUseCase} from "@phone/useCase/upadte/updatePhoneCode/IUpdatePhoneCode.useCase";
+import {IDeletePhoneCodesUseCase} from "@phone/useCase/delete/deletePhoneCode/IDeletePhoneCodes.useCase";
+import {ICreatePhoneUseCase} from "@phone/useCase/create/createPhone/ICreatePhone.useCase";
 import {
     CreatePhoneDTO, CreatePhoneResponseDTO, FindPhonesRawDTO,
     FindPhonesResponseDTO, UpdatePhoneDTO, UpdatePhoneResponseDTO
 } from "@phone/adapters/dtos/phone.dto";
-import {IFindPhonesUseCase} from "@phone/useCase/findPhones/IFindPhones.useCase";
-import {IUpdatePhoneUseCase} from "@phone/useCase/updatePhone/IUpdatePhone.useCase";
-import {IDeletePhoneUseCase} from "@phone/useCase/deletePhone/IDeletePhone.useCase";
+import {IFindPhonesUseCase} from "@phone/useCase/read/findPhones/IFindPhones.useCase";
+import {IUpdatePhoneUseCase} from "@phone/useCase/upadte/updatePhone/IUpdatePhone.useCase";
+import {IDeletePhoneUseCase} from "@phone/useCase/delete/deletePhone/IDeletePhone.useCase";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 

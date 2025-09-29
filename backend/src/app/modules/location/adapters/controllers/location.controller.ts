@@ -1,8 +1,8 @@
 import {inject, injectable} from "tsyringe";
 import {ILocationController} from "@location/adapters/controllers/ILocation.controller";
-import {ICreateCountryUseCase} from "@location/useCases/createCountry/ICreateCountry.useCase";
-import {ICreateCityUseCase} from "@location/useCases/createCity/ICreateCity.useCase";
-import {ICreateStateUseCase} from "@location/useCases/createState/ICreateState.useCase";
+import {ICreateCountryUseCase} from "@location/useCases/create/createCountry/ICreateCountry.useCase";
+import {ICreateCityUseCase} from "@location/useCases/create/createCity/ICreateCity.useCase";
+import {ICreateStateUseCase} from "@location/useCases/create/createState/ICreateState.useCase";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Request, Response} from "express";
 import {ResultType} from "@coreShared/types/result.type";
@@ -26,17 +26,17 @@ import {
     FindStatesRawDTO,
     FindStatesResponseDTO, UpdateStateDTO, UpdateStateResponseDTO
 } from "@location/adapters/dtos/state.dto";
-import {IFindCitiesUseCase} from "@location/useCases/findCities/IFindCities.useCase";
-import {IFindStatesUseCase} from "@location/useCases/findStates/IFindStates.useCase";
-import {IFindCountriesUseCase} from "@location/useCases/findCountries/IFindCountries.useCase";
-import {IUpdateCityUseCase} from "@location/useCases/updateCity/IUpdateCity.useCase";
-import {IUpdateCountryUseCase} from "@location/useCases/updateCountry/IUpdateCountry.UseCase";
-import {IUpdateStateUseCase} from "@location/useCases/updateState/IUpdateState.useCase";
+import {IFindCitiesUseCase} from "@location/useCases/read/findCities/IFindCities.useCase";
+import {IFindStatesUseCase} from "@location/useCases/read/findStates/IFindStates.useCase";
+import {IFindCountriesUseCase} from "@location/useCases/read/findCountries/IFindCountries.useCase";
+import {IUpdateCityUseCase} from "@location/useCases/update/updateCity/IUpdateCity.useCase";
+import {IUpdateCountryUseCase} from "@location/useCases/update/updateCountry/IUpdateCountry.UseCase";
+import {IUpdateStateUseCase} from "@location/useCases/update/updateState/IUpdateState.useCase";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {CityEntity} from "@location/domain/entities/city.entity";
-import {IDeleteStateUseCase} from "@location/useCases/deleteState/IDeleteState.useCase";
-import {IDeleteCountryUseCase} from "@location/useCases/deleteCountry/IDeleteCountry.useCase";
-import {IDeleteCityUseCase} from "@location/useCases/deleteCity/IDeleteCity.useCase";
+import {IDeleteStateUseCase} from "@location/useCases/delete/deleteState/IDeleteState.useCase";
+import {IDeleteCountryUseCase} from "@location/useCases/delete/deleteCountry/IDeleteCountry.useCase";
+import {IDeleteCityUseCase} from "@location/useCases/delete/deleteCity/IDeleteCity.useCase";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 
 @injectable()

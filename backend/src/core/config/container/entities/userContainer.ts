@@ -4,39 +4,39 @@ import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {ModelStatic} from "sequelize";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
 import {UserTypeService} from "@user/domain/services/userType.service";
-import {ICreateUserTypeUseCase} from "@user/useCases/createUserType/ICreateUserType.useCase";
-import {CreateUserTypeUseCase} from "@user/useCases/createUserType/createUserType.useCase";
+import {ICreateUserTypeUseCase} from "@user/useCases/create/createUserType/ICreateUserType.useCase";
+import {CreateUserTypeUseCase} from "@user/useCases/create/createUserType/createUserType.useCase";
 import {UserTypeModel} from "@user/infrastructure/models/userType.model";
 import {IUserTypeRepository} from "@user/infrastructure/repositories/interface/IUserType.repository";
 import {UserTypeRepository} from "@user/infrastructure/repositories/userType.repository";
 import {IUserController} from "@user/adapters/controllers/IUser.controller";
 import {UserController} from "@user/adapters/controllers/user.controller";
-import {IFindUserTypesUseCase} from "@user/useCases/findUserTypes/IFindUserTypes.useCase";
-import {FindUserTypesUseCase} from "@user/useCases/findUserTypes/findUserTypes.useCase";
-import {IUpdateUserTypeUseCase} from "@user/useCases/updateUserType/IUpdateUserType.useCase";
-import {UpdateUserTypeUseCase} from "@user/useCases/updateUserType/updateUserType.useCase";
-import {IDeleteUserTypeUseCase} from "@user/useCases/deleteUserTypes/IDeleteUserType.useCase";
-import {DeleteUserTypeUseCase} from "@user/useCases/deleteUserTypes/deleteUserType.useCase";
+import {IFindUserTypesUseCase} from "@user/useCases/read/findUserTypes/IFindUserTypes.useCase";
+import {FindUserTypesUseCase} from "@user/useCases/read/findUserTypes/findUserTypes.useCase";
+import {IUpdateUserTypeUseCase} from "@user/useCases/update/updateUserType/IUpdateUserType.useCase";
+import {UpdateUserTypeUseCase} from "@user/useCases/update/updateUserType/updateUserType.useCase";
+import {IDeleteUserTypeUseCase} from "@user/useCases/delete/deleteUserTypes/IDeleteUserType.useCase";
+import {DeleteUserTypeUseCase} from "@user/useCases/delete/deleteUserTypes/deleteUserType.useCase";
 import {
     ICreateUserCredentialTypeUseCase
-} from "@user/useCases/createUserCredentialType/ICreateUserCredentialType.useCase";
+} from "@user/useCases/create/createUserCredentialType/ICreateUserCredentialType.useCase";
 import {
     CreateUserCredentialTypeUseCase
-} from "@user/useCases/createUserCredentialType/createUserCredentialType.useCase";
-import {IFindUserCredentialTypesUseCase} from "@user/useCases/findUserCredentialTypes/IFindUserCredentialTypes.useCase";
-import {FindUserCredentialTypesUseCase} from "@user/useCases/findUserCredentialTypes/findUserCredentialTypes.useCase";
+} from "@user/useCases/create/createUserCredentialType/createUserCredentialType.useCase";
+import {IFindUserCredentialTypesUseCase} from "@user/useCases/read/findUserCredentialTypes/IFindUserCredentialTypes.useCase";
+import {FindUserCredentialTypesUseCase} from "@user/useCases/read/findUserCredentialTypes/findUserCredentialTypes.useCase";
 import {
     UpdateUserCredentialTypeUseCase
-} from "@user/useCases/updateUserCredentialType/updateUserCredentialType.useCase";
+} from "@user/useCases/update/updateUserCredentialType/updateUserCredentialType.useCase";
 import {
     IUpdateUserCredentialTypeUseCase
-} from "@user/useCases/updateUserCredentialType/IUpdateUserCredentialType.useCase";
+} from "@user/useCases/update/updateUserCredentialType/IUpdateUserCredentialType.useCase";
 import {
     IDeleteUserCredentialTypesUseCase
-} from "@user/useCases/deleteUserCredentialTypes/IDeleteUserCredentialTypes.useCase";
+} from "@user/useCases/delete/deleteUserCredentialTypes/IDeleteUserCredentialTypes.useCase";
 import {
     DeleteUserCredentialTypesUseCase
-} from "@user/useCases/deleteUserCredentialTypes/deleteUserCredentialTypes.useCase";
+} from "@user/useCases/delete/deleteUserCredentialTypes/deleteUserCredentialTypes.useCase";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
 import {IUserCredentialTypeRepository} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
 import {UserCredentialTypeRepository} from "@user/infrastructure/repositories/userCredentialType.repository";
@@ -46,29 +46,29 @@ import {UserTypeBaseRepositoryType} from "@user/adapters/dtos/userType.dto";
 import {UserCredentialTypeBaseRepositoryType} from "@user/adapters/dtos/userCredentialType.dto";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
 import {UserCredentialService} from "@user/domain/services/userCredential.service";
-import {IUpdateUserCredentialUseCase} from "@user/useCases/updateUserCredential/IUpdateUserCredential.useCase";
-import {UpdateUserCredentialUseCase} from "@user/useCases/updateUserCredential/updateUserCredential.useCase";
+import {IUpdateUserCredentialUseCase} from "@user/useCases/update/updateUserCredential/IUpdateUserCredential.useCase";
+import {UpdateUserCredentialUseCase} from "@user/useCases/update/updateUserCredential/updateUserCredential.useCase";
 import {UserCredentialRepository} from "@user/infrastructure/repositories/userCredential.repository";
 import {UserCredentialModel} from "@user/infrastructure/models/userCredential.model";
 import {IUserCredentialRepository} from "@user/infrastructure/repositories/interface/IUserCredential.repository";
-import {CreateUserCredentialUseCase} from "@user/useCases/createUserCredential/createUserCredential.useCase";
-import {ICreateUserCredentialUseCase} from "@user/useCases/createUserCredential/ICreateUserCredential.useCase";
-import {ICreateUserUseCase} from "@user/useCases/createUser/ICreateUser.useCase";
-import {CreateUserUseCase} from "@user/useCases/createUser/createUser.useCase";
+import {CreateUserCredentialUseCase} from "@user/useCases/create/createUserCredential/createUserCredential.useCase";
+import {ICreateUserCredentialUseCase} from "@user/useCases/create/createUserCredential/ICreateUserCredential.useCase";
+import {ICreateUserUseCase} from "@user/useCases/create/createUser/ICreateUser.useCase";
+import {CreateUserUseCase} from "@user/useCases/create/createUser/createUser.useCase";
 import {UserModel} from "@user/infrastructure/models/user.model";
 import {UserRepository} from "@user/infrastructure/repositories/user.repository";
 import {IUserRepository} from "@user/infrastructure/repositories/interface/IUser.repository";
 import {UserBaseRepositoryType} from "@user/adapters/dtos/user.dto";
 import {IUserService} from "@user/domain/services/interface/IUser.service";
 import {UserService} from "@user/domain/services/user.service";
-import {DeleteUserCredentialUseCase} from "@user/useCases/deleteUserCredential/deleteUserCredential.useCase";
-import {IDeleteUserCredentialUseCase} from "@user/useCases/deleteUserCredential/IDeleteUserCredential.useCase";
-import {IFindUsersUseCase} from "@user/useCases/findUsers/IFindUsers.useCase";
-import {IUpdateUserUseCase} from "@user/useCases/updateUser/IUpdateUser.useCase";
-import {IDeleteUserUseCase} from "@user/useCases/deleteUser/IDeleteUser.useCase";
-import {FindUsersUseCase} from "@user/useCases/findUsers/findUsers.useCase";
-import {UpdateUserUseCase} from "@user/useCases/updateUser/updateUser.useCase";
-import {DeleteUserUseCase} from "@user/useCases/deleteUser/deleteUser.useCase";
+import {DeleteUserCredentialUseCase} from "@user/useCases/delete/deleteUserCredential/deleteUserCredential.useCase";
+import {IDeleteUserCredentialUseCase} from "@user/useCases/delete/deleteUserCredential/IDeleteUserCredential.useCase";
+import {IFindUsersUseCase} from "@user/useCases/read/findUsers/IFindUsers.useCase";
+import {IUpdateUserUseCase} from "@user/useCases/update/updateUser/IUpdateUser.useCase";
+import {IDeleteUserUseCase} from "@user/useCases/create/deleteUser/IDeleteUser.useCase";
+import {FindUsersUseCase} from "@user/useCases/read/findUsers/findUsers.useCase";
+import {UpdateUserUseCase} from "@user/useCases/update/updateUser/updateUser.useCase";
+import {DeleteUserUseCase} from "@user/useCases/create/deleteUser/deleteUser.useCase";
 
 //#region Services
 container.registerSingleton<IUserTypeService>("IUserTypeService", UserTypeService);
