@@ -17,3 +17,8 @@ export const phoneServiceUrl = {
     getPhoneType: "/admin/phone/phoneType/findAll",
     getPhoneCode: "/admin/phone/phoneCode/findAll",
 }
+
+export const adminServiceUrl = {
+    getAllEntitiesNames: "/metadata/getAllEntitiesNames",
+    getModelAttributes: "/metadata/getAttribute",
+}

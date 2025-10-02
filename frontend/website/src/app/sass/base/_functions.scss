@@ -1,0 +1,5 @@
+@use "variables" as *;
+
+@function color($key) {
+  @return map-get($normal-colors, $key);
+}

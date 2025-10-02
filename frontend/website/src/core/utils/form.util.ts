@@ -1,6 +1,7 @@
 import {NullFieldError, ValidationError} from "../errors/generic.error.ts";
 import {errorMessage} from "../constants/messages/error.message.ts";
 import {t} from "../constants/messages/translations.ts";
+import {TableEnum} from "../enums/table.enum.ts";
 
 export class FormUtil {
     public getFormValue(formData: FormData, key: string): string {
@@ -25,6 +26,21 @@ export class FormUtil {
 
     public getOptionalValue(formData: FormData, key: string): string | undefined {
         return formData.get(key)?.toString();
+    }
+
+    public dbTypeToInputType(dbType: string, dbColumn?: string): string {
+        const key = dbType.toUpperCase() as keyof typeof TableEnum;
+
+        if (key === "STRING") {
+            if (dbColumn?.toLowerCase().includes("email")) {
+                return "email";
+            }
+            if (dbColumn?.toLowerCase().includes("password")) {
+                return "password";
+            }
+        }
+
+        return TableEnum[key] ?? "text";
     }
 }
 

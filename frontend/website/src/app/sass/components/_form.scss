@@ -1,0 +1,72 @@
+@use '../base/functions';
+
+// Form base
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+form input, form select {
+  padding: 0.5em 1em;
+  background-color: transparent;
+  border: none;
+}
+
+form input, form select {
+  border-bottom: 2px solid functions.color(tertiary);
+}
+
+form input:focus {
+  outline: none !important;
+}
+
+form select option {
+  text-align: left;
+  border: none;
+}
+
+// form-area
+div.form-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+//Div Label / Input
+div.input-field, div.input-field-error {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: transparent;
+  transition: color 0.3s ease;
+  padding: 0.5em 0;
+}
+
+label.filled {
+  color: functions.color(tertiary);
+}
+
+input::placeholder {
+  color: functions.color(normal);
+  transition: color 0.3s ease;
+}
+
+input::placeholder:focus-within label {
+  color: #5FCDD9;
+}
+
+div.input-field-error {
+  border-bottom: 1px solid functions.color(error-color);
+}
+
+//label.filled {
+//  color: functions.color(right-color);;
+//}

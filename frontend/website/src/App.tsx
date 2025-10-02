@@ -1,7 +1,7 @@
 import {BrowserRouter, Routes} from "react-router-dom";
 
 // Styles
-import './app/sass/main.sass'
+import './app/sass/main.scss'
 
 // Contexts
 

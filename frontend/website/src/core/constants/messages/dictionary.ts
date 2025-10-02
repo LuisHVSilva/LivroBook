@@ -1,4 +1,4 @@
-import {LanguageEnum} from "../../api/enums/language.enum.ts";
+import {LanguageEnum} from "../../enums/language.enum.ts";
 
 class Dictionary {
     public getDictionary(language?: LanguageEnum): Record<string, string> {
@@ -37,6 +37,7 @@ const portugueseDictionary = (): Record<string, string> => {
         //#endregion
 
         //#region AppError
+        "appError.api.get": "Erro ao buscar os dados.",
         "appError.auth.loginError": "Usuário ou senha inválido.",
         "appError.auth.sessionExpired": "Sessão expirada, faça login novamente.",
         //#endregion

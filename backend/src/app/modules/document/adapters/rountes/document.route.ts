@@ -12,30 +12,30 @@ const documentTypeController = makeDocumentTypeController()
 const router = Router();
 
 router.post(
-    "/create",
+    "/documentType/create",
     isAbelToAccessMiddleware(),
     validateRequest(CreateDocumentTypeSchema),
     asyncHandler((req, res) => documentTypeController.createDocumentType(req, res))
 );
 
 router.get(
-    "/findAll",
+    "/documentType/findAll",
     isAbelToAccessMiddleware(),
     validateRequest(FindDocumentTypesSchema, 'query'),
     asyncHandler((req, res) => documentTypeController.findDocumentTypes(req, res))
 )
 
 router.patch(
-    "/update",
+    "/documentType/update",
     isAbelToAccessMiddleware(),
     validateRequest(UpdateDocumentTypeSchema),
     asyncHandler((req, res) => documentTypeController.updateDocumentType(req, res))
 )
 
 router.delete(
-    "/delete",
+    "/documentType/delete",
     isAbelToAccessMiddleware(),
     validateRequest(deleteDocumentTypesSchema, 'query'),
     asyncHandler((req, res) => documentTypeController.deleteDocumentTypes(req, res))
 )
-export {router as documentTypeRouter};
+export {router as document};

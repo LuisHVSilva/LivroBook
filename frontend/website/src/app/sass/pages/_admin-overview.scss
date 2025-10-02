@@ -1,0 +1,81 @@
+@use '../base/functions';
+
+//------------------------ admin ------------------------------
+#admin-overview {
+  display: grid;
+  grid-template-columns: 25% 70%;
+  gap: 5%;
+  height: 100%;
+  overflow: hidden;
+}
+
+//------------------------ admin-menu -------------------------
+#admin-menu {
+  border-right: 2px solid functions.color(secondary);
+  overflow-y: auto;
+}
+
+#admin-menu .h1 {
+  text-align: start;
+  padding-left: 0;
+}
+
+.admin-menu-option.h3, .admin-menu-item p, .admin-menu-item ul li {
+  cursor: pointer;
+
+}
+
+.admin-menu-item p {
+  margin-left: 2%;
+}
+
+.admin-menu-option.h3:hover, .admin-menu-item p:hover, .admin-menu-item ul li:hover {
+  color: functions.color(primary)
+}
+
+.admin-menu-item ul, .close {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin: 0;
+  padding-left: 16px;
+  list-style-type: none;
+}
+
+ul.open, .open {
+  max-height: 500px;
+}
+
+//------------------------ admin-content -------------------------
+#admin-content table {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#admin-content table td, #admin-content table th {
+  border: 1px solid #ddd;
+  padding: 0.3em;
+}
+
+#admin-content table tbody tr:nth-child(odd) {
+  background-color: functions.color(white);
+}
+
+#admin-content table tbody tr:nth-child(even) {
+  background-color: functions.color(disabled); /* Listras alternadas */
+}
+
+//#admin-content table thead {
+//  background-color: white;
+//}
+//
+//#admin-content table tr {
+//  background-color: functions.color(background);
+//}
+//
+#admin-content table tbody tr:hover {
+  background-color: functions.color(primary);
+  cursor: pointer;
+  color: white
+}

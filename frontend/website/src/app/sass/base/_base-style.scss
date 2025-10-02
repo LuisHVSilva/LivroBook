@@ -1,0 +1,120 @@
+@use 'functions';
+
+//------------------------ Geral -------------------------
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: functions.color(background);
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 2em);
+}
+
+body:has(section#main-layout) {
+  padding: 0;
+  display: block;
+  //display: grid;
+  //grid-template-columns: 100%;
+  //grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+//------------------------ Root ----------------------
+
+#root{
+  height: 100%;
+  margin: 0;
+}
+
+#root:has(section#main-layout) {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+//------------------------ Text ----------------------
+p, a{
+  font-family: "Georgia", "Times New Roman", Times, serif;
+  line-height: 1.6;
+  font-size: 1em;
+  text-decoration: none;
+}
+
+a {
+  color: functions.color(secondary);
+  font-weight: bold;
+}
+
+a:hover {
+  color: functions.color(tertiary);
+}
+
+p.h1, p.h2 {
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0.5em;
+  color: functions.color(primary);
+}
+
+//------------------------ Base Tags ----------------------
+
+button {
+  padding: 0.5em;
+  border-radius: 50px;
+  border: none;
+  background-color: functions.color(secondary);
+  font-weight: bold;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  background-color: functions.color(disabled);
+  opacity: 0.4;
+  color: white;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: functions.color(tertiary);
+  color: white;
+}
+
+//------------------------ Reusable classes ----------------------
+
+.text-center {
+  //text-align: center;
+}
+
+.field-not-informed {
+  color: rgba(1, 1, 1, 0.5);
+}
+
+.field-right {
+  color: functions.color(right-font);
+}
+
+.field-wrong {
+  color: functions.color(wrong-font);
+}
+
+.div-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  display: flex !important;
+}

@@ -3,8 +3,9 @@ import {AbstractDataType, ModelAttributeColumnOptions} from "sequelize";
 import {SimplifiedMetadataAttribute} from "@coreShared/types/metadata.type";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {NotFoundError} from "@coreShared/errors/domain.error";
-import {EntitiesNamesEnum} from "@coreShared/enums/entitiesNamesEnum";
+import {EntitiesList, EntitiesNamesEnum} from "@coreShared/enums/entitiesNamesEnum";
 import {RepositoryFactory} from "@modules/metadata/adapters/factories/repositories.factory";
+import {GetAllEntitiesNamesDTO} from "@modules/metadata/adapters/dtos/metadata.dto";
 
 export class MetadataService implements IMetadataService {
     async getModelAttributes(modelName: EntitiesNamesEnum): Promise<SimplifiedMetadataAttribute[]> {
@@ -30,8 +31,8 @@ export class MetadataService implements IMetadataService {
         });
     }
 
-    public getAllEntitiesNames(): EntitiesNamesEnum[] {
-        return Object.values(EntitiesNamesEnum);
+    public getAllEntitiesNames(): GetAllEntitiesNamesDTO {
+        return EntitiesList;
     }
 
     private getColumnType(column: ModelAttributeColumnOptions): string {

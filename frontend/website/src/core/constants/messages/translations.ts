@@ -1,5 +1,5 @@
 import {dictionary} from "./dictionary.ts";
-import {LanguageEnum} from "../../api/enums/language.enum.ts";
+import {LanguageEnum} from "../../enums/language.enum.ts";
 
 export function t(key: string, params?: Record<string, string>, language?: LanguageEnum): string {
     const translations: Record<string, string> = dictionary.getDictionary(language);

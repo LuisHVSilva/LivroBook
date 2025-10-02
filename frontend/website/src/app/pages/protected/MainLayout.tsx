@@ -11,11 +11,9 @@ export default function MainLayout() {
                     <Navbar/>
                 </header>
 
-                <div className="content-wrapper">
-                    <main>
-                        <Outlet/> {/* Aqui vai renderizar a página específica */}
-                    </main>
-                </div>
+                <main id="main-content">
+                    <Outlet/>
+                </main>
             </section>
         </>
     );

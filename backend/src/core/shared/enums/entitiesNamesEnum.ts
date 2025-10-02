@@ -1,3 +1,5 @@
+import {EntityMap} from "@modules/metadata/adapters/dtos/metadata.dto";
+
 export enum EntitiesNamesEnum {
     DocumentType = "documentType",
     City = "city",
@@ -8,7 +10,58 @@ export enum EntitiesNamesEnum {
     PhoneType = "phoneType",
     Status = "status",
     User = "user",
-    UserCredential = "UserCredential",
-    UserCredentialType = "UserCredentialType",
-    UserType = "UserType"
+    UserCredential = "userCredential",
+    UserCredentialType = "userCredentialType",
+    UserType = "userType",
 }
+
+export const EntitiesList: Record<string, EntityMap> = {
+    Documento: {
+        tipo_documento: EntitiesNamesEnum.DocumentType,
+    },
+    Localidade: {
+        cidade: EntitiesNamesEnum.City,
+        estado: EntitiesNamesEnum.State,
+        pais: EntitiesNamesEnum.Country,
+    },
+    Telefone: {
+        telefone: EntitiesNamesEnum.Phone,
+        ddd: EntitiesNamesEnum.PhoneCode,
+        tipo_telefone: EntitiesNamesEnum.PhoneType,
+    },
+    Sistema: {
+        status: EntitiesNamesEnum.Status,
+    },
+    Usuario: {
+        usuario: EntitiesNamesEnum.User,
+        credencial_usuario: EntitiesNamesEnum.UserCredential,
+        tipo_credencial_usuario: EntitiesNamesEnum.UserCredentialType,
+        tipo_usuario: EntitiesNamesEnum.UserType,
+    },
+};
+
+
+// export const EntitiesList = {
+//     Document: [
+//         EntitiesNamesEnum.DocumentType,
+//     ],
+//     Localidade: [
+//         EntitiesNamesEnum.City,
+//         EntitiesNamesEnum.State,
+//         EntitiesNamesEnum.Country,
+//     ],
+//     Telefone: [
+//         EntitiesNamesEnum.Phone,
+//         EntitiesNamesEnum.PhoneCode,
+//         EntitiesNamesEnum.PhoneType,
+//     ],
+//     Sistema: [
+//         EntitiesNamesEnum.Status,
+//     ],
+//     Usuario: [
+//         EntitiesNamesEnum.User,
+//         EntitiesNamesEnum.UserCredential,
+//         EntitiesNamesEnum.UserCredentialType,
+//         EntitiesNamesEnum.UserType,
+//     ],
+// };

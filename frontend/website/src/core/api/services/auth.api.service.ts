@@ -7,7 +7,7 @@ import type {
     RegisterAuthRequest,
     UserLocalStorageData
 } from "../types/auth.type.ts";
-import {NotFoundError, ServiceError} from "../../errors/generic.error.ts";
+import {ServiceError} from "../../errors/generic.error.ts";
 import {errorMessage} from "../../constants/messages/error.message.ts";
 import {t} from "../../constants/messages/translations.ts";
 import {jwtDecode} from "jwt-decode";
@@ -24,7 +24,7 @@ class AuthApiService {
             throw new ServiceError(t(errorMessage.appError.auth.loginError));
         }
 
-        const userData: LoginResponse = data.data;
+        const userData: LoginResponse = data.result;
         const userSafeData = {name: userData.user.name, email: userData.user.email}
 
         localStorage.setItem(this.TOKEN_KEY, userData.token);
@@ -51,13 +51,8 @@ class AuthApiService {
         return null;
     }
 
-    getTokenKey(): string {
-        const token: string | null = localStorage.getItem(this.TOKEN_KEY);
-        if (!token) {
-            throw new NotFoundError(t(errorMessage.notFoundError.userTokenValue));
-        }
-
-        return token;
+    getTokenKey(): string | null{
+        return localStorage.getItem(this.TOKEN_KEY);
     }
 
     getUserTypeFromToken(): number | null {

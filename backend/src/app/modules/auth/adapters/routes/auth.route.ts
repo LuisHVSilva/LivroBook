@@ -9,7 +9,7 @@ const authController: IAuthController = makeAuthController()
 const router = Router();
 
 router.post(
-    "/login",
+    "/auth/login",
     validateRequest(LoginSchema),
     asyncHandler((req, res) => authController.login(req, res))
 );

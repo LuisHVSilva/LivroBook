@@ -8,8 +8,8 @@ import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {UseCaseError} from "@coreShared/errors/useCase.error";
 
 export class ApiResponseUtil {
-    static success<T>(res: Response, data: T, status: number = StatusCodes.OK): Response {
-        return res.status(status).json({success: true, data});
+    static success<T>(res: Response, result: T, status: number = StatusCodes.OK): Response {
+        return res.status(status).json({success: true, result});
     }
 
     static notChanged(res: Response, status: number = StatusCodes.NO_CONTENT): Response {

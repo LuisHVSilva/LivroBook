@@ -16,6 +16,9 @@ export const errorMessage = {
         required: "nullFieldError.required",
     },
     appError: {
+        api: {
+            get: 'appError.api.get',
+        },
         auth: {
             loginError: 'appError.auth.loginError',
             sessionExpired: 'appError.auth.sessionExpired',
