@@ -1,11 +1,4 @@
-import {Request, Response} from "express";
+import {IControllerBase} from "@coreShared/base/interfaces/IControllerBase";
 
-export interface IDocumentTypeController {
-    createDocumentType(req: Request, res: Response): Promise<Response>;
-
-    findDocumentTypes(req: Request, res: Response): Promise<Response>;
-
-    updateDocumentType(req: Request, res: Response): Promise<Response>;
-
-    deleteDocumentTypes(req: Request, res: Response): Promise<Response>;
+export interface IDocumentTypeController extends IControllerBase{
 }

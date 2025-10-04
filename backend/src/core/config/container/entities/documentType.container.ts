@@ -18,6 +18,8 @@ import {DeleteDocumentTypesUseCase} from "@document/useCases/delete/deleteDocume
 import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
 import {ModelStatic} from "sequelize";
 import {DocumentTypeBaseRepositoryType} from "@document/adapters/dto/documentType.dto";
+import {IFindDocumentTypeByIdUseCase} from "@document/useCases/read/findDocumentTypeById/IFindDocumentTypeById.useCase";
+import {FindDocumentTypeByIdUseCase} from "@document/useCases/read/findDocumentTypeById/findDocumentTypeById.useCase";
 
 //#region Services
 container.registerSingleton<IDocumentTypeService>("IDocumentTypeService", DocumentTypeService);
@@ -25,6 +27,7 @@ container.registerSingleton<IDocumentTypeService>("IDocumentTypeService", Docume
 
 //#region UseCases
 container.registerSingleton<ICreateDocumentTypeUseCase>("ICreateDocumentTypeUseCase", CreateDocumentTypeUseCase);
+container.registerSingleton<IFindDocumentTypeByIdUseCase>("IFindDocumentTypeByIdUseCase", FindDocumentTypeByIdUseCase);
 container.registerSingleton<IFindDocumentTypesUseCase>("IFindDocumentTypesUseCase", FindDocumentTypesUseCase);
 container.registerSingleton<IUpdateDocumentTypeUseCase>("IUpdateDocumentTypeUseCase", UpdateDocumentTypeUseCase);
 container.registerSingleton<IDeleteDocumentTypesUseCase>("IDeleteDocumentTypesUseCase", DeleteDocumentTypesUseCase);

@@ -15,27 +15,33 @@ router.post(
     "/documentType/create",
     isAbelToAccessMiddleware(),
     validateRequest(CreateDocumentTypeSchema),
-    asyncHandler((req, res) => documentTypeController.createDocumentType(req, res))
+    asyncHandler((req, res) => documentTypeController.create(req, res))
 );
+
+router.get(
+    "/documentType/findById/:id",
+    isAbelToAccessMiddleware(),
+    asyncHandler((req, res) => documentTypeController.findById(req, res))
+)
 
 router.get(
     "/documentType/findAll",
     isAbelToAccessMiddleware(),
     validateRequest(FindDocumentTypesSchema, 'query'),
-    asyncHandler((req, res) => documentTypeController.findDocumentTypes(req, res))
+    asyncHandler((req, res) => documentTypeController.findAll(req, res))
 )
 
 router.patch(
     "/documentType/update",
     isAbelToAccessMiddleware(),
     validateRequest(UpdateDocumentTypeSchema),
-    asyncHandler((req, res) => documentTypeController.updateDocumentType(req, res))
+    asyncHandler((req, res) => documentTypeController.update(req, res))
 )
 
 router.delete(
     "/documentType/delete",
     isAbelToAccessMiddleware(),
     validateRequest(deleteDocumentTypesSchema, 'query'),
-    asyncHandler((req, res) => documentTypeController.deleteDocumentTypes(req, res))
+    asyncHandler((req, res) => documentTypeController.delete(req, res))
 )
 export {router as document};

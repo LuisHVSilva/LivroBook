@@ -9,3 +9,7 @@ export type DeleteResponseDTO = {
         notFound: number[];
     };
 };
+
+export type FindByIdRequestDTO = {
+    id: string;
+}

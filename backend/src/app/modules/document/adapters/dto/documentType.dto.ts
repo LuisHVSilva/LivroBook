@@ -1,14 +1,10 @@
 // ---------- BASE ----------
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {DocumentTypeModel} from "@document/infrastructure/models/documentType.model";
-import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
+import {DocumentTypeProps} from "@document/domain/entities/documentType.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
-export type DocumentTypeDTO = {
-    id?: number;
-    description: string;
-    countryId: number;
-    statusId: number;
-};
+export type DocumentTypeDTO = DocumentTypeProps;
 
 //---------- FILTER ---------
 export type DocumentTypeFilterDTO = {
@@ -32,6 +28,8 @@ export type UpdateDocumentTypeDTO = Partial<Omit<DocumentTypeDTO, "id">> & { id:
 export type UpdateDocumentTypeResponseDTO = DocumentTypeDTO;
 
 // ---------- FIND ----------
+export type FindByIdDocumentTypeResponseDTO = DocumentTypeDTO;
+
 export type FindDocumentTypesRawDTO = {
     id?: string;
     description?: string;
@@ -59,7 +57,20 @@ export type DocumentTypeDtoBaseType = DtoBaseType<
 // ------ BASE REPOSITORY TYPE -------
 export type DocumentTypeBaseRepositoryType = BaseRepositoryType<
     DocumentTypeModel,
-    DocumentTypeEntity,
+    DocumentTypeProps,
     DocumentTypeFilterDTO,
     DocumentTypePersistenceDTO
 >;
+
+// ------ BASE CONTROLLER TYPE -------
+export type DocumentTypeAbstractControllerBaseType = AbstractControllerBaseType<
+    DocumentTypeProps,
+    CreateDocumentTypeDTO,
+    CreateDocumentTypeResponseDTO,
+    FindByIdDocumentTypeResponseDTO,
+    FindDocumentTypesRawDTO,
+    FindDocumentTypesResponseDTO,
+    UpdateDocumentTypeDTO,
+    UpdateDocumentTypeResponseDTO
+>
+
