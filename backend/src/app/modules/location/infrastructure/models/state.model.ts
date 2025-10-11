@@ -40,10 +40,10 @@ class StateModel extends Model<InferAttributes<StateModel>, InferCreationAttribu
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: 'status'})
     status?: StatusModel;
 
-    @BelongsTo(() => CountryModel)
+    @BelongsTo(() => CountryModel, {as: 'country'})
     country?: CountryModel;
 
     @CreatedAt

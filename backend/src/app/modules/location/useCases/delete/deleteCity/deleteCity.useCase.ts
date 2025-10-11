@@ -1,6 +1,5 @@
 import {inject, injectable} from "tsyringe";
 import {Transaction} from "sequelize";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -12,15 +11,17 @@ import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dt
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {IDeleteCityUseCase} from "@location/useCases/delete/deleteCity/IDeleteCity.useCase";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class DeleteCityUseCase implements IDeleteCityUseCase {
     constructor(
-        @inject("ICityService") private readonly service: ICityService,
+        @inject("ICityService")
+        private readonly service: ICityService,
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {
@@ -33,9 +34,7 @@ export class DeleteCityUseCase implements IDeleteCityUseCase {
 
             const report: DeleteReport = await this.service.deleteMany(ids, transaction!);
 
-            return ResultType.success({
-                report
-            });
+            return ResultType.success({report});
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

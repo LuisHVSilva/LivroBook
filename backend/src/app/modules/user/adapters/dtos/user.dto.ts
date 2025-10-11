@@ -1,30 +1,69 @@
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {UserModel} from "@user/infrastructure/models/user.model";
 import {UserEntity, UserProps} from "@user/domain/entities/user.entity";
-import {CreateUserCredentialRequestDTO} from "@user/adapters/dtos/userCredential.dto";
 import {CreatePhoneDTO} from "@phone/adapters/dtos/phone.dto";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
 // ---------- BASE ------------
 export type UserDTO = UserProps;
 
 // --------- FILTER -----------
 export type UserFilterDTO = {
-    id?: number[],
-    name?: string[];
-    email?: string[];
-    document?: string[];
-    birthday?: Date[];
-    userTypeId?: number[];
-    cityId?: number[];
-    userCredentialId?: number[];
-    documentTypeId?: number[];
-    phoneId?: number[];
-    statusId?: number[];
+    id?: number | number[],
+    name?: string | string[];
+    email?: string | string[];
+    document?: string | string[];
+    birthday?: Date | Date[];
+    isTwoFactorEnable?: boolean | boolean[];
+    isEmailVerified?: boolean | boolean[];
+    userType?: string | string[];
+    city?: string | string[];
+    documentType?: string | string[];
+    phone?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE --------
 export type UserPersistenceDTO = Omit<UserDTO, "id">;
 
+// ---------- CREATE ----------
+export type CreateUserDTO = Omit<UserDTO, 'isTwoFactorEnable' | 'isEmailVerified' | 'status'>;
+export type CreateUserRequestDTO =
+    Pick<UserDTO, "name" | "email" | "document" | "birthday" | "city" | "documentType">
+    & {
+    userCredential: string;
+    phone?: CreatePhoneDTO,
+};
+export type CreateUserResponseDTO = UserDTO;
+
+// ---------- UPDATE ----------
+export type UpdateUserDTO = Partial<Omit<UserDTO, "id">> & { id: number };
+export type UpdateUserResponseDTO = UserDTO;
+
+// ---------- FIND ------------
+export type FindByIdUserResponseDTO = UserDTO;
+export type FindUsersRawDTO = {
+    id?: string;
+    name?: string;
+    email?: string;
+    document?: string;
+    birthday?: string;
+    isTwoFactorEnable: string;
+    isEmailVerified: string;
+    userType?: string;
+    city?: string;
+    documentType?: string;
+    phone?: string;
+    status?: string;
+    page?: string;
+    limit?: string;
+};
+export type FindUsersResponseDTO = {
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    data: UserDTO[];
+};
 
 // ------ DTO BASE TYPE -------
 export type UserDtoBaseType = DtoBaseType<
@@ -36,47 +75,31 @@ export type UserDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface UserNormalizedRelations {
+    userTypeId: number;
+    cityId?: number;
+    documentTypeId?: number;
+    phoneId?: number;
+    statusId: number;
+}
+
 export type UserBaseRepositoryType = BaseRepositoryType<
     UserModel,
     UserEntity,
     UserFilterDTO,
-    UserPersistenceDTO
+    UserPersistenceDTO,
+    UserNormalizedRelations
 >;
 
-// ---------- CREATE ----------
-export type CreateUserDTO = Pick<UserDTO, "name" | "email" | "document" | "birthday" | "userTypeId" | "cityId" | "userCredentialId" | "documentTypeId" | "phoneId">;
-export type CreateUserRequestDTO =
-    Pick<UserDTO, "name" | "email" | "document" | "birthday" | "cityId" | "documentTypeId">
-    & {
-    userCredential: CreateUserCredentialRequestDTO,
-    phone?: CreatePhoneDTO,
-};
-export type CreateUserResponseDTO = UserDTO;
-
-// ---------- UPDATE ----------
-export type UpdateUserDTO = Partial<Omit<UserDTO, "id">> & { id: number };
-export type UpdateUserResponseDTO = UserDTO;
-
-// ---------- FIND ------------
-export type FindUsersRawDTO = {
-    id?: string;
-    name?: string;
-    email?: string;
-    document?: string;
-    birthday?: string;
-    userTypeId?: string;
-    cityId?: string;
-    userCredentialId?: string;
-    documentTypeId?: string;
-    phoneId?: string;
-    statusId?: string;
-    page?: string;
-    limit?: string;
-};
-export type FindUsersResponseDTO = {
-    page?: number;
-    limit?: number;
-    totalPages?: number;
-    data: UserDTO[];
-};
+// ------ BASE CONTROLLER TYPE -------
+export type UserAbstractControllerBaseType = AbstractControllerBaseType<
+    UserDTO,
+    CreateUserRequestDTO,
+    CreateUserResponseDTO,
+    FindByIdUserResponseDTO,
+    FindUsersRawDTO,
+    FindUsersResponseDTO,
+    UpdateUserDTO,
+    UpdateUserResponseDTO
+>
 

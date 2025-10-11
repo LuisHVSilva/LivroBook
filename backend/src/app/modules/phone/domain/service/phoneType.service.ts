@@ -12,21 +12,25 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
 import {PhoneTypeBaseRepositoryType, PhoneTypeDtoBaseType} from "@phone/adapters/dtos/phoneType.dto";
-import {CityDtoBaseType} from "@location/adapters/dtos/city.dto";
+import {StringUtil} from "@coreShared/utils/string.util";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 @injectable()
 export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTypeEntity> implements IPhoneTypeService {
     //#region PROPERTIES
     private readonly uniquenessValidator: EntityUniquenessValidator<PhoneTypeBaseRepositoryType>;
-    private readonly PHONE_TYPE: string = PhoneTypeEntity.ENTITY_NAME;
     //#endregion
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("IPhoneTypeRepository") protected readonly repo: IPhoneTypeRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("PhoneTypeRepository") private readonly phoneTypeRepository: IRepositoryBase<PhoneTypeBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
+        @inject("IPhoneTypeRepository")
+        protected readonly repo: IPhoneTypeRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("PhoneTypeRepository")
+        private readonly phoneTypeRepository: IRepositoryBase<PhoneTypeBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
     ) {
         super(repo, PhoneTypeEntity, statusService);
         this.uniquenessValidator = this.validatorFactory(this.phoneTypeRepository);
@@ -35,38 +39,33 @@ export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTyp
     //#endregion
 
     @LogError()
-    protected async createEntity(data: PhoneTypeDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneTypeEntity> {
+    protected async createEntity(data: PhoneTypeDtoBaseType["CreateDTO"], status: string): Promise<PhoneTypeEntity> {
         return PhoneTypeEntity.create({
             description: data.description,
-            statusId
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: PhoneTypeEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: PhoneTypeEntity, previousEntity?: PhoneTypeEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) {
-            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.PHONE_TYPE, "description"));
+            throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(PhoneTypeEntity.name, "description"));
         }
     }
 
     @LogError()
     protected filterTransform(input: PhoneTypeDtoBaseType['FilterDTO']): PhoneTypeDtoBaseType['FilterDTO'] {
-        const transformedFilter: CityDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                PhoneTypeTransformer.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: PhoneTypeTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<PhoneTypeDtoBaseType["DTO"]>): Promise<void> {
-        await this.validateStatusExistence(data.statusId)
+        await this.validateStatusExistence(data.status)
     }
 
 }

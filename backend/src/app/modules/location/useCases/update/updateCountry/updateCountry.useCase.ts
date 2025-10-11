@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -9,6 +8,7 @@ import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateCountryUseCase} from "@location/useCases/update/updateCountry/IUpdateCountry.UseCase";
 import {UpdateCountryDTO, UpdateCountryResponseDTO} from "@location/adapters/dtos/country.dto";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdateCountryUseCase implements IUpdateCountryUseCase {
@@ -17,7 +17,7 @@ export class UpdateCountryUseCase implements IUpdateCountryUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: UpdateCountryDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateCountryResponseDTO>>> {
         if (!transaction) {

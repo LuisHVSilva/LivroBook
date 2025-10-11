@@ -33,7 +33,7 @@ class CountryModel extends Model<InferAttributes<CountryModel>, InferCreationAtt
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, { as: 'status' })
     status?: StatusModel;
 
     @CreatedAt

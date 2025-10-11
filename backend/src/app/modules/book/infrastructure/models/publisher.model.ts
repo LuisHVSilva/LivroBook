@@ -35,7 +35,7 @@ class PublisherModel extends Model<InferAttributes<PublisherModel>, InferCreatio
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

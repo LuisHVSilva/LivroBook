@@ -1,41 +1,56 @@
-import { Op, WhereOptions } from 'sequelize';
+import { WhereOptions, Op } from "sequelize";
 
-interface FieldConfig {
-    in?: boolean;
-    like?: boolean;
-}
+export type FilterMode = 'exact' | 'partial';
+type AssociationMap<T> = Partial<Record<keyof T, string>>;
 
-type Config<T> = Partial<Record<keyof T, FieldConfig>>;
 
-export class SequelizeWhereBuilderUtil<T extends Record<string, any>> {
-    private readonly filters?: Partial<T>;
-    private readonly config: Config<T>;
+export class SequelizeWhereBuilderUtil<TFilter> {
+    private readonly filters?: TFilter;
+    private readonly config?: Partial<Record<keyof TFilter, { in?: boolean; like?: boolean }>>;
+    private readonly mode: FilterMode;
 
-    constructor(filters?: Partial<T>, config?: Config<T>) {
+    constructor(
+        filters?: TFilter,
+        config?: Partial<Record<keyof TFilter, { in?: boolean; like?: boolean }>>,
+        mode: FilterMode = 'partial'
+    ) {
         this.filters = filters;
-        this.config = config ?? {};
+        this.config = config;
+        this.mode = mode;
     }
 
-    public build(): WhereOptions {
+    build(associationMap?: AssociationMap<TFilter>): WhereOptions {
         const where: WhereOptions = {};
-
         if (!this.filters) return where;
 
-        for (const key in this.filters) {
-            const value = this.filters[key];
-            if (value == null) continue;
+        Object.entries(this.filters).forEach(([key, rawValue]) => {
+            if (rawValue === undefined || rawValue === null) return;
 
-            const fieldCfg = this.config[key as keyof T] ?? {};
+            const fieldConfig = this.config?.[key as keyof TFilter];
+            const value = Array.isArray(rawValue) ? rawValue : [rawValue];
 
-            if (Array.isArray(value) && fieldCfg.in) {
-                where[key] = { [Op.in]: value };
-            } else if (typeof value === 'string' && fieldCfg.like) {
-                where[key] = { [Op.iLike]: `%${value}%` };
-            } else {
-                where[key] = value;
+            // Verifica se o campo é de associação
+            const fieldKey = associationMap?.[key as keyof TFilter]
+                ? `$${associationMap[key as keyof TFilter]}$`
+                : key;
+
+            // Modo exato
+            if (this.mode === 'exact') {
+                where[fieldKey] = Array.isArray(rawValue) ? { [Op.in]: rawValue } : rawValue;
+                return;
             }
-        }
+
+            // Modo parcial
+            if (fieldConfig?.in || Array.isArray(rawValue)) {
+                where[fieldKey] = { [Op.in]: value };
+            } else if (fieldConfig?.like && typeof rawValue === 'string') {
+                where[fieldKey] = { [Op.iLike]: `%${rawValue}%` };
+            } else {
+                where[fieldKey] = rawValue;
+            }
+        });
 
         return where;
     }
+
 }

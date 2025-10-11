@@ -1,21 +1,16 @@
 // ---------- BASE ----------
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
-import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
+import {PhoneTypeEntity, PhoneTypeProps} from "@phone/domain/entities/phoneType.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
-export type PhoneTypeDTO = {
-    id?: number;
-    description: string;
-    statusId: number;
-};
+export type PhoneTypeDTO = PhoneTypeProps;
 
 // --------- FILTER ---------
 export type PhoneTypeFilterDTO = {
     id?: number[];
-    description?: string[];
-    statusId?: number[];
-    page?: number;
-    limit?: number;
+    description?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE ------
@@ -30,10 +25,11 @@ export type UpdatePhoneTypeDTO = Partial<Omit<PhoneTypeDTO, "id">> & { id: numbe
 export type UpdatePhoneTypeResponseDTO = PhoneTypeDTO;
 
 // ---------- FIND ----------
+export type FindByIdPhoneTypeResponseDTO = PhoneTypeProps;
 export type FindPhoneTypesRawDTO = {
     id?: string;
     description?: string;
-    statusId?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
@@ -54,9 +50,26 @@ export type PhoneTypeDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface PhoneTypeNormalizedRelations {
+    statusId: number;
+}
+
 export type PhoneTypeBaseRepositoryType = BaseRepositoryType<
     PhoneTypeModel,
     PhoneTypeEntity,
     PhoneTypeFilterDTO,
-    PhoneTypePersistenceDTO
+    PhoneTypePersistenceDTO,
+    PhoneTypeNormalizedRelations
 >;
+
+// ------ BASE CONTROLLER TYPE -------
+export type PhoneTypeAbstractControllerBaseType = AbstractControllerBaseType<
+    PhoneTypeDTO,
+    CreatePhoneTypeDTO,
+    CreatePhoneTypeResponseDTO,
+    FindByIdPhoneTypeResponseDTO,
+    FindPhoneTypesRawDTO,
+    FindPhoneTypesResponseDTO,
+    UpdatePhoneTypeDTO,
+    UpdatePhoneTypeResponseDTO
+>

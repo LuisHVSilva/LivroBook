@@ -1,30 +1,24 @@
 // ---------- BASE ----------
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {CityModel} from "@location/infrastructure/models/city.model";
-import {CityEntity} from "@location/domain/entities/city.entity";
+import {CityEntity, CityProps} from "@location/domain/entities/city.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
-export type CityDTO = {
-    id?: number;
-    description: string;
-    stateId: number;
-    statusId: number
-}
+export type CityDTO = CityProps;
 
 // --------- FILTER ---------
 export type CityFilterDTO = {
-    id?: number[];
-    description?: string[];
-    stateId?: number[];
-    statusId?: number[];
-    page?: number;
-    limit?: number;
+    id?: number | number[];
+    description?: string | string[];
+    state?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE ------
 export type CityPersistenceDTO = Omit<CityDTO, "id">;
 
 // ---------- CREATE ----------
-export type CreateCityDTO = Pick<CityDTO, "description" | "stateId">;
+export type CreateCityDTO = Pick<CityDTO, "description" | "state">;
 export type CreateCityResponseDTO = CityDTO;
 
 // ---------- UPDATE ----------
@@ -32,11 +26,13 @@ export type UpdateCityDTO = Partial<Omit<CreateCityDTO, "id">> & { id: number };
 export type UpdateCityResponseDTO = CreateCityDTO;
 
 // ---------- FIND ----------
+export type FindByIdCityResponseDto = CityDTO;
+
 export type FindCitiesRawDTO = {
     id?: string;
     description?: string;
-    stateId?: string;
-    statusId?: string;
+    state?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
@@ -57,4 +53,26 @@ export type CityDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
-export type CityBaseRepositoryType = BaseRepositoryType<CityModel, CityEntity, CityFilterDTO, CityPersistenceDTO>;
+export interface CityNormalizedRelations {
+    stateId: number;
+    statusId: number;
+}
+export type CityBaseRepositoryType = BaseRepositoryType<
+    CityModel,
+    CityEntity,
+    CityFilterDTO,
+    CityPersistenceDTO,
+    CityNormalizedRelations
+>;
+
+// ------ BASE CONTROLLER TYPE -------
+export type CityAbstractControllerBaseType = AbstractControllerBaseType<
+    CityProps,
+    CreateCityDTO,
+    CreateCityResponseDTO,
+    FindByIdCityResponseDto,
+    FindCitiesRawDTO,
+    FindCitiesResponseDTO,
+    UpdateCityDTO,
+    UpdateCityResponseDTO
+>

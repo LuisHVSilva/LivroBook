@@ -11,9 +11,9 @@ export type StatusDto = {
 
 // --------- FILTER -----------
 export type FilterStatusDTO = {
-    id?: number[],
-    description?: string[]
-    active?: boolean[]
+    id?: number | number[],
+    description?: string | string[]
+    active?: boolean | boolean[]
 }
 
 // ------- PERSISTENCE --------
@@ -43,4 +43,4 @@ export type FindStatusesResponseDTO = {
 };
 
 // ------ BASE REPOSITORY TYPE -------
-export type StatusBaseRepositoryType = BaseRepositoryType<StatusModel, StatusEntity, FilterStatusDTO, StatusPersistenceDTO>;
+export type StatusBaseRepositoryType = BaseRepositoryType<StatusModel, StatusEntity, FilterStatusDTO, StatusPersistenceDTO, any>;

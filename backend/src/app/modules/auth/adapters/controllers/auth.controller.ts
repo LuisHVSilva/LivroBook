@@ -7,6 +7,7 @@ import {LoginDTO, LoginResponseDTO} from "@modules/auth/adapters/dtos/auth.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {StatusCodes} from "http-status-codes";
 import {ApiResponseUtil} from "@coreShared/utils/apiResponse.util";
+import {IpUtils} from "@coreShared/utils/ip.util";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -18,6 +19,8 @@ export class AuthController implements IAuthController {
     @LogExecution()
     async login(req: Request, res: Response): Promise<Response> {
         const input: LoginDTO = req.body;
+        input.ip = IpUtils.getRequestIp(req);
+
         const result: ResultType<LoginResponseDTO> = await this.loginUseCase.execute(input);
 
         if (result.isSuccess()) {

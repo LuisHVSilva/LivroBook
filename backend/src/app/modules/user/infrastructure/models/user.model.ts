@@ -6,7 +6,8 @@ import {
     AllowNull,
     Table,
     CreatedAt,
-    UpdatedAt, ForeignKey, BelongsTo,
+    UpdatedAt, ForeignKey, BelongsTo, Default,
+    HasMany
 } from "sequelize-typescript";
 
 import {CreationOptional, InferAttributes, InferCreationAttributes} from "sequelize";
@@ -35,13 +36,23 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     @DbColumn(DataType.STRING(100))
     declare email: string;
 
-    // @AllowNull(false)
+    // @AllowNull(true)
     @DbColumn(DataType.STRING(20))
-    declare document: string;
+    declare document?: string;
 
     @AllowNull(false)
     @DbColumn(DataType.DATE)
     declare birthday: Date;
+
+    @AllowNull(false)
+    @Default(false)
+    @DbColumn(DataType.BOOLEAN)
+    declare isTwoFactorEnable: boolean;
+
+    @AllowNull(false)
+    @Default(false)
+    @DbColumn(DataType.BOOLEAN)
+    declare isEmailVerified: boolean;
 
     @ForeignKey(() => UserTypeModel)
     @AllowNull(false)
@@ -51,17 +62,12 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     @ForeignKey(() => CityModel)
     // @AllowNull(false)
     @DbColumn(DataType.INTEGER)
-    declare cityId: number;
-
-    @ForeignKey(() => UserCredentialModel)
-    @AllowNull(false)
-    @DbColumn(DataType.INTEGER)
-    declare userCredentialId: number;
+    declare cityId?: number;
 
     @ForeignKey(() => DocumentTypeModel)
     // @AllowNull(false)
     @DbColumn(DataType.INTEGER)
-    declare documentTypeId: number;
+    declare documentTypeId?: number;
 
     @ForeignKey(() => PhoneModel)
     @AllowNull(true)
@@ -73,23 +79,23 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => UserTypeModel)
+    @BelongsTo(() => UserTypeModel, {as: "userType"})
     userType?: UserTypeModel;
 
-    @BelongsTo(() => CityModel)
+    @BelongsTo(() => CityModel, {as: "city"})
     city?: CityModel;
 
-    @BelongsTo(() => UserCredentialModel)
-    userCredential?: UserCredentialModel;
-
-    @BelongsTo(() => DocumentTypeModel)
+    @BelongsTo(() => DocumentTypeModel, {as: "documentType"})
     documentType?: DocumentTypeModel;
 
-    @BelongsTo(() => PhoneModel)
+    @BelongsTo(() => PhoneModel, {as: "phone"})
     phone?: PhoneModel;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
+
+    @HasMany(() => UserCredentialModel, { as: 'userCredential', foreignKey: "userId" })
+    userCredentials?: UserCredentialModel[];
 
     @CreatedAt
     @DbColumn(DataType.DATE)

@@ -5,7 +5,7 @@ import {LanguageValidator} from "@modules/book/domain/validators/language.valida
 export interface LanguageProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class LanguageEntity extends EntityBase<LanguageProps> {
@@ -21,7 +21,7 @@ export class LanguageEntity extends EntityBase<LanguageProps> {
             description: LanguageTransform.normalizeDescription(props.description),
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
 
@@ -36,8 +36,8 @@ export class LanguageEntity extends EntityBase<LanguageProps> {
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

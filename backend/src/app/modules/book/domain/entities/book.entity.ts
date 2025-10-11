@@ -6,11 +6,11 @@ export interface BookProps {
     name: string;
     pageCount?: number;
     publishedDate?: Date;
-    authorId?: number;
-    publisherId?: number;
-    bookCategoryId: number;
-    languageId: number;
-    statusId: number;
+    author?: string;
+    publisher?: string;
+    bookCategory: string;
+    language: string;
+    status: string;
 }
 
 export class BookEntity extends EntityBase<BookProps> {
@@ -22,7 +22,7 @@ export class BookEntity extends EntityBase<BookProps> {
     //#region CONSTRUCTOR
     constructor(props: BookProps) {
         super(props);
-        this.validateRequiredFields(['name', 'bookCategoryId', 'languageId', 'statusId']);
+        this.validateRequiredFields(['name', 'bookCategory', 'language', 'status']);
         this.validate();
     }
 
@@ -45,24 +45,24 @@ export class BookEntity extends EntityBase<BookProps> {
         return this.props.publishedDate;
     }
 
-    get authorId(): number | undefined{
-        return this.props.authorId;
+    get author(): string | undefined{
+        return this.props.author;
     }
 
-    get publisherId(): number | undefined{
-        return this.props.publisherId;
+    get publisher(): string | undefined{
+        return this.props.publisher;
     }
 
-    get bookCategoryId(): number {
-        return this.props.bookCategoryId;
+    get bookCategory(): string {
+        return this.props.bookCategory;
     }
 
-    get languageId(): number {
-        return this.props.languageId;
+    get language(): string {
+        return this.props.language;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

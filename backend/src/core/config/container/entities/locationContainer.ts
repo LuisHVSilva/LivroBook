@@ -1,5 +1,5 @@
 import {container} from "tsyringe";
-import {ILocationController} from "@location/adapters/controllers/ILocation.controller";
+import {ILocationController} from "@location/adapters/controllers/interfaces/ILocation.controller";
 import {LocationController} from "@location/adapters/controllers/location.controller";
 import {CountryRepository} from "@location/infrastructure/repositories/country.repository";
 import {StateRepository} from "@location/infrastructure/repositories/state.repository";
@@ -46,6 +46,18 @@ import {CityModel} from "@location/infrastructure/models/city.model";
 import {CountryBaseRepositoryType} from "@location/adapters/dtos/country.dto";
 import {StateBaseRepositoryType} from "@location/adapters/dtos/state.dto";
 import {CityBaseRepositoryType} from "@location/adapters/dtos/city.dto";
+import {IFindCountryByIdUseCase} from "@location/useCases/read/findCountryById/IFindCountryById.useCase";
+import {FindCountryByIdUseCase} from "@location/useCases/read/findCountryById/findCountryById.useCase";
+import {ICountryController} from "@location/adapters/controllers/interfaces/ICountry.controller";
+import {CountryController} from "@location/adapters/controllers/country.controller";
+import {FindStateByIdUseCase} from "@location/useCases/read/findStateById/findStateById.useCase";
+import {IFindStateByIdUseCase} from "@location/useCases/read/findStateById/IFindStateById.useCase";
+import {StateController} from "@location/adapters/controllers/state.controller";
+import {IStateController} from "@location/adapters/controllers/interfaces/IState.controller";
+import {FindCityByIdUseCase} from "@location/useCases/read/findCityById/findCityById.useCase";
+import {IFindCityByIdUseCase} from "@location/useCases/read/findCityById/IFindCityById.useCase";
+import {CityController} from "@location/adapters/controllers/city.controller";
+import {ICityController} from "@location/adapters/controllers/interfaces/ICity.controller";
 
 //#region Domain
 container.registerSingleton<ICountryService>("ICountryService", CountryService);
@@ -55,14 +67,19 @@ container.registerSingleton<ICityService>("ICityService", CityService);
 
 //#region UseCases
 container.registerSingleton<ICreateCountryUseCase>("ICreateCountryUseCase", CreateCountryUseCase);
+container.registerSingleton<IFindCountryByIdUseCase>("IFindCountryByIdUseCase", FindCountryByIdUseCase);
 container.registerSingleton<IFindCountriesUseCase>("IFindCountriesUseCase", FindCountriesUseCase);
 container.registerSingleton<IUpdateCountryUseCase>("IUpdateCountryUseCase", UpdateCountryUseCase);
 container.registerSingleton<IDeleteCountryUseCase>("IDeleteCountryUseCase", DeleteCountryUseCase);
+
 container.registerSingleton<ICreateStateUseCase>("ICreateStateUseCase", CreateStateUseCase);
 container.registerSingleton<IFindStatesUseCase>("IFindStatesUseCase", FindStatesUseCase);
+container.registerSingleton<IFindStateByIdUseCase>("IFindStateByIdUseCase", FindStateByIdUseCase);
 container.registerSingleton<IUpdateStateUseCase>("IUpdateStateUseCase", UpdateStateUseCase);
 container.registerSingleton<IDeleteStateUseCase>("IDeleteStateUseCase", DeleteStateUseCase);
+
 container.registerSingleton<ICreateCityUseCase>("ICreateCityUseCase", CreateCityUseCase);
+container.registerSingleton<IFindCityByIdUseCase>("IFindCityByIdUseCase", FindCityByIdUseCase);
 container.registerSingleton<IFindCitiesUseCase>("IFindCitiesUseCase", FindCitiesUseCase);
 container.registerSingleton<IUpdateCityUseCase>("IUpdateCityUseCase", UpdateCityUseCase);
 container.registerSingleton<IDeleteCityUseCase>("IDeleteCityUseCase", DeleteCityUseCase);
@@ -79,6 +96,9 @@ container.registerSingleton<ICityRepository>("ICityRepository", CityRepository);
 
 //#region Adapters
 container.registerSingleton<ILocationController>("ILocationController", LocationController);
+container.registerSingleton<ICountryController>("ICountryController", CountryController);
+container.registerSingleton<IStateController>("IStateController", StateController);
+container.registerSingleton<ICityController>("ICityController", CityController);
 //#endregion
 
 //#region Validators

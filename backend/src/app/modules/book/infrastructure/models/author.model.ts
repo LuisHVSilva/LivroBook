@@ -35,7 +35,7 @@ class AuthorModel extends Model<InferAttributes<AuthorModel>, InferCreationAttri
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

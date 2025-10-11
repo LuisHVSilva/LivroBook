@@ -9,17 +9,20 @@ export const EntitiesMessage = {
             duplicateValueGeneric: "Já existe esse conjunto de dados salvos.",
         },
         failure: {
+            create: (entity: string) => `Erro ao criar ${entity.toUpperCase()}.`,
             delete: (entity: string) => `Erro ao apagar ${entity.toUpperCase()}.`,
             update: (entity: string) => `Erro ao atualizar ${entity.toUpperCase()}.`,
+            createGeneric: "Erro ao criar."
         },
         retrieval: {
             notFound: (entity: string) => `Nenhum valor encontrado para ${entity.toUpperCase()}.`,
-            notFoundForeignKey: (entity: string, id: number) => `Id ${id.toString()} não encontrado para ${entity.toUpperCase()}.`,
+            notFoundForeignKey: (fieldName: string) => `${fieldName.toUpperCase()} não é uma foreing key. `,
             notFoundGeneric: "Nenhum valor encontrado para os parâmetros passados.",
             inactiveStatus: 'Status está inativo. Favor entrar em contato com o administrador do sistema',
             noPasswordRegister: "Não há senha antiga registrada para esse usuário.",
         },
         validation: {
+            requiredField: (field: string) => `É necessario o campo ${field.toUpperCase()}.`,
             descriptionRequired: "Descrição é obrigatória.",
             idRequired: "Pelo menos um id é obrigatório.",
             idType: "ID deve ser do tipo número.",
@@ -41,12 +44,12 @@ export const EntitiesMessage = {
             invalidPassword: "A senha informada não está correta.",
             emailFormat: "Formato de email inválido",
             ipInvalid: "IP inválido",
+            blockedAccount: "Sua conta foi bloqueada. Favor entrar em contato com o suporte para desbloquear",
             nullField: (field: string): string => `${field} não pode estar vazio`,
             inactiveEntity: (entity: string): string => `A entidade ${entity.toUpperCase()} não está ativa.`,
             invalidLen: (field: string, minLen: number, maxLen: number): string => `'${field}' deve ter entre ${minLen} e ${maxLen} caracteres.`,
-            invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,
-            invalidMaxLen: (field: string, max: string) => `O campo '${field}' deve ter até ${max} caracteres.`,
             invalidType: (field: string, type: string)=> `O campo '${field}' deve ser do tipo ${type}.`,
+            invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,
         },
         forbidden: {
             inactiveUser: 'O usuário está inativo',
@@ -54,5 +57,12 @@ export const EntitiesMessage = {
     },
     info: {
         alreadyInactive: "As propriedades já foram apagadas."
+    },
+    zod: {
+        invalidMinLen: (field: string, min: string) => `O campo '${field}' deve ter pelo menos ${min} caracteres.`,
+        invalidMaxLen: (field: string, max: string) => `O campo '${field}' deve ter até ${max} caracteres.`,
+        invalidType: (field: string, type: string)=> `O campo '${field}' deve ser do tipo ${type}.`,
+        unrecognizedKey: (field: string): string => `Chave não é válida para a chamada: ${field.toUpperCase()}`,
+        nullBody: 'A requisição não pode ser vazia.',
     }
 } as const;

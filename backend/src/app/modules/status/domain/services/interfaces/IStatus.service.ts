@@ -1,6 +1,6 @@
 import {
     CreateStatusDTO,
-    FilterStatusDTO,
+    FilterStatusDTO, StatusDto,
     UpdateStatusDTO,
     UpdateStatusResponseDTO
 } from "@status/adapters/dtos/status.dto";
@@ -16,7 +16,11 @@ export interface IStatusService {
 
     getById(id: number): Promise<StatusEntity>;
 
+    getByDescription(description: string): Promise<StatusEntity>
+
     findMany(filter: FilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>>;
+
+    findOneByFilter(filter: FilterStatusDTO, exact?: boolean): Promise<StatusEntity>;
 
     getStatusForNewEntities(): Promise<StatusEntity>;
 
@@ -26,11 +30,15 @@ export interface IStatusService {
 
     getStatusForActiveEntities(): Promise<StatusEntity>
 
+    getStatusForBlockedEntities(): Promise<StatusEntity>;
+
     update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<UpdateStatusResponseDTO>>;
 
     delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum>;
 
     deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport>;
 
-    isActive(id: number): Promise<boolean>;
+    isStatusActive(statusProperties: Partial<StatusDto>): Promise<boolean>;
+
+    isEntityActive(entityStatus: string): Promise<boolean>
 }

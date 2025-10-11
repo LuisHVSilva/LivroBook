@@ -34,7 +34,7 @@ class PhoneTypeModel extends Model<InferAttributes<PhoneTypeModel>, InferCreatio
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: 'status'})
     status?: StatusModel;
 
     @CreatedAt

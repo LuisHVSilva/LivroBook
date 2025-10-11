@@ -13,6 +13,9 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {DocumentTypeBaseRepositoryType, DocumentTypeDtoBaseType} from "@document/adapters/dto/documentType.dto";
+import {CountryTransformer} from "@location/domain/transformers/country.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {StringUtil} from "@coreShared/utils/string.util";
 
 @injectable()
 export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, DocumentTypeEntity> implements IDocumentTypeService {
@@ -23,11 +26,16 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("IDocumentTypeRepository") protected readonly repo: IDocumentTypeRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("DocumentTypeRepository") private readonly documentTypeRepo: IRepositoryBase<DocumentTypeBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
-        @inject("ICountryService") private readonly countryService: ICountryService,
+        @inject("IDocumentTypeRepository")
+        protected readonly repo: IDocumentTypeRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("DocumentTypeRepository")
+        private readonly documentTypeRepo: IRepositoryBase<DocumentTypeBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
+        @inject("ICountryService")
+        private readonly countryService: ICountryService,
     ) {
         super(repo, DocumentTypeEntity, statusService)
         this.uniquenessValidator = this.validatorFactory(this.documentTypeRepo);
@@ -37,40 +45,37 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], statusId: number): Promise<DocumentTypeEntity> {
+    protected async createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], status: string): Promise<DocumentTypeEntity> {
         return DocumentTypeEntity.create({
             description: data.description,
-            countryId: data.countryId,
-            statusId
+            country: data.country,
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: DocumentTypeEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: DocumentTypeEntity, previousEntity?: DocumentTypeEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, 'description'));
     }
 
     @LogError()
-    protected filterTransform(input: DocumentTypeDtoBaseType['FilterDTO']): DocumentTypeDtoBaseType['FilterDTO'] {
-        const transformedFilter: DocumentTypeDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                DocumentTypeTransform.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+    protected filterTransform(input: DocumentTypeDtoBaseType["FilterDTO"]): DocumentTypeDtoBaseType["FilterDTO"] {
+        return StringUtil.applyFilterTransform(input, {
+            description: DocumentTypeTransform.normalizeDescription,
+            country: CountryTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<DocumentTypeDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
-            this.validateExistence("countryId", data.countryId, this.countryService),
-            this.validateStatusExistence(data.statusId)
+            this.validateExistence("country", data.country, 'description', this.countryService),
+            this.validateStatusExistence(data.status)
         ]);
     }
+
     //#endregion
 }

@@ -12,6 +12,8 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {ServiceBase} from "@coreShared/base/service.base";
 import {CountryTransformer} from "@location/domain/transformers/country.transform";
 import {CountryBaseRepositoryType, CountryDtoBaseType} from "@location/adapters/dtos/country.dto";
+import {StringUtil} from "@coreShared/utils/string.util";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 
 @injectable()
@@ -23,13 +25,16 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("ICountryRepository") protected readonly repo: ICountryRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("CountryRepository") protected readonly countryRepo: IRepositoryBase<CountryBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
+        @inject("ICountryRepository")
+        protected readonly repo: ICountryRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("CountryRepository")
+        protected readonly countryRepo: IRepositoryBase<CountryBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
     ) {
         super(repo, CountryEntity, statusService);
-
         this.uniquenessValidator = this.validatorFactory(this.countryRepo);
     }
 
@@ -37,36 +42,32 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: CountryDtoBaseType["CreateDTO"], statusId: number): Promise<CountryEntity> {
+    protected async createEntity(data: CountryDtoBaseType["CreateDTO"], status: string): Promise<CountryEntity> {
         return CountryEntity.create({
             description: data.description,
-            statusId
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: CountryEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: CountryEntity, previousEntity?: CountryEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, 'description'));
     }
 
     @LogError()
     protected filterTransform(input: CountryDtoBaseType['FilterDTO']): CountryDtoBaseType['FilterDTO'] {
-        const transformedFilter: CountryDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                CountryTransformer.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: CountryTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<CountryDtoBaseType["DTO"]>): Promise<void> {
-        await this.validateStatusExistence(data.statusId);
+        await this.validateStatusExistence(data.status);
     }
+
     //#endregion
 }

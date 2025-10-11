@@ -29,13 +29,20 @@ export class UserValidator {
         }
     }
 
-    static validateDocumentsFields(document?: string, documentTypeId?: number) {
-        if (document !== undefined && documentTypeId === undefined) {
-            throw new ValidationError(EntitiesMessage.error.validation.nullField('DocumentTypeId'))
+    static validateDocumentsFields(document?: string | null, documentType?: string | null) {
+        const isDocumentEmpty = document == null;
+        const isTypeEmpty = documentType == null;
+
+        if (!isDocumentEmpty && isTypeEmpty) {
+            throw new ValidationError(
+                EntitiesMessage.error.validation.nullField('DocumentType')
+            );
         }
 
-        if(documentTypeId !== undefined && document === undefined) {
-            throw new ValidationError(EntitiesMessage.error.validation.nullField('Document'))
+        if (isDocumentEmpty && !isTypeEmpty) {
+            throw new ValidationError(
+                EntitiesMessage.error.validation.nullField('Document')
+            );
         }
     }
 }

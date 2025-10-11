@@ -13,11 +13,11 @@ export class LoginUseCase implements ILoginUseCase {
     ) {
     }
 
+
     @LogExecution()
     async execute(input: LoginDTO): Promise<ResultType<LoginResponseDTO>> {
         try {
-            const token: LoginResponseDTO = await this.authService.login(input);
-            return ResultType.success(token);
+            return await this.authService.login(input);
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

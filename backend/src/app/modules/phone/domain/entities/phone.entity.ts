@@ -1,27 +1,38 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {PhoneValidator} from "@phone/domain/validations/phone.validation";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
 
 export interface PhoneProps {
     id?: number;
     number: string;
-    phoneCodeId: number;
-    phoneTypeId: number;
-    statusId: number;
+    phoneCode: {
+        dddCode: number;
+        ddiCode: number;
+    },
+    phoneType: string;
+    status: string;
 }
+
 
 export class PhoneEntity extends EntityBase<PhoneProps> {
     //#region PROPERTIES
     public static readonly MIN_NUMBER: number = 4;
     public static readonly MAX_NUMBER: number = 20;
-    public static readonly ENTITY_NAME: string = 'phone';
     //#endregion
 
     //#region CONSTRUCTOR
     constructor(props: PhoneProps) {
-        super(props);
-        this.validateRequiredFields(['number', 'phoneCodeId', 'statusId']);
+        const normalizedProps: PhoneProps = {
+            ...props,
+            phoneType: PhoneTypeTransformer.normalizeDescription(props.phoneType),
+            status: StatusTransformer.normalizeDescription(props.status),
+        };
+        super(normalizedProps);
+        this.validateRequiredFields(['number', 'phoneCode', 'status']);
         this.validate();
     }
+
     //#endregion
 
     //#region GET
@@ -33,17 +44,18 @@ export class PhoneEntity extends EntityBase<PhoneProps> {
         return this.props.number;
     }
 
-    get phoneCodeId(): number {
-        return this.props.phoneCodeId;
+    get phoneCode(): { dddCode: number; ddiCode: number } {
+        return this.props.phoneCode;
     }
 
-    get phoneTypeId(): number {
-        return this.props.phoneTypeId;
+    get phoneType(): string {
+        return this.props.phoneType;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
+
     //#endregion
 
     //#region VALIDATION
@@ -51,17 +63,20 @@ export class PhoneEntity extends EntityBase<PhoneProps> {
         PhoneValidator.validateNumberFormat(this.props.number);
         PhoneValidator.validateNumberLength(this.props.number, PhoneEntity.MIN_NUMBER, PhoneEntity.MAX_NUMBER);
     }
+
     //#endregion
 
     //#region CREATE
     public static create(props: PhoneProps): PhoneEntity {
         return new PhoneEntity(props);
     }
+
     //#endregion
 
     //#region UPDATE
     public update(props: Partial<PhoneProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
 }

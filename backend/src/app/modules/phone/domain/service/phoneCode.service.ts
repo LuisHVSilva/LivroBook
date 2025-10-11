@@ -14,14 +14,19 @@ import {FindAllType} from "@coreShared/types/findAll.type";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {StringUtil} from "@coreShared/utils/string.util";
+import {StateTransformer} from "@location/domain/transformers/state.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 @injectable()
 export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCodeEntity> implements IPhoneCodeService {
     //#region CONSTRUCTOR
     constructor(
-        @inject("IPhoneCodeRepository") protected readonly repo: IPhoneCodeRepository,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
-        @inject('IStateService') private readonly stateService: IStateService,
+        @inject("IPhoneCodeRepository")
+        protected readonly repo: IPhoneCodeRepository,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
+        @inject('IStateService')
+        private readonly stateService: IStateService,
     ) {
         super(repo, PhoneCodeEntity, statusService);
     }
@@ -29,12 +34,12 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
     //#endregion
 
     @LogError()
-    protected async createEntity(data: PhoneCodeDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneCodeEntity> {
+    protected async createEntity(data: PhoneCodeDtoBaseType["CreateDTO"], status: string): Promise<PhoneCodeEntity> {
         return PhoneCodeEntity.create({
             ddiCode: data.ddiCode,
             dddCode: data.dddCode,
-            stateId: data.stateId,
-            statusId
+            state: data.state,
+            status
         });
     }
 
@@ -43,7 +48,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
         const filter: PhoneCodeFilterDTO = {
             ddiCode: StringUtil.parseCsvFilter(entity.ddiCode?.toString(), Number),
             dddCode: StringUtil.parseCsvFilter(entity.dddCode?.toString(), Number),
-            stateId: StringUtil.parseCsvFilter(entity.stateId?.toString(), Number)
+            state: StringUtil.parseCsvFilter(entity.state?.toString(), String)
         }
 
         const result: FindAllType<PhoneCodeEntity> = await this.findMany(filter);
@@ -56,14 +61,17 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
 
     @LogError()
     protected filterTransform(input: PhoneCodeDtoBaseType['FilterDTO']): PhoneCodeDtoBaseType['FilterDTO'] {
-        return input;
+        return StringUtil.applyFilterTransform(input, {
+            state: StateTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<PhoneCodeDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
-            this.validateExistence("stateId", data.stateId, this.stateService),
-            this.validateStatusExistence(data.statusId),
+            this.validateExistence("state", data.state, 'description', this.stateService),
+            this.validateStatusExistence(data.status),
         ]);
     }
 

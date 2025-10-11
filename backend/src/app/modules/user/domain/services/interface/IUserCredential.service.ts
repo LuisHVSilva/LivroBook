@@ -1,11 +1,9 @@
 import {IServiceBase} from "@coreShared/base/interfaces/IServiceBase";
-import {CreateUserCredentialRequestDTO, UserCredentialDtoBaseType} from "@user/adapters/dtos/userCredential.dto";
+import {UserCredentialDtoBaseType} from "@user/adapters/dtos/userCredential.dto";
 import {UserCredentialEntity} from "@user/domain/entities/userCredential.entity";
-import {Transaction} from "sequelize";
-
+import {UserEntity} from "@user/domain/entities/user.entity";
+import {ResultType} from "@coreShared/types/result.type";
 
 export interface IUserCredentialService extends IServiceBase<UserCredentialDtoBaseType, UserCredentialEntity> {
-    create(data: CreateUserCredentialRequestDTO, transaction: Transaction): Promise<UserCredentialEntity>;
-
-    isPasswordValid(userCredentialId: number, password: string): Promise<boolean>;
+    validateLoginCredential(user: UserEntity, password: string, ip: string): Promise<ResultType<UserCredentialEntity>>;
 }

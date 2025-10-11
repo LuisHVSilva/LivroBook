@@ -5,7 +5,7 @@ import {BookCategoryValidator} from "@modules/book/domain/validators/bookCategor
 export interface BookCategoryProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class BookCategoryEntity extends EntityBase<BookCategoryProps> {
@@ -21,7 +21,7 @@ export class BookCategoryEntity extends EntityBase<BookCategoryProps> {
             description: BookCategoryTransform.normalizeDescription(props.description),
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
 
@@ -36,8 +36,8 @@ export class BookCategoryEntity extends EntityBase<BookCategoryProps> {
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

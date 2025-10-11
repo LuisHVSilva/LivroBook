@@ -4,7 +4,7 @@ import {AuthorValidator} from "@modules/book/domain/validators/author.validator"
 export interface AuthorProps {
     id?: number;
     name: string;
-    statusId: number;
+    status: string;
 }
 
 export class AuthorEntity extends EntityBase<AuthorProps> {
@@ -16,7 +16,7 @@ export class AuthorEntity extends EntityBase<AuthorProps> {
     //#region CONSTRUCTOR
     constructor(props: AuthorProps) {
         super(props);
-        this.validateRequiredFields(['name', 'statusId']);
+        this.validateRequiredFields(['name', 'status']);
         this.validate();
     }
 
@@ -31,8 +31,8 @@ export class AuthorEntity extends EntityBase<AuthorProps> {
         return this.props.name;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

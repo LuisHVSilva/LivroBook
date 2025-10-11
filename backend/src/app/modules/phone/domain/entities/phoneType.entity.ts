@@ -1,18 +1,18 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
 import {PhoneTypeValidator} from "@phone/domain/validations/phoneType.validation";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface PhoneTypeProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class PhoneTypeEntity extends EntityBase<PhoneTypeProps> {
     //#region PROPERTIES
     public static readonly MIN_DESC: number = 4;
     public static readonly MAX_DESC: number = 50;
-    public static readonly ENTITY_NAME: string = 'phone_type';
     //#endregion
 
     //#region CONSTRUCTOR
@@ -20,10 +20,11 @@ export class PhoneTypeEntity extends EntityBase<PhoneTypeProps> {
         const normalizedProps: PhoneTypeProps = {
             ...props,
             description: PhoneTypeTransformer.normalizeDescription(props.description),
+            status: StatusTransformer.normalizeDescription(props.status),
         };
 
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
     //#endregion
@@ -37,8 +38,8 @@ export class PhoneTypeEntity extends EntityBase<PhoneTypeProps> {
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
     //#endregion
 

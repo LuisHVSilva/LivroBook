@@ -5,9 +5,9 @@ import {LogError} from "@coreShared/decorators/LogError";
 import {IUserService} from "@user/domain/services/interface/IUser.service";
 import {UserEntity} from "@user/domain/entities/user.entity";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
-import {ValidationError} from "@coreShared/errors/domain.error";
-import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import jwt, {Secret, SignOptions} from "jsonwebtoken";
+import {ResultType} from "@coreShared/types/result.type";
+import {UserCredentialEntity} from "@user/domain/entities/userCredential.entity";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -28,40 +28,31 @@ export class AuthService implements IAuthService {
     }
 
     @LogError()
-    public async login(input: LoginDTO): Promise<LoginResponseDTO> {
+    public async login(input: LoginDTO): Promise<ResultType<LoginResponseDTO>> {
         const user: UserEntity = await this.userService.getUserActiveByEmail(input.email);
-        const isPasswordValid: boolean = await this.userCredentialService.isPasswordValid(user.userCredentialId, input.password);
 
-        if (!isPasswordValid) {
-            throw new ValidationError(EntitiesMessage.error.validation.invalidPassword);
+        const isValid: ResultType<UserCredentialEntity> = await this.userCredentialService.validateLoginCredential(user, input.password, input.ip);
+
+        if (!isValid.isSuccess()) {
+            return ResultType.failure(isValid.getError());
         }
 
-        const token: string = this.createToken({userId: user.id!, email: user.email, userTypeId: user.userTypeId});
+        const token: string = this.createToken({userId: user.id!, email: user.email, userType: user.userType});
 
-        return {
+        const result = {
             token: token,
             user: {
                 email: user.email,
                 name: user.name,
-                userTypeId: user.userTypeId,
+                userType: user.userType,
             }
         }
+
+        return ResultType.success(result);
     }
 
     private createToken(payload: CreateTokenPayloadDTO): string {
         const options: SignOptions = {expiresIn: this.TOKEN_EXPIRES_TIME};
         return jwt.sign(payload, AuthService.secretJwtKey, options);
     }
-
-    // private verifyToken(token: string): any {
-    //     try {
-    //         return jwt.verify(token, AuthService.secretJwtKey);
-    //     } catch (err) {
-    //         throw new ServiceError("Token inválido ou expirado");
-    //     }
-    // }
-    //
-    // private decodeToken(token: string): any {
-    //     return jwt.decode(token);
-    // }
 }

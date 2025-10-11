@@ -1,19 +1,16 @@
 // ---------- BASE ----------
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {CountryModel} from "@location/infrastructure/models/country.model";
-import {CountryEntity} from "@location/domain/entities/country.entity";
+import {CountryEntity, CountryProps} from "@location/domain/entities/country.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
-export type CountryDTO = {
-    id?: number;
-    description: string;
-    statusId: number;
-};
+export type CountryDTO = CountryProps;
 
 // --------- FILTER ---------
 export type CountryFilterDTO = {
-    id?: number[];
-    description?: string[];
-    statusId?: number[];
+    id?: number | number[];
+    description?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE ------
@@ -28,13 +25,16 @@ export type UpdateCountryDTO = Partial<Omit<CountryDTO, "id">> & { id: number };
 export type UpdateCountryResponseDTO = CountryDTO;
 
 // ---------- FIND ----------
+export type FindByIdCountryResponseDTO = CountryDTO;
+
 export type FindCountriesRawDTO = {
     id?: string;
     description?: string;
-    statusId?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
+
 export type FindCountriesResponseDTO = {
     page?: number;
     limit?: number;
@@ -52,4 +52,25 @@ export type CountryDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
-export type CountryBaseRepositoryType = BaseRepositoryType<CountryModel, CountryEntity, CountryFilterDTO, CountryPersistenceDTO>;
+export interface CountryNormalizedRelations {
+    statusId: number;
+}
+export type CountryBaseRepositoryType = BaseRepositoryType<
+    CountryModel,
+    CountryEntity,
+    CountryFilterDTO,
+    CountryPersistenceDTO,
+    CountryNormalizedRelations
+>;
+
+// ------ BASE CONTROLLER TYPE -------
+export type CountryAbstractControllerBaseType = AbstractControllerBaseType<
+    CountryProps,
+    CreateCountryDTO,
+    CreateCountryResponseDTO,
+    FindByIdCountryResponseDTO,
+    FindCountriesRawDTO,
+    FindCountriesResponseDTO,
+    UpdateCountryDTO,
+    UpdateCountryResponseDTO
+>

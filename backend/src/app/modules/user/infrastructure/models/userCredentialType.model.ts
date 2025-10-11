@@ -33,7 +33,7 @@ class UserCredentialTypeModel extends Model<InferAttributes<UserCredentialTypeMo
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

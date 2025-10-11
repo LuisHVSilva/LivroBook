@@ -1,36 +1,26 @@
 import {container} from "tsyringe";
-import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
-import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {PhoneTypeService} from "@phone/domain/service/phoneType.service";
+import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
+import {PhoneCodeService} from "@phone/domain/service/phoneCode.service";
+import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
+import {PhoneService} from "@phone/domain/service/phone.service";
 import {ICreatePhoneTypeUseCase} from "@phone/useCase/create/createPhoneType/ICreatePhoneType.useCase";
 import {CreatePhoneTypeUseCase} from "@phone/useCase/create/createPhoneType/createPhoneType.useCase";
-import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
-import {PhoneTypeRepository} from "@phone/infrastructure/repositories/phoneType.repository";
-import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
-import {PhoneController} from "@phone/adapters/controllers/phone.controller";
 import {IFindPhoneTypesUseCase} from "@phone/useCase/read/findPhoneTypes/IFindPhoneTypes.useCase";
 import {FindPhoneTypesUseCase} from "@phone/useCase/read/findPhoneTypes/findPhoneTypes.useCase";
 import {IUpdatePhoneTypeUseCase} from "@phone/useCase/upadte/updatePhoneType/IUpdatePhoneType.useCase";
 import {UpdatePhoneTypeUseCase} from "@phone/useCase/upadte/updatePhoneType/updatePhoneType.useCase";
-import {IDeletePhoneTypesUseCase} from "@phone/useCase/delete/deletePhoneTypes/IDeletePhoneTypes.useCase";
-import {DeletePhoneTypesUseCase} from "@phone/useCase/delete/deletePhoneTypes/deletePhoneTypes.useCase";
-import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
-import {PhoneCodeService} from "@phone/domain/service/phoneCode.service";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/create/createPhoneCode/ICreatePhoneCode.useCase";
+import {IDeletePhoneTypeUseCase} from "@phone/useCase/delete/deletePhoneType/IDeletePhoneType.useCase";
+import {DeletePhoneTypeUseCase} from "@phone/useCase/delete/deletePhoneType/deletePhoneType.useCase";
 import {CreatePhoneCodeUseCase} from "@phone/useCase/create/createPhoneCode/createPhoneCode.useCase";
-import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
-import {PhoneCodeRepository} from "@phone/infrastructure/repositories/phoneCode.repository";
-import {IFindPhoneCodesUseCase} from "@phone/useCase/read/findPhoneCodeTypes/IFindPhoneCodes.useCase";
-import {FindPhoneCodesUseCase} from "@phone/useCase/read/findPhoneCodeTypes/findPhoneCodes.useCase";
+import {IFindPhoneCodesUseCase} from "@phone/useCase/read/findPhoneCodes/IFindPhoneCodes.useCase";
+import {FindPhoneCodesUseCase} from "@phone/useCase/read/findPhoneCodes/findPhoneCodes.useCase";
 import {IUpdatePhoneCodeUseCase} from "@phone/useCase/upadte/updatePhoneCode/IUpdatePhoneCode.useCase";
 import {UpdatePhoneCodeUseCase} from "@phone/useCase/upadte/updatePhoneCode/updatePhoneCode.useCase";
-import {IDeletePhoneCodesUseCase} from "@phone/useCase/delete/deletePhoneCode/IDeletePhoneCodes.useCase";
-import {DeletePhoneCodesUseCase} from "@phone/useCase/delete/deletePhoneCode/deletePhoneCodes.useCase";
-import {PhoneService} from "@phone/domain/service/phone.service";
-import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
-import {PhoneRepository} from "@phone/infrastructure/repositories/phone.repository";
+import {IDeletePhoneCodeUseCase} from "@phone/useCase/delete/deletePhoneCode/IDeletePhoneCode.useCase";
+import {DeletePhoneCodeUseCase} from "@phone/useCase/delete/deletePhoneCode/deletePhoneCode.useCase";
 import {ICreatePhoneUseCase} from "@phone/useCase/create/createPhone/ICreatePhone.useCase";
 import {CreatePhoneUseCase} from "@phone/useCase/create/createPhone/createPhone.useCase";
 import {IFindPhonesUseCase} from "@phone/useCase/read/findPhones/IFindPhones.useCase";
@@ -41,10 +31,31 @@ import {IDeletePhoneUseCase} from "@phone/useCase/delete/deletePhone/IDeletePhon
 import {DeletePhoneUseCase} from "@phone/useCase/delete/deletePhone/deletePhone.useCase";
 import {ModelStatic} from "sequelize";
 import {PhoneTypeModel} from "@phone/infrastructure/models/phoneType.model";
+import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
+import {PhoneTypeRepository} from "@phone/infrastructure/repositories/phoneType.repository";
 import {PhoneCodeModel} from "@phone/infrastructure/models/phoneCode.model";
+import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
+import {PhoneCodeRepository} from "@phone/infrastructure/repositories/phoneCode.repository";
 import {PhoneModel} from "@phone/infrastructure/models/phone.model";
+import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
+import {PhoneRepository} from "@phone/infrastructure/repositories/phone.repository";
+import {IPhoneController} from "@phone/adapters/controllers/interfaces/IPhone.controller";
+import {PhoneController} from "@phone/adapters/controllers/phone.controller";
+import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {PhoneTypeBaseRepositoryType} from "@phone/adapters/dtos/phoneType.dto";
+import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {PhoneBaseRepositoryType} from "@phone/adapters/dtos/phone.dto";
+import {IFindPhoneTypeByIdUseCase} from "@phone/useCase/read/findPhoneTypeById/IFindPhoneTypeById.useCase";
+import {FindPhoneTypeByIdUseCase} from "@phone/useCase/read/findPhoneTypeById/findPhoneTypeById.useCase";
+import {IFindPhoneCodeByIdUseCase} from "@phone/useCase/read/findPhoneCodeById/IFindPhoneCodeById.useCase";
+import {FindPhoneCodeByIdUseCase} from "@phone/useCase/read/findPhoneCodeById/findPhoneCodeById.useCase";
+import {IFindPhoneByIdUseCase} from "@phone/useCase/read/findPhoneById/IFindPhoneById.useCase";
+import {FindPhoneByIdUseCase} from "@phone/useCase/read/findPhoneById/findPhoneById.useCase";
+import {IPhoneCodeController} from "@phone/adapters/controllers/interfaces/IPhoneCode.controller";
+import {PhoneCodeController} from "@phone/adapters/controllers/phoneCode.controller";
+import {PhoneTypeController} from "@phone/adapters/controllers/phoneType.controller";
+import {IPhoneTypeController} from "@phone/adapters/controllers/interfaces/IPhoneType.controller";
+
 
 //#region Services
 container.registerSingleton<IPhoneTypeService>("IPhoneTypeService", PhoneTypeService);
@@ -54,16 +65,19 @@ container.registerSingleton<IPhoneService>("IPhoneService", PhoneService);
 
 //#region UseCases
 container.registerSingleton<ICreatePhoneTypeUseCase>("ICreatePhoneTypeUseCase", CreatePhoneTypeUseCase);
+container.registerSingleton<IFindPhoneTypeByIdUseCase>("IFindPhoneTypeByIdUseCase", FindPhoneTypeByIdUseCase);
 container.registerSingleton<IFindPhoneTypesUseCase>("IFindPhoneTypesUseCase", FindPhoneTypesUseCase);
 container.registerSingleton<IUpdatePhoneTypeUseCase>("IUpdatePhoneTypeUseCase", UpdatePhoneTypeUseCase);
-container.registerSingleton<IDeletePhoneTypesUseCase>("IDeletePhoneTypesUseCase", DeletePhoneTypesUseCase);
+container.registerSingleton<IDeletePhoneTypeUseCase>("IDeletePhoneTypeUseCase", DeletePhoneTypeUseCase);
 
 container.registerSingleton<ICreatePhoneCodeUseCase>("ICreatePhoneCodeUseCase", CreatePhoneCodeUseCase);
+container.registerSingleton<IFindPhoneCodeByIdUseCase>("IFindPhoneCodeByIdUseCase", FindPhoneCodeByIdUseCase);
 container.registerSingleton<IFindPhoneCodesUseCase>("IFindPhoneCodesUseCase", FindPhoneCodesUseCase);
 container.registerSingleton<IUpdatePhoneCodeUseCase>("IUpdatePhoneCodeUseCase", UpdatePhoneCodeUseCase);
-container.registerSingleton<IDeletePhoneCodesUseCase>("IDeletePhoneCodesUseCase", DeletePhoneCodesUseCase);
+container.registerSingleton<IDeletePhoneCodeUseCase>("IDeletePhoneCodeUseCase", DeletePhoneCodeUseCase);
 
 container.registerSingleton<ICreatePhoneUseCase>("ICreatePhoneUseCase", CreatePhoneUseCase);
+container.registerSingleton<IFindPhoneByIdUseCase>("IFindPhoneByIdUseCase", FindPhoneByIdUseCase);
 container.registerSingleton<IFindPhonesUseCase>("IFindPhonesUseCase", FindPhonesUseCase);
 container.registerSingleton<IUpdatePhoneUseCase>("IUpdatePhoneUseCase", UpdatePhoneUseCase);
 container.registerSingleton<IDeletePhoneUseCase>("IDeletePhoneUseCase", DeletePhoneUseCase);
@@ -80,6 +94,8 @@ container.registerSingleton<IPhoneRepository>("IPhoneRepository", PhoneRepositor
 
 //#region Adapters
 container.registerSingleton<IPhoneController>("IPhoneController", PhoneController);
+container.registerSingleton<IPhoneCodeController>("IPhoneCodeController", PhoneCodeController);
+container.registerSingleton<IPhoneTypeController>("IPhoneTypeController", PhoneTypeController);
 //#endregion
 
 //#region Validators

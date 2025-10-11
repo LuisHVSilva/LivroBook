@@ -14,6 +14,8 @@ import {UserTypeTransform} from "@user/domain/transformers/userType.transformer"
 import {UserTypeBaseRepositoryType, UserTypeDtoBaseType} from "@user/adapters/dtos/userType.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {UserTypeDescriptionEnum} from "@user/domain/enums/userType.enum";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {StringUtil} from "@coreShared/utils/string.util";
 
 @injectable()
 export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEntity> implements IUserTypeService {
@@ -46,8 +48,8 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
     @LogError()
     async getExactByDescription(description: string): Promise<UserTypeEntity> {
         const descriptionFormatted: string = UserTypeTransform.normalizeDescription(description);
-        const entity: ResultType<UserTypeEntity> = await this.repo.findOneExactByFilter({
-            description: [descriptionFormatted]
+        const entity: ResultType<UserTypeEntity> = await this.repo.findOneByFilter({
+            description: descriptionFormatted
         });
 
         if (!entity.isSuccess()) {
@@ -58,35 +60,31 @@ export class UserTypeService extends ServiceBase<UserTypeDtoBaseType, UserTypeEn
     }
 
     @LogError()
-    protected async createEntity(data: UserTypeDtoBaseType["CreateDTO"], statusId: number): Promise<UserTypeEntity> {
+    protected async createEntity(data: UserTypeDtoBaseType["CreateDTO"], status: string): Promise<UserTypeEntity> {
         return UserTypeEntity.create({
             description: data.description,
-            statusId
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: UserTypeEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: UserTypeEntity, previousEntity?: UserTypeEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserTypeEntity.name, 'description'));
     }
 
     @LogError()
     protected filterTransform(input: UserTypeDtoBaseType['FilterDTO']): UserTypeDtoBaseType['FilterDTO'] {
-        const transformedFilter: UserTypeDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                UserTypeTransform.normalizeDescription(desc))
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: UserTypeTransform.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<UserTypeDtoBaseType["DTO"]>): Promise<void> {
-        await this.validateStatusExistence(data.statusId);
+        await this.validateStatusExistence(data.status);
     }
 
     //#endregion

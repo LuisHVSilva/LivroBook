@@ -1,7 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IDeletePhoneUseCase} from "@phone/useCase/delete/deletePhone/IDeletePhone.useCase";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {ResultType} from "@coreShared/types/result.type";
 import {Transaction} from "sequelize";
@@ -12,6 +11,7 @@ import {DomainError} from "@coreShared/errors/domain.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
+import {LogError} from "@coreShared/decorators/LogError";
 
 
 @injectable()
@@ -21,7 +21,7 @@ export class DeletePhoneUseCase implements IDeletePhoneUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {

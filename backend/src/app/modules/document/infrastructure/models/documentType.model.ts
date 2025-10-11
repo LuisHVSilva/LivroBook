@@ -41,10 +41,10 @@ class DocumentTypeModel extends Model<InferAttributes<DocumentTypeModel>, InferC
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => CountryModel)
+    @BelongsTo(() => CountryModel, {as: 'country'})
     country?: CountryModel;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: 'status'})
     status?: StatusModel;
 
     @CreatedAt

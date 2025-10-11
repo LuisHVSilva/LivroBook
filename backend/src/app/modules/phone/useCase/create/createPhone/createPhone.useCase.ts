@@ -5,10 +5,10 @@ import {CreatePhoneDTO, CreatePhoneResponseDTO} from "@phone/adapters/dtos/phone
 import {ResultType} from "@coreShared/types/result.type";
 import {Transaction} from "sequelize";
 import {Transactional} from "@coreShared/decorators/Transactional";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {PhoneEntity} from "@phone/domain/entities/phone.entity";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class CreatePhoneUseCase implements ICreatePhoneUseCase {
@@ -17,7 +17,7 @@ export class CreatePhoneUseCase implements ICreatePhoneUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: CreatePhoneDTO, transaction?: Transaction): Promise<ResultType<CreatePhoneResponseDTO>> {
         if (!transaction) {
@@ -27,13 +27,7 @@ export class CreatePhoneUseCase implements ICreatePhoneUseCase {
         try {
             const created: PhoneEntity = await this.service.create(input, transaction);
 
-            return ResultType.success({
-                id: created.id!,
-                number: created.number,
-                phoneCodeId: created.phoneCodeId,
-                phoneTypeId: created.phoneTypeId,
-                statusId: created.statusId,
-            });
+            return ResultType.success(created);
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

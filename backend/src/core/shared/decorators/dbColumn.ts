@@ -1,6 +1,6 @@
 import { Column } from "sequelize-typescript";
-import { DataType } from "sequelize";
-import { ColumnOptions } from "sequelize/types";
+import {ColumnOptions, DataType} from "sequelize";
+
 
 
 export function camelToSnakeLower(str: string): string {

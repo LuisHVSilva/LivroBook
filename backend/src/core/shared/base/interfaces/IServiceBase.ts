@@ -13,7 +13,9 @@ export interface IServiceBase<T extends DtoBaseType<any, any, any, any, any>, TE
 
     getMetadata(): Promise<SimplifiedMetadataAttribute[]>;
 
-    findMany(filter: T["FilterDTO"], page?: number, limit?: number): Promise<FindAllType<TEntity>>;
+    findOneByFilter(filter: T["FilterDTO"], exact?: boolean): Promise<TEntity>;
+
+    findMany(filter: T["FilterDTO"], page?: number, limit?: number, exact?: boolean): Promise<FindAllType<TEntity>>;
 
     update(newData: T["UpdateDTO"], transaction: Transaction): Promise<UpdateResultType<TEntity>>;
 

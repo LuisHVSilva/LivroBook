@@ -3,7 +3,7 @@ import {ValidationError} from "@coreShared/errors/domain.error";
 import {isIP} from "net";
 
 export class UserCredentialValidator {
-    static validateLoginAttempts(loginAttempts: number): void {
+    static validateLoginAttemptsType(loginAttempts: number): void {
         if (loginAttempts < 0) {
             throw new ValidationError(EntitiesMessage.error.validation.invalidType('Login attempts', 'inteiro positivo'));
         }

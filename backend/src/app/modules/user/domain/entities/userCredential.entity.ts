@@ -1,30 +1,43 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {UserCredentialValidator} from "@user/domain/validators/userCredential.validator";
 import * as argon2 from "argon2";
-import {CreateUserCredentialEntityDTO} from "@user/adapters/dtos/userCredential.dto";
+import {UserCredentialTypeTransform} from "@user/domain/transformers/userCredentialType.transformer";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface UserCredentialProps {
     id?: number;
+    userEmail: string;
     password?: string;
     loginAttempts: number;
-    isTwoFactorEnable: boolean;
-    isEmailVerified: boolean;
     lastLoginIp?: string;
     lastLoginAt?: Date;
-    userCredentialTypeId: number;
-    statusId: number;
+    userCredentialType: string;
+    status: string;
 }
 
 export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
     //#region PROPS
     public static MIN_PASSWORD: number = 6;
+    public static MAX_LOGIN_ATTEMPTS: number = 3;
     //#endregion
 
     //#region constructor
     constructor(props: UserCredentialProps) {
-        super(props);
+        const normalizedProps: UserCredentialProps = {
+            ...props,
+            userCredentialType: UserCredentialTypeTransform.normalizeDescription(props.userCredentialType),
+            status: StatusTransformer.normalizeDescription(props.status)
+        };
 
-        this.validateRequiredFields(['loginAttempts', 'isTwoFactorEnable', 'isEmailVerified', 'statusId', 'userCredentialTypeId']);
+        super(normalizedProps);
+
+        this.validateRequiredFields([
+            'loginAttempts',
+            'userEmail',
+
+            'status',
+            'userCredentialType'
+        ]);
 
         this.validate();
     }
@@ -36,20 +49,16 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
         return this.props.id;
     }
 
+    get userEmail(): string {
+        return this.props.userEmail;
+    }
+
     get password(): string | undefined {
         return this.props.password;
     }
 
     get loginAttempts(): number {
         return this.props.loginAttempts;
-    }
-
-    get isTwoFactorEnable(): boolean {
-        return this.props.isTwoFactorEnable;
-    }
-
-    get isEmailVerified(): boolean {
-        return this.props.isEmailVerified;
     }
 
     get lastLoginIp(): string | undefined {
@@ -60,19 +69,18 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
         return this.props.lastLoginAt;
     }
 
-    get userCredentialTypeId(): number {
-        return this.props.userCredentialTypeId;
+    get userCredentialType(): string {
+        return this.props.userCredentialType;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
-
     //#endregion
 
     //#region VALIDATION
     private validate(): void {
-        UserCredentialValidator.validateLoginAttempts(this.props.loginAttempts);
+        UserCredentialValidator.validateLoginAttemptsType(this.props.loginAttempts);
         UserCredentialValidator.validateLastLoginIp(this.props.lastLoginIp);
     }
 
@@ -81,22 +89,18 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
     //#region CREATE
     private static createDefaultProperties(): Pick<
         UserCredentialProps,
-        "loginAttempts" | "isTwoFactorEnable" | "isEmailVerified" | "lastLoginIp" | "lastLoginAt"
+        "loginAttempts" | "lastLoginIp" | "lastLoginAt"
     > {
         return {
             loginAttempts: 0,
-            isTwoFactorEnable: false,
-            isEmailVerified: false,
             lastLoginIp: undefined,
             lastLoginAt: undefined,
         };
     }
 
-    public static async create(props: CreateUserCredentialEntityDTO): Promise<UserCredentialEntity> {
-        const defaultProps: Pick<
-            UserCredentialProps,
-            "loginAttempts" | "isTwoFactorEnable" | "isEmailVerified" | "lastLoginIp" | "lastLoginAt"
-        > = Object.assign(props, this.createDefaultProperties());
+    public static async create(props: Omit<UserCredentialProps, "loginAttempts" | "lastLoginIp" | "lastLoginAt">): Promise<UserCredentialEntity> {
+        const defaultProps: Pick<UserCredentialProps, "loginAttempts" | "lastLoginIp" | "lastLoginAt"> =
+            Object.assign(props, this.createDefaultProperties());
 
         if (props.password) {
             return this.createWithPassword(props.password, {...props, ...defaultProps});
@@ -135,6 +139,10 @@ export class UserCredentialEntity extends EntityBase<UserCredentialProps> {
 
     public static async verifyPassword(hashedPassword: string, plainPassword: string): Promise<boolean> {
         return await argon2.verify(hashedPassword, plainPassword);
+    }
+
+    public static rehydrate(props: UserCredentialProps): UserCredentialEntity {
+        return new UserCredentialEntity(props);
     }
 
     //#endregion

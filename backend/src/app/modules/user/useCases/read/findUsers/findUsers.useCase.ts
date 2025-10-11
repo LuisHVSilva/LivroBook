@@ -41,16 +41,15 @@ export class FindUsersUseCase implements IFindUsersUseCase {
     private mapLocationFilter(input: FindUsersRawDTO): UserFilterDTO {
         return {
             id: StringUtil.parseCsvFilter(input.id, Number),
-            name: StringUtil.parseCsvFilter(input.name, String),
-            email: StringUtil.parseCsvFilter(input.email, String),
+            name: StringUtil.parseCsvFilter(input.name, String, false),
+            email: StringUtil.parseCsvFilter(input.email, String, false),
             document: StringUtil.parseCsvFilter(input.document, String),
             birthday: StringUtil.parseCsvFilter(input.birthday, StringUtil.parseDate),
-            userTypeId: StringUtil.parseCsvFilter(input.userTypeId, Number),
-            cityId: StringUtil.parseCsvFilter(input.cityId, Number),
-            userCredentialId: StringUtil.parseCsvFilter(input.userCredentialId, Number),
-            documentTypeId: StringUtil.parseCsvFilter(input.documentTypeId, Number),
-            phoneId: StringUtil.parseCsvFilter(input.phoneId, Number),
-            statusId: StringUtil.parseCsvFilter(input.statusId, Number),
+            userType: StringUtil.parseCsvFilter(input.userType, String),
+            city: StringUtil.parseCsvFilter(input.city, String),
+            documentType: StringUtil.parseCsvFilter(input.documentType, String),
+            phone: StringUtil.parseCsvFilter(input.phone, String),
+            status: StringUtil.parseCsvFilter(input.status, String),
         };
     }
 }

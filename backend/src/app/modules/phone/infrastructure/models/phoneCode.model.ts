@@ -44,10 +44,10 @@ class PhoneCodeModel extends Model<InferAttributes<PhoneCodeModel>, InferCreatio
     @DbColumn(DataType.INTEGER)
     declare statusId: number
 
-    @BelongsTo(() => StateModel)
+    @BelongsTo(() => StateModel, {as: 'state'})
     state?: StateModel;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: 'status'})
     status?: StatusModel;
 
     @CreatedAt

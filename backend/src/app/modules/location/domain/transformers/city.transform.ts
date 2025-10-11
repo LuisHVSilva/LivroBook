@@ -1,4 +1,4 @@
-import { StringUtil } from '@coreShared/utils/string.util';
+import {StringUtil} from '@coreShared/utils/string.util';
 
 export class CityTransformer {
     static normalizeDescription(description: string): string {

@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -14,6 +13,7 @@ import {
     CreateUserCredentialTypeResponseDTO
 } from "@user/adapters/dtos/userCredentialType.dto";
 import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class CreateUserCredentialTypeUseCase implements ICreateUserCredentialTypeUseCase {
@@ -22,7 +22,7 @@ export class CreateUserCredentialTypeUseCase implements ICreateUserCredentialTyp
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: CreateUserCredentialTypeDTO, transaction?: Transaction): Promise<ResultType<CreateUserCredentialTypeResponseDTO>> {
         if (!transaction) {
@@ -32,12 +32,7 @@ export class CreateUserCredentialTypeUseCase implements ICreateUserCredentialTyp
         try {
             const created: UserCredentialTypeEntity = await this.service.create(input, transaction);
 
-            return ResultType.success({
-                id: created.id!,
-                description: created.description,
-                statusId: created.statusId
-            })
-
+            return ResultType.success(created)
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

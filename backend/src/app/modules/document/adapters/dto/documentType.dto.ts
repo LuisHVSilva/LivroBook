@@ -8,19 +8,17 @@ export type DocumentTypeDTO = DocumentTypeProps;
 
 //---------- FILTER ---------
 export type DocumentTypeFilterDTO = {
-    id?: number[];
-    description?: string[];
-    countryId?: number[];
-    statusId?: number[];
-    page?: number;
-    limit?: number;
+    id?: number | number[];
+    description?: string | string[];
+    country?: string | string[];
+    status?: string | string[];
 };
 
 // ------- PERSISTENCE ------
 export type DocumentTypePersistenceDTO = Omit<DocumentTypeDTO, "id">;
 
 // ---------- CREATE ----------
-export type CreateDocumentTypeDTO = Pick<DocumentTypeDTO, "description" | "countryId">;
+export type CreateDocumentTypeDTO = Pick<DocumentTypeDTO, "description" | "country">;
 export type CreateDocumentTypeResponseDTO = DocumentTypeDTO;
 
 // ---------- UPDATE ----------
@@ -33,8 +31,8 @@ export type FindByIdDocumentTypeResponseDTO = DocumentTypeDTO;
 export type FindDocumentTypesRawDTO = {
     id?: string;
     description?: string;
-    countryId?: string;
-    statusId?: string;
+    country?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
@@ -55,11 +53,16 @@ export type DocumentTypeDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface DocumentTypeNormalizedRelations {
+    countryId: number;
+    statusId: number;
+}
 export type DocumentTypeBaseRepositoryType = BaseRepositoryType<
     DocumentTypeModel,
     DocumentTypeProps,
     DocumentTypeFilterDTO,
-    DocumentTypePersistenceDTO
+    DocumentTypePersistenceDTO,
+    DocumentTypeNormalizedRelations
 >;
 
 // ------ BASE CONTROLLER TYPE -------

@@ -1,47 +1,49 @@
 import {Router} from "express";
 import {asyncHandler} from "@coreShared/middlewares/asyncHandler";
 import {validateRequest} from "@coreShared/middlewares/validateRequest";
-import {makeDocumentTypeController} from "@document/adapters/factories/documentTypeController.factory";
-import {CreateDocumentTypeSchema} from "@document/schemas/createDocumentType.schema";
-import {FindDocumentTypesSchema} from "@document/schemas/findDocumentTypes.schema";
-import {UpdateDocumentTypeSchema} from "@document/schemas/updateDocumentType.schema";
-import {deleteDocumentTypesSchema} from "@document/schemas/deleteDocumentTypes.schema";
-import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
+import {makeDocumentController} from "@document/adapters/factories/documentController.factory";
+import {CreateDocumentTypeSchema} from "@document/schemas/post/createDocumentType.schema";
+import {FindDocumentTypesSchema} from "@document/schemas/get/findDocumentTypes.schema";
+import {UpdateDocumentTypeSchema} from "@document/schemas/patch/updateDocumentType.schema";
+import {deleteDocumentTypesSchema} from "@document/schemas/delete/deleteDocumentTypes.schema";
+import {isAdminMiddleware} from "@coreShared/middlewares/isAdmin.middleware";
+import {FindDocumentTypeByIdSchema} from "@document/schemas/get/findDocumentTypeById.schema";
 
-const documentTypeController = makeDocumentTypeController()
+const documentController = makeDocumentController()
 const router = Router();
 
 router.post(
     "/documentType/create",
-    isAbelToAccessMiddleware(),
     validateRequest(CreateDocumentTypeSchema),
-    asyncHandler((req, res) => documentTypeController.create(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => documentController.documentTypeController.create(req, res))
 );
 
 router.get(
     "/documentType/findById/:id",
-    isAbelToAccessMiddleware(),
-    asyncHandler((req, res) => documentTypeController.findById(req, res))
+    validateRequest(FindDocumentTypeByIdSchema, 'params'),
+    isAdminMiddleware(),
+    asyncHandler((req, res) => documentController.documentTypeController.findById(req, res))
 )
 
 router.get(
     "/documentType/findAll",
-    isAbelToAccessMiddleware(),
     validateRequest(FindDocumentTypesSchema, 'query'),
-    asyncHandler((req, res) => documentTypeController.findAll(req, res))
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => documentController.documentTypeController.findAll(req, res))
 )
 
 router.patch(
     "/documentType/update",
-    isAbelToAccessMiddleware(),
     validateRequest(UpdateDocumentTypeSchema),
-    asyncHandler((req, res) => documentTypeController.update(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => documentController.documentTypeController.update(req, res))
 )
 
 router.delete(
     "/documentType/delete",
-    isAbelToAccessMiddleware(),
     validateRequest(deleteDocumentTypesSchema, 'query'),
-    asyncHandler((req, res) => documentTypeController.delete(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => documentController.documentTypeController.delete(req, res))
 )
 export {router as document};

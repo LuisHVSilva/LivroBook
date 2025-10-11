@@ -1,5 +1,8 @@
 import {DomainError} from "@coreShared/errors/domain.error";
 
+export type TransformerFn = (value: string) => string;
+export type TransformerMap<T> = Partial<Record<keyof T, TransformerFn>>;
+
 export class StringUtil {
     static transformCapitalLetterWithoutAccent(str: string, validateRequiredString: boolean = false, fieldName?: string): string {
         if (validateRequiredString) {
@@ -45,9 +48,13 @@ export class StringUtil {
 
     static parseCsvFilter<T = string>(
         value: string | undefined,
-        parser: (v: string) => T
+        parser: (v: string) => T,
+        upperCase: boolean = true,
     ): T[] | undefined {
         if (!value) return undefined;
+        if (upperCase) {
+            return value.split(',').map(v => parser(v.trim().toUpperCase()));
+        }
         return value.split(',').map(v => parser(v.trim()));
     }
 
@@ -73,5 +80,36 @@ export class StringUtil {
         const [day, month, year] = dateStr.split('/');
         return new Date(Number(year), Number(month) - 1, Number(day));
     }
+
+    /**
+     * Aplica transformações de normalização em campos de um DTO de filtro.
+     *
+     * @param input - O objeto de entrada (ex: FilterDTO)
+     * @param transformers - Mapa de chaves → função transformadora
+     * @returns Um novo objeto com os campos transformados
+     */
+    static applyFilterTransform<T extends Record<string, any>>(
+        input: T,
+        transformers: TransformerMap<T>
+    ): T {
+        const transformed = { ...input };
+
+        (Object.keys(transformers) as (keyof T)[]).forEach((key) => {
+            const transformFn = transformers[key];
+            if (!transformFn) return;
+
+            const value = transformed[key];
+            if (!value) return;
+
+            if (Array.isArray(value)) {
+                transformed[key] = (value as string[]).map(transformFn) as any;
+            } else {
+                transformed[key] = [transformFn(value as string)] as any;
+            }
+        });
+
+        return transformed;
+    }
+
 
 }

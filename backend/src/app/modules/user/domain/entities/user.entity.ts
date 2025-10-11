@@ -1,5 +1,9 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {UserValidator} from "@user/domain/validators/user.validator";
+import {CityTransformer} from "@location/domain/transformers/city.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
+import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
 
 export interface UserProps {
     id?: number;
@@ -7,13 +11,15 @@ export interface UserProps {
     email: string;
     document?: string;
     birthday: Date;
-    userTypeId: number;
-    cityId?: number;
-    userCredentialId: number;
-    documentTypeId?: number;
-    phoneId?: number;
-    statusId: number;
+    isTwoFactorEnable: boolean;
+    isEmailVerified: boolean;
+    city?: string;
+    documentType?: string;
+    phone?: string;
+    userType: string;
+    status: string;
 }
+
 
 export class UserEntity extends EntityBase<UserProps> {
 
@@ -28,22 +34,32 @@ export class UserEntity extends EntityBase<UserProps> {
 
     //#region CONSTRUCTOR
     constructor(props: UserProps) {
-        super(props);
+        const normalizedProps: UserProps = {
+            ...props,
+            city: props.city ? CityTransformer.normalizeDescription(props.city) : undefined,
+            documentType: props.documentType ? DocumentTypeTransform.normalizeDescription(props.documentType) : undefined,
+            userType: UserTypeTransform.normalizeDescription(props.userType),
+            status: StatusTransformer.normalizeDescription(props.status)
+        };
 
-        // this.validateRequiredFields([
-        //     'name',
-        //     'email',
-        //     // 'document',
-        //     'birthday',
-        //     'userTypeId',
-        //     // 'cityId',
-        //     'userCredentialId',
-        //     // 'documentTypeId',
-        //     'statusId',
-        // ]);
+        super(normalizedProps);
+
+        this.validateRequiredFields([
+            'name',
+            'email',
+            // 'document',
+            'birthday',
+            'isTwoFactorEnable',
+            'isEmailVerified',
+            'userType',
+            // 'city',
+            // 'documentType',
+            'status',
+        ]);
 
         this.validate();
     }
+
     //#endregion
 
     //#region GET
@@ -67,49 +83,65 @@ export class UserEntity extends EntityBase<UserProps> {
         return this.props.birthday;
     }
 
-    get userTypeId(): number {
-        return this.props.userTypeId;
+    get isTwoFactorEnable(): boolean {
+        return this.props.isTwoFactorEnable;
     }
 
-    get cityId(): number | undefined {
-        return this.props.cityId;
+    get isEmailVerified(): boolean {
+        return this.props.isEmailVerified;
     }
 
-    get userCredentialId(): number {
-        return this.props.userCredentialId;
+    get userType(): string {
+        return this.props.userType;
     }
 
-    get documentTypeId(): number | undefined{
-        return this.props.documentTypeId;
+    get city(): string | undefined {
+        return this.props.city;
     }
 
-    get phoneId(): number | undefined {
-        return this.props.phoneId;
+    get documentType(): string | undefined {
+        return this.props.documentType;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get phone(): string | undefined {
+        return this.props.phone;
     }
+
+    get status(): string {
+        return this.props.status;
+    }
+
     //#endregion
 
     //#region VALIDATION
     private validate(): void {
         UserValidator.validateName(this.props.name, UserEntity.MIN_NAME, UserEntity.MAX_NAME);
         UserValidator.validateEmail(this.props.email);
-        UserValidator.validateDocumentsFields(this.props.document, this.props.documentTypeId);
+        UserValidator.validateDocumentsFields(this.props.document, this.props.documentType);
         //this.validateIsUnder18();
     }
+
     //#endregion
 
     //#region CREATE
-    public static create(props: UserProps): UserEntity {
-        return new UserEntity(props);
+    public static create(props: Omit<UserProps, "isTwoFactorEnable" | "isEmailVerified">): UserEntity {
+        return new UserEntity({
+            ...props,
+            isTwoFactorEnable: false,
+            isEmailVerified: false,
+        });
     }
+
     //#endregion
 
     //#region UPDATE
     public update(props: Partial<UserProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
+
+    public static rehydrate(props: UserProps): UserEntity {
+        return new UserEntity(props);
+    }
 }

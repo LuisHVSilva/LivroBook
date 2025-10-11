@@ -34,7 +34,7 @@ class UserTypeModel extends Model<InferAttributes<UserTypeModel>, InferCreationA
     declare statusId: number;
 
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

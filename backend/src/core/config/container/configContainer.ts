@@ -11,10 +11,10 @@ container.registerInstance("SequelizeInstance", Database.getInstance());
 container.registerSingleton<ILogger>("ILogger", Logger);
 container.register<EntityUniquenessValidatorFactory>("EntityUniquenessValidatorFactory", {
     useFactory: () => {
-        return <TModel, TEntity, TFilter, TPersistence>(
-            repo: IRepositoryBase<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence>>
+        return <TModel, TEntity, TFilter, TPersistence, TNormalizedRelations>(
+            repo: IRepositoryBase<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence, TNormalizedRelations>>
         ) =>
-            new EntityUniquenessValidator<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence>>(repo);
+            new EntityUniquenessValidator<BaseRepositoryType<TModel, TEntity, TFilter, TPersistence, TNormalizedRelations>>(repo);
     }
 });
 

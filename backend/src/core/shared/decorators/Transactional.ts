@@ -1,7 +1,7 @@
 import { container } from "tsyringe";
 import { Sequelize } from "sequelize";
 
-export function Transactional(): MethodDecorator {
+export function Transactional(ignoreRollback: boolean = false): MethodDecorator {
     return function (
         target: any,
         propertyKey: string | symbol,
@@ -17,7 +17,11 @@ export function Transactional(): MethodDecorator {
                 const result = await originalMethod.apply(this, [...args, transaction]);
 
                 if (!result.isSuccess()) {
-                    await transaction.rollback();
+                    if (ignoreRollback) {
+                        await transaction.commit();
+                    } else {
+                        await transaction.rollback();
+                    }
                 } else {
                     await transaction.commit();
                 }

@@ -1,12 +1,14 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {CityTransformer} from "@location/domain/transformers/city.transform";
 import {CityValidator} from "@location/domain/validators/city.validator";
+import {StateTransformer} from "@location/domain/transformers/state.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface CityProps {
     id?: number;
     description: string;
-    stateId: number;
-    statusId: number
+    state: string;
+    status: string;
 }
 
 export class CityEntity extends EntityBase<CityProps> {
@@ -21,10 +23,12 @@ export class CityEntity extends EntityBase<CityProps> {
         const normalizedProps: CityProps = {
             ...props,
             description: CityTransformer.normalizeDescription(props.description),
+            state: StateTransformer.normalizeDescription(props.state),
+            status: StatusTransformer.normalizeDescription(props.status),
         };
         super(normalizedProps);
 
-        this.validateRequiredFields(['description', 'stateId', 'statusId']);
+        this.validateRequiredFields(['description', 'state', 'status']);
         this.validate();
     }
 
@@ -39,12 +43,12 @@ export class CityEntity extends EntityBase<CityProps> {
         return this.props.description;
     }
 
-    get stateId(): number {
-        return this.props.stateId;
+    get state(): string {
+        return this.props.state;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion
@@ -53,17 +57,20 @@ export class CityEntity extends EntityBase<CityProps> {
     private validate(): void {
         CityValidator.validateDescriptionLength(this.props.description, CityEntity.MIN_DESC, CityEntity.MAX_DESC);
     }
+
     //#endregion
 
     //#region CREATION
     public static create(props: CityProps): CityEntity {
         return new CityEntity(props);
     }
+
     //#endregion
 
     //#region UPDATES
     public update(props: Partial<CityProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
 }

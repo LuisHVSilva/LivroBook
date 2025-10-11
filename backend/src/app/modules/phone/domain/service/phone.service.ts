@@ -13,6 +13,9 @@ import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.ser
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {PhoneBaseRepositoryType, PhoneDtoBaseType} from "@phone/adapters/dtos/phone.dto";
+import {StringUtil} from "@coreShared/utils/string.util";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
 
 @injectable()
 export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> implements IPhoneService {
@@ -22,12 +25,18 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("IPhoneRepository") protected readonly repo: IPhoneRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("PhoneRepository") private readonly phoneRepository: IRepositoryBase<PhoneBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
-        @inject("IPhoneCodeService") private readonly phoneCodeService: IPhoneCodeService,
-        @inject("IPhoneTypeService") private readonly phoneTypeService: IPhoneTypeService,
+        @inject("IPhoneRepository")
+        protected readonly repo: IPhoneRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("PhoneRepository")
+        private readonly phoneRepository: IRepositoryBase<PhoneBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
+        @inject("IPhoneCodeService")
+        private readonly phoneCodeService: IPhoneCodeService,
+        @inject("IPhoneTypeService")
+        private readonly phoneTypeService: IPhoneTypeService,
     ) {
         super(repo, PhoneEntity, statusService);
         this.uniquenessValidator = this.validatorFactory(this.phoneRepository);
@@ -37,18 +46,18 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: PhoneDtoBaseType["CreateDTO"], statusId: number): Promise<PhoneEntity> {
+    protected async createEntity(data: PhoneDtoBaseType["CreateDTO"], status: string): Promise<PhoneEntity> {
         return PhoneEntity.create({
             number: data.number,
-            phoneCodeId: data.phoneCodeId,
-            phoneTypeId: data.phoneTypeId,
-            statusId
+            phoneCode: data.phoneCode,
+            phoneType: data.phoneType,
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: PhoneEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('number', entity.number);
+    protected async uniquenessValidatorEntity(entity: PhoneEntity, previousEntity: PhoneEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('number', entity.number, previousEntity);
         if (!isUnique) {
             throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue("PHONE", "number"));
         }
@@ -56,16 +65,23 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
 
     @LogError()
     protected filterTransform(input: PhoneDtoBaseType['FilterDTO']): PhoneDtoBaseType['FilterDTO'] {
-        return input;
+        return StringUtil.applyFilterTransform(input, {
+            phoneType: PhoneTypeTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<PhoneDtoBaseType["DTO"]>): Promise<void> {
+        await this.validateExistence("phoneCode", undefined, {
+            ddiCode: data.phoneCode?.ddiCode,
+            dddCode: data.phoneCode?.dddCode
+        }, this.phoneCodeService);
         await Promise.all([
-            this.validateExistence("phoneCodeId", data.phoneCodeId, this.phoneCodeService),
-            this.validateExistence("phoneTypeId", data.phoneTypeId, this.phoneTypeService),
-            this.validateStatusExistence(data.statusId),
+            this.validateExistence("phoneType", data.phoneType, "description", this.phoneTypeService),
+            this.validateStatusExistence(data.status),
         ]);
     }
+
     //#endregion
 }

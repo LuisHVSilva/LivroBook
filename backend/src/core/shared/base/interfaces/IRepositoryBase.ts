@@ -3,7 +3,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {BaseRepositoryType} from "@coreShared/types/entity.type";
 
-export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any>> {
+export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any, any>> {
     /**
      * Create a new register.
      * @param entity - The T entity to create.
@@ -15,34 +15,37 @@ export interface IRepositoryBase<T extends BaseRepositoryType<any, any, any, any
     /**
      * Finds a single entity by its ID.
      * @param id - Entity identifier.
+     * @param transaction
+     * @param includes
      */
-    findById(id: string | number): Promise<ResultType<T["Entity"]>>;
+    findById(id: number, transaction?: Transaction, includes?: boolean): Promise<ResultType<T["Entity"]>>;
 
     /**
      * Finds a single entity by filter.
      * @param filter - Filter criteria to apply when searching for entity.
+     * @param exact - Exact match filter. Default is true.
+     * @param includes
+     * @param transaction
      */
-    findOneByFilter(filter: T["Filter"]): Promise<ResultType<T["Entity"]>>;
-
-    /**
-     * Finds a single exactly entity by filter.
-     * @param filter - Filter criteria to apply when searching for entity.
-     */
-    findOneExactByFilter(filter?: T["Filter"]): Promise<ResultType<T["Entity"]>>;
+    findOneByFilter(filter: T["Filter"], exact?: boolean, includes?: boolean, transaction?: Transaction): Promise<ResultType<T["Entity"]>>;
 
     /**
      * @param limit - The maximum number of statuses to return.
      * @param offset - The number of statuses to skip before starting to collect the result set.
-     * @param filter - Optional filter criteria to apply when searching for entity.
+     * @param filters - Optional filter criteria to apply when searching for entity.
      * @param orderBy -
+     * @param exact - Exact match filter. Default is true.
+     * @param includes
      * @return A ResultType containing an array of StatusEntity objects and the total count of matching statuses.
      */
     findMany(
         limit: number,
         offset: number,
-        filter?: T["Filter"],
-        orderBy?: { field: keyof T["Entity"]; direction: 'ASC' | 'DESC' }
-    ): Promise<ResultType<FindAllType<T["Entity"]>>>;
+        filters?: T["Filter"],
+        orderBy?: { field: keyof T["Entity"]; direction: 'ASC' | 'DESC' },
+        exact?: boolean,
+        includes?: boolean
+    ): Promise<ResultType<FindAllType<T["Entity"]>>>
 
     /**
      * Update a status entity.

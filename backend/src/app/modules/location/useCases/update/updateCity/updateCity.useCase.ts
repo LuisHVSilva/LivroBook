@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -9,6 +8,7 @@ import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateCityUseCase} from "@location/useCases/update/updateCity/IUpdateCity.useCase";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {UpdateCityDTO, UpdateCityResponseDTO} from "@location/adapters/dtos/city.dto";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdateCityUseCase implements IUpdateCityUseCase {
@@ -17,7 +17,7 @@ export class UpdateCityUseCase implements IUpdateCityUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: UpdateCityDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateCityResponseDTO>>> {
         if (!transaction) {

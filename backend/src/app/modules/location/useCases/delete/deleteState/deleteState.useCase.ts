@@ -1,6 +1,5 @@
 import {inject, injectable} from "tsyringe";
 import {Transaction} from "sequelize";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -12,15 +11,17 @@ import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dt
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {IDeleteStateUseCase} from "@location/useCases/delete/deleteState/IDeleteState.useCase";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class DeleteStateUseCase implements IDeleteStateUseCase {
     constructor(
-        @inject("IStateService") private readonly service: IStateService,
+        @inject("IStateService")
+        private readonly service: IStateService,
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {

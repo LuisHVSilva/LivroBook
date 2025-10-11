@@ -5,7 +5,7 @@ import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 export class PhoneTypeValidator {
     static validateDescriptionLength(description: string, min: number, max: number) {
         if (description.length < min || description.length > max) {
-            throw new EntityError(EntitiesMessage.error.validation.invalidLen(PhoneTypeEntity.ENTITY_NAME, min, max));
+            throw new EntityError(EntitiesMessage.error.validation.invalidLen(PhoneTypeEntity.name, min, max));
         }
     }
 }

@@ -1,12 +1,14 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {StateTransformer} from "@location/domain/transformers/state.transform";
 import {StateValidator} from "@location/domain/validators/state.validator";
+import {CountryTransformer} from "@location/domain/transformers/country.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface StateProps {
     id?: number;
     description: string;
-    countryId: number;
-    statusId: number;
+    country: string;
+    status: string;
 }
 
 export class StateEntity extends EntityBase<StateProps> {
@@ -21,11 +23,14 @@ export class StateEntity extends EntityBase<StateProps> {
         const normalizedProps: StateProps = {
             ...props,
             description: StateTransformer.normalizeDescription(props.description),
+            country: CountryTransformer.normalizeDescription(props.country),
+            status: StatusTransformer.normalizeDescription(props.status),
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'countryId', 'statusId']);
+        this.validateRequiredFields(['description', 'country', 'status']);
         this.validate();
     }
+
     //#endregion
 
     //#region GETTERS
@@ -37,13 +42,14 @@ export class StateEntity extends EntityBase<StateProps> {
         return this.props.description;
     }
 
-    get countryId(): number {
-        return this.props.countryId;
+    get country(): string {
+        return this.props.country;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
+
     //#endregion
 
     //#region VALIDATIONS
@@ -57,11 +63,13 @@ export class StateEntity extends EntityBase<StateProps> {
     public static create(props: StateProps): StateEntity {
         return new StateEntity(props);
     }
+
     //#endregion
 
     //#region UPDATES
     public update(props: Partial<StateProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
 }

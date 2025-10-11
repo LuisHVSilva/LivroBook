@@ -65,19 +65,19 @@ class BookModel extends Model<InferAttributes<BookModel>, InferCreationAttribute
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
-    @BelongsTo(() => AuthorModel)
+    @BelongsTo(() => AuthorModel, {as: "author"})
     author?: AuthorModel;
 
-    @BelongsTo(() => PublisherModel)
+    @BelongsTo(() => PublisherModel, {as: "publisher"})
     publisher?: PublisherModel;
 
-    @BelongsTo(() => BookCategoryModel)
+    @BelongsTo(() => BookCategoryModel, {as: "bookCategory"})
     bookCategory?: BookCategoryModel;
 
-    @BelongsTo(() => LanguageModel)
+    @BelongsTo(() => LanguageModel, {as: "language"})
     language?: LanguageModel;
 
     @CreatedAt

@@ -1,12 +1,13 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {UserCredentialTypeTransform} from "@user/domain/transformers/userCredentialType.transformer";
 import {UserCredentialTypeValidator} from "@user/domain/validators/userCredentialType.validator";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 
 export interface UserCredentialTypeProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class UserCredentialTypeEntity extends EntityBase<UserCredentialTypeProps> {
@@ -20,10 +21,11 @@ export class UserCredentialTypeEntity extends EntityBase<UserCredentialTypeProps
         const normalizedProps: UserCredentialTypeProps = {
             ...props,
             description: UserCredentialTypeTransform.normalizeDescription(props.description),
+            status: StatusTransformer.normalizeDescription(props.status)
         };
 
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
 
@@ -38,8 +40,8 @@ export class UserCredentialTypeEntity extends EntityBase<UserCredentialTypeProps
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

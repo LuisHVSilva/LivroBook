@@ -4,7 +4,7 @@ import {PublisherValidator} from "@modules/book/domain/validators/publisher.vali
 export interface PublisherProps {
     id?: number;
     name: string;
-    statusId: number;
+    status: string;
 }
 
 export class PublisherEntity extends EntityBase<PublisherProps> {
@@ -16,7 +16,7 @@ export class PublisherEntity extends EntityBase<PublisherProps> {
     //#region CONSTRUCTOR
     constructor(props: PublisherProps) {
         super(props);
-        this.validateRequiredFields(['name', 'statusId']);
+        this.validateRequiredFields(['name', 'status']);
         this.validate();
     }
 
@@ -31,8 +31,8 @@ export class PublisherEntity extends EntityBase<PublisherProps> {
         return this.props.name;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

@@ -2,7 +2,6 @@ import {inject, injectable} from "tsyringe";
 import {IDeleteDocumentTypesUseCase} from "@document/useCases/delete/deleteDocumentTypes/IDeleteDocumentTypes.useCase";
 import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
 import {Transaction} from "sequelize";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -12,15 +11,17 @@ import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class DeleteDocumentTypesUseCase implements IDeleteDocumentTypesUseCase {
     constructor(
-        @inject("IDocumentTypeService") private readonly documentTypeService: IDocumentTypeService
+        @inject("IDocumentTypeService")
+        private readonly documentTypeService: IDocumentTypeService
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: DeleteRequestDTO, transaction?: Transaction): Promise<ResultType<DeleteResponseDTO>> {
         if (!transaction) {
@@ -33,9 +34,7 @@ export class DeleteDocumentTypesUseCase implements IDeleteDocumentTypesUseCase {
 
             const report: DeleteReport = await this.documentTypeService.deleteMany(ids, transaction!);
 
-            return ResultType.success({
-                report
-            });
+            return ResultType.success({report});
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

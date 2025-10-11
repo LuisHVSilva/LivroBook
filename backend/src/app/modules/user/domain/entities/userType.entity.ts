@@ -1,11 +1,12 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {UserTypeTransform} from "@user/domain/transformers/userType.transformer";
 import {UserTypeValidator} from "@user/domain/validators/userType.validator";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface UserTypeProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class UserTypeEntity extends EntityBase<UserTypeProps> {
@@ -19,9 +20,10 @@ export class UserTypeEntity extends EntityBase<UserTypeProps> {
         const normalizedProps: UserTypeProps = {
             ...props,
             description: UserTypeTransform.normalizeDescription(props.description),
+            status: StatusTransformer.normalizeDescription(props.status)
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
     //#endregion
@@ -35,8 +37,8 @@ export class UserTypeEntity extends EntityBase<UserTypeProps> {
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion

@@ -1,7 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IUpdateDocumentTypeUseCase} from "@document/useCases/update/updateDocumentType/IUpdateDocumentType.useCase";
 import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocumentType.service";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {UpdateDocumentTypeDTO, UpdateDocumentTypeResponseDTO} from "@document/adapters/dto/documentType.dto";
 import {Transaction} from "sequelize";
@@ -9,6 +8,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdateDocumentTypeUseCase implements IUpdateDocumentTypeUseCase {
@@ -17,7 +17,7 @@ export class UpdateDocumentTypeUseCase implements IUpdateDocumentTypeUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: UpdateDocumentTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateDocumentTypeResponseDTO>>> {
         if (!transaction) {

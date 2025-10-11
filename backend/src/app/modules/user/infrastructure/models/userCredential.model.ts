@@ -16,6 +16,7 @@ import {DbColumn} from "@coreShared/decorators/dbColumn";
 import {IUserCredentialModel} from "@user/infrastructure/models/interfaces/IUserCredential.model";
 import {StatusModel} from "@status/infrastructure/models/status.model";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
+import {UserModel} from "@user/infrastructure/models/user.model";
 
 @Table({tableName: "user_credential", timestamps: true})
 class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, InferCreationAttributes<UserCredentialModel>> implements IUserCredentialModel {
@@ -25,6 +26,11 @@ class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, In
     @DbColumn(DataType.INTEGER)
     declare id: CreationOptional<number>;
 
+    @ForeignKey(() => UserModel)
+    @AllowNull(false)
+    @DbColumn(DataType.INTEGER)
+    declare userId: number;
+
     @AllowNull(true)
     @DbColumn(DataType.STRING)
     declare password?: string;
@@ -33,16 +39,6 @@ class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, In
     @Default(0)
     @DbColumn(DataType.INTEGER)
     declare loginAttempts: number;
-
-    @AllowNull(false)
-    @Default(false)
-    @DbColumn(DataType.BOOLEAN)
-    declare isTwoFactorEnable: boolean;
-
-    @AllowNull(false)
-    @Default(false)
-    @DbColumn(DataType.BOOLEAN)
-    declare isEmailVerified: boolean;
 
     @AllowNull(true)
     @DbColumn(DataType.STRING(39))
@@ -62,10 +58,13 @@ class UserCredentialModel extends Model<InferAttributes<UserCredentialModel>, In
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => UserCredentialTypeModel)
+    @BelongsTo(() => UserModel, {as: "user"})
+    user?: UserModel;
+
+    @BelongsTo(() => UserCredentialTypeModel, {as: "userCredentialType"})
     userCredentialType?: UserCredentialTypeModel;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

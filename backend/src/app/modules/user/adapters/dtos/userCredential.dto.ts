@@ -1,47 +1,37 @@
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {UserCredentialModel} from "@user/infrastructure/models/userCredential.model";
-import {UserCredentialEntity} from "@user/domain/entities/userCredential.entity";
+import {UserCredentialEntity, UserCredentialProps} from "@user/domain/entities/userCredential.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
 
 // ---------- BASE ------------
-export type UserCredentialDTO = {
-    id?: number;
-    password?: string;
-    loginAttempts: number;
-    isTwoFactorEnable: boolean;
-    isEmailVerified: boolean;
-    lastLoginIP?: string;
-    lastLoginAt?: Date;
-    userCredentialTypeId: number;
-    statusId: number;
-};
+export type UserCredentialDTO = UserCredentialProps;
 
 // --------- FILTER -----------
 export type UserCredentialFilterDTO = {
-    id?: number[],
-    password?: string[];
-    loginAttempts?: number[];
-    isTwoFactorEnable?: boolean[];
-    isEmailVerified?: boolean[];
-    lastLoginIP?: string[];
-    lastLoginAt?: Date[];
-    userCredentialTypeId?: number[];
-    statusId?: number[];
+    id?: number | number[],
+    userEmail: string | string[],
+    password?: string | string[],
+    loginAttempts?: number | number[],
+    lastLoginIP?: number | number[],
+    lastLoginAt?: Date | Date[];
+    userCredentialType?: string | string[],
+    status?: string | string[],
 }
 
 // ------- PERSISTENCE --------
 export type UserCredentialPersistenceDTO = Omit<UserCredentialDTO, "id">;
 
 // ---------- CREATE ----------
-export type CreateUserCredentialEntityDTO = Pick<UserCredentialDTO, "password" | "userCredentialTypeId" | "statusId">;
+export type CreateUserCredentialEntityDTO = Pick<UserCredentialDTO, "password" | "userEmail">;
 export type CreateUserCredentialResponseDTO = Omit<UserCredentialDTO, "password">;
-export type CreateUserCredentialRequestDTO = Pick<UserCredentialDTO, "password">;
 
 // ---------- UPDATE ----------
 export type UpdateUserCredentialDTO = Partial<Omit<UserCredentialDTO, "id">> & { id: number, newPassword?: string };
 export type UpdateUserCredentialResponseDTO = UserCredentialDTO;
 
 // ---------- FIND ------------
+export type FindByIdUserCredentialResponseDTO = UserCredentialDTO;
 export type FindUserCredentialsRawDTO = {
     id?: string;
     password?: string;
@@ -50,7 +40,7 @@ export type FindUserCredentialsRawDTO = {
     isEmailVerified?: string;
     lastLoginIP?: string;
     lastLoginAt?: string;
-    userCredentialTypeId?: string;
+    userCredentialType?: string;
     page?: string;
     limit?: string;
 };
@@ -71,9 +61,27 @@ export type UserCredentialDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface UserCredentialNormalizedRelations {
+    userCredentialTypeId: number;
+    userId: number;
+    statusId: number;
+}
 export type UserCredentialBaseRepositoryType = BaseRepositoryType<
     UserCredentialModel,
     UserCredentialEntity,
     UserCredentialFilterDTO,
-    UserCredentialPersistenceDTO
+    UserCredentialPersistenceDTO,
+    UserCredentialNormalizedRelations
 >;
+
+// ------ BASE CONTROLLER TYPE -------
+export type PhoneAbstractControllerBaseType = AbstractControllerBaseType<
+    UserCredentialDTO,
+    CreateUserCredentialEntityDTO,
+    CreateUserCredentialResponseDTO,
+    FindByIdUserCredentialResponseDTO,
+    FindUserCredentialsRawDTO,
+    FindUserCredentialsResponseDTO,
+    UpdateUserCredentialDTO,
+    UpdateUserCredentialResponseDTO
+>

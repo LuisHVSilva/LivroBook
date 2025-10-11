@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
@@ -9,15 +8,17 @@ import {ICreateUserTypeUseCase} from "@user/useCases/create/createUserType/ICrea
 import {CreateUserTypeDTO, CreateUserTypeResponseDTO} from "@user/adapters/dtos/userType.dto";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
 import {UserTypeEntity} from "@user/domain/entities/userType.entity";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class CreateUserTypeUseCase implements ICreateUserTypeUseCase {
     constructor(
-        @inject("IUserTypeService") private readonly service: IUserTypeService
+        @inject("IUserTypeService")
+        private readonly service: IUserTypeService
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: CreateUserTypeDTO, transaction?: Transaction): Promise<ResultType<CreateUserTypeResponseDTO>> {
         if (!transaction) {
@@ -27,12 +28,7 @@ export class CreateUserTypeUseCase implements ICreateUserTypeUseCase {
         try {
             const created: UserTypeEntity = await this.service.create(input, transaction);
 
-            return ResultType.success({
-                id: created.id!,
-                description: created.description,
-                statusId: created.statusId
-            })
-
+            return ResultType.success(created)
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

@@ -2,12 +2,12 @@ import {FindStatesRawDTO, FindStatesResponseDTO, StateFilterDTO} from "@location
 import {IFindStatesUseCase} from "@location/useCases/read/findStates/IFindStates.useCase";
 import {inject, injectable} from "tsyringe";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StateEntity} from "@location/domain/entities/state.entity";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {LogError} from "@coreShared/decorators/LogError";
 
 
 @injectable()
@@ -17,20 +17,13 @@ export class FindStatesUseCase implements IFindStatesUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     async execute(input: FindStatesRawDTO): Promise<ResultType<FindStatesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
             const limit: number = input.limit ? StringUtil.strToNumber(input.limit) : 20;
 
-            const filter: StateFilterDTO = {
-                id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
-                description: StringUtil.parseCsvFilter(input.description?.toString(), String),
-                countryId: StringUtil.parseCsvFilter(input.countryId?.toString(), Number),
-                statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
-            };
-
-            const {entities, total}: FindAllType<StateEntity> = await this.service.findMany(filter, page, limit);
+            const {entities, total}: FindAllType<StateEntity> = await this.service.findMany(this.makeFilter(input), page, limit);
 
             const response: FindStatesResponseDTO = {
                 page,
@@ -43,5 +36,14 @@ export class FindStatesUseCase implements IFindStatesUseCase {
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }
+    }
+
+    private makeFilter(input: FindStatesRawDTO): StateFilterDTO {
+        return {
+            id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
+            description: StringUtil.parseCsvFilter(input.description?.toString(), String),
+            country: StringUtil.parseCsvFilter(input.country?.toString(), String),
+            status: StringUtil.parseCsvFilter(input.status?.toString(), String),
+        };
     }
 }

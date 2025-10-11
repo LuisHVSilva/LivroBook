@@ -12,7 +12,8 @@ import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 @injectable()
 export class FindUserTypesUseCase implements IFindUserTypesUseCase {
     constructor(
-        @inject("IUserTypeService") private readonly service: IUserTypeService,
+        @inject("IUserTypeService")
+        private readonly service: IUserTypeService,
     ) {
     }
 
@@ -39,8 +40,9 @@ export class FindUserTypesUseCase implements IFindUserTypesUseCase {
 
     private mapLocationFilter(input: FindUserTypesRawDTO): UserTypeFilterDTO {
         return {
+            id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             description: StringUtil.parseCsvFilter(input.description?.toString(), String),
-            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
+            status: StringUtil.parseCsvFilter(input.status?.toString(), String),
         };
     }
 }

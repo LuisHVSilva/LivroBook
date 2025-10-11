@@ -66,7 +66,7 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
-        const input: T["TDeleteReq"] = req.params as unknown as T["TDeleteReq"];
+        const input: T["TDeleteReq"] = req.query as unknown as T["TDeleteReq"];
         const result: ResultType<T["TDeleteRes"]> = await this.deleteUseCase.execute(input);
 
         if (!result.isSuccess()) {

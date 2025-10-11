@@ -39,9 +39,10 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
         return {
             id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             number: StringUtil.parseCsvFilter(input.number?.toString(), String),
-            phoneCodeId: StringUtil.parseCsvFilter(input.phoneCodeId?.toString(), Number),
-            phoneTypeId: StringUtil.parseCsvFilter(input.phoneTypeId?.toString(), Number),
-            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number)
+            phoneCodeDdiCode: StringUtil.parseCsvFilter(input.ddiCode?.toString(), Number),
+            phoneCodeDddCode: StringUtil.parseCsvFilter(input.dddCode?.toString(), Number),
+            phoneType: StringUtil.parseCsvFilter(input.phoneType?.toString(), String),
+            status: StringUtil.parseCsvFilter(input.status?.toString(), String)
         }
     }
 }

@@ -1,19 +1,16 @@
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {UserTypeModel} from "@user/infrastructure/models/userType.model";
-import {UserTypeEntity} from "@user/domain/entities/userType.entity";
+import {UserTypeEntity, UserTypeProps} from "@user/domain/entities/userType.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
 // ---------- BASE ------------
-export type UserTypeDTO = {
-    id?: number;
-    description: string;
-    statusId: number;
-};
+export type UserTypeDTO = UserTypeProps;
 
 // --------- FILTER -----------
 export type UserTypeFilterDTO = {
-    id?: number[],
-    description?: string[];
-    statusId?: number[];
+    id?: number | number[],
+    description?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE --------
@@ -28,10 +25,12 @@ export type UpdateUserTypeDTO = Partial<Omit<UserTypeDTO, "id">> & { id: number 
 export type UpdateUserTypeResponseDTO = UserTypeDTO;
 
 // ---------- FIND ------------
+export type FindByIdUserTypeResponseDTO = UserTypeDTO;
+
 export type FindUserTypesRawDTO = {
     id?: string;
     description?: string;
-    statusId?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
@@ -52,9 +51,26 @@ export type UserTypeDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface UserTypeNormalizedRelations {
+    statusId: number;
+}
+
 export type UserTypeBaseRepositoryType = BaseRepositoryType<
     UserTypeModel,
     UserTypeEntity,
     UserTypeFilterDTO,
-    UserTypePersistenceDTO
+    UserTypePersistenceDTO,
+    UserTypeNormalizedRelations
 >;
+
+// ------ BASE CONTROLLER TYPE -------
+export type UserTypeAbstractControllerBaseType = AbstractControllerBaseType<
+    UserTypeDTO,
+    CreateUserTypeDTO,
+    CreateUserTypeResponseDTO,
+    FindByIdUserTypeResponseDTO,
+    FindUserTypesRawDTO,
+    FindUserTypesResponseDTO,
+    UpdateUserTypeDTO,
+    UpdateUserTypeResponseDTO
+>

@@ -1,4 +1,4 @@
-import {output, z, ZodBoolean, ZodDate, ZodNumber, ZodOptional, ZodPipe, ZodString, ZodTransform} from "zod";
+import {output, z, ZodBoolean, ZodNumber, ZodOptional, ZodPipe, ZodString, ZodTransform} from "zod";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 
 export class ZodValidator {
@@ -79,13 +79,13 @@ export class ZodValidator {
 
         if (min !== undefined) {
             schema = schema.min(min, {
-                message: EntitiesMessage.error.validation.invalidMinLen("int", min.toString()),
+                message: EntitiesMessage.zod.invalidMinLen("int", min.toString()),
             });
         }
 
         if (max !== undefined) {
             schema = schema.max(max, {
-                message: EntitiesMessage.error.validation.invalidMaxLen("int", max.toString()),
+                message: EntitiesMessage.zod.invalidMaxLen("int", max.toString()),
             });
         }
 
@@ -141,5 +141,4 @@ export class ZodValidator {
 
         return schema;
     }
-
 }

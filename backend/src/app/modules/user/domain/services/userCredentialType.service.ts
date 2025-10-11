@@ -16,6 +16,8 @@ import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserC
 import {IUserCredentialTypeRepository} from "@user/infrastructure/repositories/interface/IUserCredentialType.repository";
 import {UserCredentialTypeTransform} from "@user/domain/transformers/userCredentialType.transformer";
 import {ResultType} from "@coreShared/types/result.type";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {StringUtil} from "@coreShared/utils/string.util";
 
 @injectable()
 export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDtoBaseType, UserCredentialTypeEntity> implements IUserCredentialTypeService {
@@ -37,11 +39,7 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
     //#endregion
 
     async getExactByDescription(description: string): Promise<UserCredentialTypeEntity> {
-        const filter: UserCredentialTypeDtoBaseType["FilterDTO"] = {
-            description: [UserCredentialTypeTransform.normalizeDescription(description)],
-        }
-
-        const founded: ResultType<UserCredentialTypeEntity> = await this.repo.findOneExactByFilter(filter);
+        const founded: ResultType<UserCredentialTypeEntity> = await this.repo.findOneByFilter({description});
         const entity: UserCredentialTypeEntity | null = founded.unwrapOrNull();
 
         if (!entity) {
@@ -53,36 +51,31 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: UserCredentialTypeDtoBaseType["CreateDTO"], statusId: number): Promise<UserCredentialTypeEntity> {
+    protected async createEntity(data: UserCredentialTypeDtoBaseType["CreateDTO"], status: string): Promise<UserCredentialTypeEntity> {
         return UserCredentialTypeEntity.create({
             description: data.description,
-            statusId
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: UserCredentialTypeEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: UserCredentialTypeEntity, previousEntity?: UserCredentialTypeEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserCredentialTypeEntity.name, 'description'));
     }
 
     @LogError()
     protected filterTransform(input: UserCredentialTypeDtoBaseType['FilterDTO']): UserCredentialTypeDtoBaseType['FilterDTO'] {
-        const transformedFilter: UserCredentialTypeDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                UserCredentialTypeTransform.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: UserCredentialTypeTransform.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<UserCredentialTypeDtoBaseType["DTO"]>): Promise<void> {
-        await this.validateStatusExistence(data.statusId);
+        await this.validateStatusExistence(data.status);
     }
     //#endregion
 }

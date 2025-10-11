@@ -44,7 +44,7 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
         return {
             id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
             description: StringUtil.parseCsvFilter(input.description?.toString(), String),
-            statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
+            status: StringUtil.parseCsvFilter(input.status?.toString(), String),
         };
     }
 }

@@ -6,22 +6,30 @@ z.config(pt());
 
 z.config({
     customError: (iss) => {
-        if (!iss.path) {
-            return {message: EntitiesMessage.error.validation.nullBodyRequest}
-        }
+        const field = getField(iss);
 
-        const field: string = iss.path.join(".")
-        console.log(iss.code)
         switch (iss.code) {
             case "too_small":
-                return {message: EntitiesMessage.error.validation.invalidMinLen(field, iss.minimum.toString())};
+                return { message: EntitiesMessage.zod.invalidMinLen(field, iss.minimum?.toString()) };
             case "too_big":
-                return {message: EntitiesMessage.error.validation.invalidMaxLen(field, iss.maximum.toString())};
+                return { message: EntitiesMessage.zod.invalidMaxLen(field, iss.maximum?.toString()) };
             case "invalid_type":
-                return {message: EntitiesMessage.error.validation.invalidType(field, iss.expected)};
+                if(field === 'body') {
+                    return { message: EntitiesMessage.zod.nullBody };
+                }
+                return { message: EntitiesMessage.zod.invalidType(field, iss.expected) };
+            case "unrecognized_keys":
+                return { message: EntitiesMessage.zod.unrecognizedKey((iss.keys ?? []).join(", ")) };
             default:
-                return {message: "Erro de validação nos campos enviados."};
+                return { message: "Erro de validação nos campos enviados." };
         }
     },
 });
 
+function getField(iss: any): string {
+    if (!iss.path || iss.path.length === 0) {
+        return "body";
+    }
+
+    return iss.path.join(".");
+}

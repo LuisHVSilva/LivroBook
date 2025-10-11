@@ -1,12 +1,14 @@
 import {EntityBase} from "@coreShared/base/entity.base";
 import {DocumentTypeValidator} from "@document/domain/validators/documentType.validator";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
+import {CountryTransformer} from "@location/domain/transformers/country.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface DocumentTypeProps {
     id?: number;
     description: string;
-    countryId: number
-    statusId: number;
+    country: string
+    status: string;
 }
 
 export class DocumentTypeEntity extends EntityBase<DocumentTypeProps> {
@@ -21,11 +23,14 @@ export class DocumentTypeEntity extends EntityBase<DocumentTypeProps> {
         const normalizedProps: DocumentTypeProps = {
             ...props,
             description: DocumentTypeTransform.normalizeDescription(props.description),
+            country: CountryTransformer.normalizeDescription(props.country),
+            status: StatusTransformer.normalizeDescription(props.status),
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'countryId', 'statusId']);
+        this.validateRequiredFields(['description', 'country', 'status']);
         this.validate();
     }
+
     //#endregion
 
     //#region GET
@@ -37,30 +42,34 @@ export class DocumentTypeEntity extends EntityBase<DocumentTypeProps> {
         return this.props.description;
     }
 
-    get countryId(): number {
-        return this.props.countryId;
+    get country(): string {
+        return this.props.country;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
+
     //#endregion
 
     //#region VALIDATIONS
     private validate(): void {
         DocumentTypeValidator.validateDescriptionLength(this.props.description, DocumentTypeEntity.MIN_DESC, DocumentTypeEntity.MAX_DESC);
     }
+
     //#endregion
 
     //#region CREATE
     public static create(props: DocumentTypeProps): DocumentTypeEntity {
         return new DocumentTypeEntity(props);
     }
+
     //#endregion
 
     //#region UPDATES
     public update(props: Partial<DocumentTypeProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
 }

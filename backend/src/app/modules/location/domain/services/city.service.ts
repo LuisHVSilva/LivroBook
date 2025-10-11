@@ -13,6 +13,9 @@ import {IStateService} from "@location/domain/services/interfaces/IState.service
 import {ServiceBase} from "@coreShared/base/service.base";
 import {CityTransformer} from "@location/domain/transformers/city.transform";
 import {CityBaseRepositoryType, CityDtoBaseType} from "@location/adapters/dtos/city.dto";
+import {StringUtil} from "@coreShared/utils/string.util";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
+import {StateTransformer} from "@location/domain/transformers/state.transform";
 
 @injectable()
 export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implements ICityService {
@@ -23,11 +26,16 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("ICityRepository") protected readonly repo: ICityRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("CityRepository") private readonly cityRepo: IRepositoryBase<CityBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
-        @inject("IStateService") private readonly stateService: IStateService,
+        @inject("ICityRepository")
+        protected readonly repo: ICityRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("CityRepository")
+        private readonly cityRepo: IRepositoryBase<CityBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
+        @inject("IStateService")
+        private readonly stateService: IStateService,
     ) {
         super(repo, CityEntity, statusService);
         this.uniquenessValidator = this.validatorFactory(this.cityRepo);
@@ -37,17 +45,17 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: CityDtoBaseType["CreateDTO"], statusId: number): Promise<CityEntity> {
+    protected async createEntity(data: CityDtoBaseType["CreateDTO"], status: string): Promise<CityEntity> {
         return CityEntity.create({
             description: data.description,
-            stateId: data.stateId,
-            statusId
+            state: data.state,
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: CityEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: CityEntity, previousEntity?: CityEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) {
             throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.CITY, 'description'));
@@ -56,23 +64,20 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
 
     @LogError()
     protected filterTransform(input: CityDtoBaseType['FilterDTO']): CityDtoBaseType['FilterDTO'] {
-        const transformedFilter: CityDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                CityTransformer.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: CityTransformer.normalizeDescription,
+            state: StateTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<CityDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
-            this.validateExistence("stateId", data.stateId, this.stateService),
-            this.validateStatusExistence(data.statusId),
+            this.validateExistence("state", data.state, 'description', this.stateService),
+            this.validateStatusExistence(data.status),
         ]);
     }
+
     //#endregion
 }

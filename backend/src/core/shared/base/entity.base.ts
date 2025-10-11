@@ -47,7 +47,7 @@ export abstract class EntityBase<T extends { id?: unknown }> {
     public hasDifferencesExceptStatus(other: EntityBase<T>): boolean {
         const keys = Object.keys(this.props) as (keyof T)[];
         return keys
-            .filter(key => key !== "statusId")
+            .filter(key => key !== "status")
             .some(key => {
                 if (key === "id") {
                     return this.props[key] != other.props[key]

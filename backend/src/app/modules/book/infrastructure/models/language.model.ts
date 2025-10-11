@@ -35,7 +35,7 @@ class LanguageModel extends Model<InferAttributes<LanguageModel>, InferCreationA
     @DbColumn(DataType.INTEGER)
     declare statusId: number;
 
-    @BelongsTo(() => StatusModel)
+    @BelongsTo(() => StatusModel, {as: "status"})
     status?: StatusModel;
 
     @CreatedAt

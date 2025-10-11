@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
@@ -8,6 +7,7 @@ import {IFindCitiesUseCase} from "@location/useCases/read/findCities/IFindCities
 import {CityFilterDTO, FindCitiesRawDTO, FindCitiesResponseDTO} from "@location/adapters/dtos/city.dto";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {CityEntity} from "@location/domain/entities/city.entity";
+import {LogError} from "@coreShared/decorators/LogError";
 
 
 @injectable()
@@ -17,7 +17,7 @@ export class FindCitiesUseCase implements IFindCitiesUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     async execute(input: FindCitiesRawDTO): Promise<ResultType<FindCitiesResponseDTO>> {
         try {
             const page: number = input.page ? StringUtil.strToNumber(input.page) : 1;
@@ -26,8 +26,8 @@ export class FindCitiesUseCase implements IFindCitiesUseCase {
             const filter: CityFilterDTO = {
                 id: StringUtil.parseCsvFilter(input.id?.toString(), Number),
                 description: StringUtil.parseCsvFilter(input.description?.toString(), String),
-                stateId: StringUtil.parseCsvFilter(input.stateId?.toString(), Number),
-                statusId: StringUtil.parseCsvFilter(input.statusId?.toString(), Number),
+                state: StringUtil.parseCsvFilter(input.state?.toString(), String),
+                status: StringUtil.parseCsvFilter(input.status?.toString(), String),
             };
 
             const {entities, total}: FindAllType<CityEntity> = await this.service.findMany(filter, page, limit);

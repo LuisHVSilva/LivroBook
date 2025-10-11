@@ -1,28 +1,24 @@
 // ---------- BASE ----------
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {StateModel} from "@location/infrastructure/models/state.model";
-import {StateEntity} from "@location/domain/entities/state.entity";
+import {StateEntity, StateProps} from "@location/domain/entities/state.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
-export type StateDTO = {
-    id?: number;
-    description: string;
-    statusId: number;
-    countryId: number;
-};
+export type StateDTO = StateProps;
 
 // --------- FILTER ---------
 export type StateFilterDTO = {
-    id?: number[];
-    description?: string[];
-    countryId?: number[];
-    statusId?: number[];
+    id?: number | number[];
+    description?: string | string[];
+    country?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE ------
 export type StatePersistenceDTO = Omit<StateDTO, "id">;
 
 // ---------- CREATE ----------
-export type CreateStateDTO = Pick<StateDTO, "description" | "countryId">;
+export type CreateStateDTO = Pick<StateDTO, "description" | "country">;
 export type CreateStateResponseDTO = StateDTO;
 
 // ---------- UPDATE ----------
@@ -30,14 +26,17 @@ export type UpdateStateDTO = Partial<Omit<StateDTO, "id">> & { id: number };
 export type UpdateStateResponseDTO = StateDTO;
 
 // ---------- FIND ----------
+export type FindByIdStateResponseDTO = StateDTO;
+
 export type FindStatesRawDTO = {
     id?: string;
     description?: string;
-    countryId?: string;
-    statusId?: string;
+    country?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
+
 export type FindStatesResponseDTO = {
     page?: number;
     limit?: number;
@@ -55,4 +54,26 @@ export type StateDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
-export type StateBaseRepositoryType = BaseRepositoryType<StateModel, StateEntity, StateFilterDTO, StatePersistenceDTO>
+export interface StateNormalizedRelations {
+    countryId: number;
+    statusId: number;
+}
+export type StateBaseRepositoryType = BaseRepositoryType<
+    StateModel,
+    StateEntity,
+    StateFilterDTO,
+    StatePersistenceDTO,
+    StateNormalizedRelations
+>;
+
+// ------ BASE CONTROLLER TYPE -------
+export type StateAbstractControllerBaseType = AbstractControllerBaseType<
+    StateProps,
+    CreateStateDTO,
+    CreateStateResponseDTO,
+    FindByIdStateResponseDTO,
+    FindStatesRawDTO,
+    FindStatesResponseDTO,
+    UpdateStateDTO,
+    UpdateStateResponseDTO
+>

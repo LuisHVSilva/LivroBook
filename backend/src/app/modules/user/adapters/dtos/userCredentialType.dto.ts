@@ -1,19 +1,16 @@
 import {BaseRepositoryType, DtoBaseType} from "@coreShared/types/entity.type";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
-import {UserCredentialTypeEntity} from "@user/domain/entities/userCredentialType.entity";
+import {UserCredentialTypeEntity, UserCredentialTypeProps} from "@user/domain/entities/userCredentialType.entity";
+import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
 
 // ---------- BASE ------------
-export type UserCredentialTypeDTO = {
-    id?: number;
-    description: string;
-    statusId: number;
-};
+export type UserCredentialTypeDTO = UserCredentialTypeProps
 
 // --------- FILTER -----------
 export type UserCredentialTypeFilterDTO = {
-    id?: number[],
-    description?: string[];
-    statusId?: number[];
+    id?: number | number[],
+    description?: string | string[];
+    status?: string | string[];
 }
 
 // ------- PERSISTENCE --------
@@ -28,10 +25,11 @@ export type UpdateUserCredentialTypeDTO = Partial<Omit<UserCredentialTypeDTO, "i
 export type UpdateUserCredentialTypeResponseDTO = UserCredentialTypeDTO;
 
 // ---------- FIND ------------
+export type FindByIdUserCredentialTypeResponseDTO = UserCredentialTypeDTO;
 export type FindUserCredentialTypesRawDTO = {
     id?: string,
     description?: string;
-    statusId?: string;
+    status?: string;
     page?: string;
     limit?: string;
 };
@@ -52,9 +50,26 @@ export type UserCredentialTypeDtoBaseType = DtoBaseType<
 >
 
 // ------ BASE REPOSITORY TYPE -------
+export interface UserCredentialTypeNormalizedRelations {
+    statusId: number;
+}
 export type UserCredentialTypeBaseRepositoryType = BaseRepositoryType<
     UserCredentialTypeModel,
     UserCredentialTypeEntity,
     UserCredentialTypeFilterDTO,
-    UserCredentialTypePersistenceDTO
+    UserCredentialTypePersistenceDTO,
+    UserCredentialTypeNormalizedRelations
 >;
+
+
+// ------ BASE CONTROLLER TYPE -------
+export type UserCredentialTypeAbstractControllerBaseType = AbstractControllerBaseType<
+    UserCredentialTypeProps,
+    CreateUserCredentialTypeDTO,
+    CreateUserCredentialTypeResponseDTO,
+    FindByIdUserCredentialTypeResponseDTO,
+    FindUserCredentialTypesRawDTO,
+    FindUserCredentialTypesResponseDTO,
+    UpdateUserCredentialTypeDTO,
+    UpdateUserCredentialTypeResponseDTO
+>

@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -9,6 +8,7 @@ import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateStateUseCase} from "@location/useCases/update/updateState/IUpdateState.useCase";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {UpdateStateDTO, UpdateStateResponseDTO} from "@location/adapters/dtos/state.dto";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdateStateUseCase implements IUpdateStateUseCase {
@@ -17,7 +17,7 @@ export class UpdateStateUseCase implements IUpdateStateUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: UpdateStateDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateStateResponseDTO>>> {
         if (!transaction) {

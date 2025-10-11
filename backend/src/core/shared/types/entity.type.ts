@@ -2,11 +2,12 @@
 //     Entity: TEntity;
 // }
 
-export interface BaseRepositoryType<TModel, TEntity, TFilter, TPersistence> {
+export interface BaseRepositoryType<TModel, TEntity, TFilter, TPersistence, TNormalizedRelations> {
     Model: TModel;
     Entity: TEntity;
     Filter: TFilter;
     Persistence: TPersistence;
+    NormalizedRelations: TNormalizedRelations;
 }
 
 export interface DtoBaseType<TDto, TCreateDto, TFindDTO, TUpdateDto, TFilterDto> {

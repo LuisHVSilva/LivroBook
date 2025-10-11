@@ -1,5 +1,4 @@
 import {inject, injectable} from "tsyringe";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -14,6 +13,7 @@ import {
     UpdateUserCredentialTypeResponseDTO
 } from "@user/adapters/dtos/userCredentialType.dto";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdateUserCredentialTypeUseCase implements IUpdateUserCredentialTypeUseCase {
@@ -22,7 +22,7 @@ export class UpdateUserCredentialTypeUseCase implements IUpdateUserCredentialTyp
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: UpdateUserCredentialTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdateUserCredentialTypeResponseDTO>>> {
         if (!transaction) {

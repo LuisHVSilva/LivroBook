@@ -11,8 +11,10 @@ import {IStateService} from "@location/domain/services/interfaces/IState.service
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {ServiceBase} from "@coreShared/base/service.base";
-import {StateTransformer} from "@location/domain/transformers/state.transform";
 import {StateBaseRepositoryType, StateDtoBaseType} from "@location/adapters/dtos/state.dto";
+import {StringUtil} from "@coreShared/utils/string.util";
+import {CountryTransformer} from "@location/domain/transformers/country.transform";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 @injectable()
 export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> implements IStateService {
@@ -23,11 +25,16 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
 
     //#region CONSTRUCTOR
     constructor(
-        @inject("IStateRepository") protected readonly repo: IStateRepository,
-        @inject("EntityUniquenessValidatorFactory") private readonly validatorFactory: EntityUniquenessValidatorFactory,
-        @inject("StateRepository") private readonly stateRepo: IRepositoryBase<StateBaseRepositoryType>,
-        @inject('IStatusService') protected readonly statusService: IStatusService,
-        @inject('ICountryService') private readonly countryService: ICountryService,
+        @inject("IStateRepository")
+        protected readonly repo: IStateRepository,
+        @inject("EntityUniquenessValidatorFactory")
+        private readonly validatorFactory: EntityUniquenessValidatorFactory,
+        @inject("StateRepository")
+        private readonly stateRepo: IRepositoryBase<StateBaseRepositoryType>,
+        @inject('IStatusService')
+        protected readonly statusService: IStatusService,
+        @inject('ICountryService')
+        private readonly countryService: ICountryService,
     ) {
         super(repo, StateEntity, statusService);
         this.uniquenessValidator = this.validatorFactory(this.stateRepo);
@@ -37,40 +44,37 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
 
     //#region HELPERS
     @LogError()
-    protected async createEntity(data: StateDtoBaseType["CreateDTO"], statusId: number): Promise<StateEntity> {
+    protected async createEntity(data: StateDtoBaseType["CreateDTO"], status: string): Promise<StateEntity> {
         return StateEntity.create({
             description: data.description,
-            countryId: data.countryId,
-            statusId
+            country: data.country,
+            status
         });
     }
 
     @LogError()
-    protected async uniquenessValidatorEntity(entity: StateEntity): Promise<void> {
-        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description);
+    protected async uniquenessValidatorEntity(entity: StateEntity, previousEntity?: StateEntity): Promise<void> {
+        const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATE, 'description'));
     }
 
     @LogError()
     protected filterTransform(input: StateDtoBaseType['FilterDTO']): StateDtoBaseType['FilterDTO'] {
-        const transformedFilter: StateDtoBaseType['FilterDTO'] = {...input};
-
-        if (input.description !== undefined) {
-            transformedFilter.description = input.description.map(desc =>
-                StateTransformer.normalizeDescription(desc)
-            );
-        }
-
-        return transformedFilter;
+        return StringUtil.applyFilterTransform(input, {
+            description: CountryTransformer.normalizeDescription,
+            country: CountryTransformer.normalizeDescription,
+            status: StatusTransformer.normalizeDescription,
+        });
     }
 
     @LogError()
     protected async validateForeignKeys(data: Partial<StateDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
-            this.validateExistence("countryId", data.countryId, this.countryService),
-            this.validateStatusExistence(data.statusId),
+            this.validateExistence("country", data.country, 'description', this.countryService),
+            this.validateStatusExistence(data.status),
         ]);
     }
+
     //#endregion
 }

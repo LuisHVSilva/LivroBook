@@ -4,7 +4,7 @@ import {StatusEntity} from "@status/domain/entities/status.entity";
 import {
     CreateStatusDTO,
     FilterStatusDTO,
-    StatusBaseRepositoryType,
+    StatusBaseRepositoryType, StatusDto,
     UpdateStatusDTO, UpdateStatusResponseDTO
 } from "@status/adapters/dtos/status.dto";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
@@ -41,6 +41,10 @@ export class StatusService implements IStatusService {
         this.uniquenessValidator = this.validatorFactory(this.statusRepo);
     }
 
+    findOneByFilter(filter: FilterStatusDTO, exact?: boolean): Promise<StatusEntity> {
+        throw new Error("Method not implemented.");
+    }
+
     //#endregion
 
     //#region CREATE
@@ -68,9 +72,9 @@ export class StatusService implements IStatusService {
     }
 
     @LogError()
-    private async getByDescription(description: string): Promise<StatusEntity> {
+    public async getByDescription(description: string): Promise<StatusEntity> {
         const normalizedDescription: string = StatusTransformer.normalizeDescription(description);
-        const result: ResultType<StatusEntity> = await this.repo.findOneExactByFilter({description: [normalizedDescription]});
+        const result: ResultType<StatusEntity> = await this.repo.findOneByFilter({description: [normalizedDescription]});
 
         const entity: StatusEntity | null = result.unwrapOrNull();
         if (!entity) {
@@ -95,7 +99,11 @@ export class StatusService implements IStatusService {
         const offset: number = (pageValue - 1) * limitValue;
 
         if (filter.description) {
-            filter.description = filter.description.map(StatusTransformer.normalizeDescription);
+            const descriptions = Array.isArray(filter.description)
+                ? filter.description
+                : [filter.description];
+
+            filter.description = descriptions.map(StatusTransformer.normalizeDescription);
         }
 
         const found: ResultType<FindAllType<StatusEntity>> = await this.repo.findMany(limitValue, offset, filter);
@@ -125,6 +133,11 @@ export class StatusService implements IStatusService {
     @LogError()
     async getStatusForActiveEntities(): Promise<StatusEntity> {
         return this.getStausActiveByDescription(StatusEnum.ACTIVE)
+    }
+
+
+    async getStatusForBlockedEntities(): Promise<StatusEntity> {
+        return this.getStausActiveByDescription(StatusEnum.BLOCKED)
     }
 
     //#endregion
@@ -209,8 +222,20 @@ export class StatusService implements IStatusService {
 
     //#endregion
 
-    async isActive(id: number): Promise<boolean> {
-        const status: StatusEntity = await this.getById(id);
+    async isStatusActive(statusProperties: Partial<StatusDto>): Promise<boolean> {
+        const statusFounded: ResultType<StatusEntity> = await this.repo.findOneByFilter(statusProperties, true);
+
+        if (statusFounded.isNone()) {
+            throw new NotFoundError(EntitiesMessage.error.retrieval.notFound(this.STATUS));
+        }
+
+        const status = statusFounded.unwrapOrThrow();
+
         return status.active;
+    }
+
+    async isEntityActive(entityStatus: string): Promise<boolean> {
+        const statusActiveEntity: StatusEntity = await this.getStatusForActiveEntities();
+        return entityStatus === statusActiveEntity.description;
     }
 }

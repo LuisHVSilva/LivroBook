@@ -1,7 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {ICreatePhoneCodeUseCase} from "@phone/useCase/create/createPhoneCode/ICreatePhoneCode.useCase";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO} from "@phone/adapters/dtos/phoneCode.dto";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -9,6 +8,7 @@ import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {Transactional} from "@coreShared/decorators/Transactional";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class CreatePhoneCodeUseCase implements ICreatePhoneCodeUseCase {
@@ -17,7 +17,7 @@ export class CreatePhoneCodeUseCase implements ICreatePhoneCodeUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(input: CreatePhoneCodeDTO, transaction?: Transaction): Promise<ResultType<CreatePhoneCodeResponseDTO>> {
         if (!transaction) {
@@ -27,14 +27,7 @@ export class CreatePhoneCodeUseCase implements ICreatePhoneCodeUseCase {
         try {
             const created: PhoneCodeEntity = await this.service.create(input, transaction);
 
-            return ResultType.success({
-                id: created.id!,
-                ddiCode: created.ddiCode,
-                dddCode: created.dddCode,
-                stateId: created.stateId,
-                statusId: created.statusId
-            })
-
+            return ResultType.success(created)
         } catch (error) {
             return UseCaseResponseUtil.handleResultError(error);
         }

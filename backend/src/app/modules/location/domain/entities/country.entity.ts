@@ -1,11 +1,12 @@
 import {EntityBase} from '@coreShared/base/entity.base';
 import {CountryTransformer} from "@location/domain/transformers/country.transform";
 import {CountryValidator} from "@location/domain/validators/country.validator";
+import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
 
 export interface CountryProps {
     id?: number;
     description: string;
-    statusId: number;
+    status: string;
 }
 
 export class CountryEntity extends EntityBase<CountryProps> {
@@ -20,9 +21,10 @@ export class CountryEntity extends EntityBase<CountryProps> {
         const normalizedProps: CountryProps = {
             ...props,
             description: CountryTransformer.normalizeDescription(props.description),
+            status: StatusTransformer.normalizeDescription(props.status),
         };
         super(normalizedProps);
-        this.validateRequiredFields(['description', 'statusId']);
+        this.validateRequiredFields(['description', 'status']);
         this.validate();
     }
 
@@ -37,8 +39,8 @@ export class CountryEntity extends EntityBase<CountryProps> {
         return this.props.description;
     }
 
-    get statusId(): number {
-        return this.props.statusId;
+    get status(): string {
+        return this.props.status;
     }
 
     //#endregion
@@ -54,11 +56,13 @@ export class CountryEntity extends EntityBase<CountryProps> {
     public static create(props: CountryProps): CountryEntity {
         return new CountryEntity(props);
     }
+
     //#endregion
 
     //#region UPDATES
     public update(props: Partial<CountryProps>): this {
         return this.cloneWith(props);
     }
+
     //#endregion
 }

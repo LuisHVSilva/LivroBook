@@ -1,18 +1,24 @@
 import {Router} from "express";
 import {asyncHandler} from "@coreShared/middlewares/asyncHandler";
 import {validateRequest} from "@coreShared/middlewares/validateRequest";
-import {IPhoneController} from "@phone/adapters/controllers/IPhone.controller";
+import {IPhoneController} from "@phone/adapters/controllers/interfaces/IPhone.controller";
 import {makePhoneController} from "@phone/adapters/factories/phoneController.factory";
-import {CreatePhoneTypeSchema} from "@phone/schemas/createPhoneType.schema";
-import {UpdatePhoneTypeSchema} from "@phone/schemas/updatePhoneType.schema";
-import {DeletePhoneTypesSchema} from "@phone/schemas/deletePhoneType.schema";
-import {CreatePhoneCodeSchema} from "@phone/schemas/createPhoneCode.schema";
-import {UpdatePhoneCodeSchema} from "@phone/schemas/updatePhoneCode.schema";
-import {DeletePhoneCodesSchema} from "@phone/schemas/deletePhoneCodes.schema";
-import {CreatePhoneSchema} from "@phone/schemas/createPhone.schema";
-import {UpdatePhoneSchema} from "@phone/schemas/updatePhone.schema";
-import {DeletePhoneSchema} from "@phone/schemas/deletePhone.schema";
-import {isAbelToAccessMiddleware} from "@coreShared/middlewares/isAbleToAccess.middleware";
+import {CreatePhoneTypeSchema} from "@phone/schemas/post/createPhoneType.schema";
+import {UpdatePhoneTypeSchema} from "@phone/schemas/patch/updatePhoneType.schema";
+import {DeletePhoneTypesSchema} from "@phone/schemas/delete/deletePhoneType.schema";
+import {CreatePhoneCodeSchema} from "@phone/schemas/post/createPhoneCode.schema";
+import {UpdatePhoneCodeSchema} from "@phone/schemas/patch/updatePhoneCode.schema";
+import {DeletePhoneCodesSchema} from "@phone/schemas/delete/deletePhoneCodes.schema";
+import {CreatePhoneSchema} from "@phone/schemas/post/createPhone.schema";
+import {UpdatePhoneSchema} from "@phone/schemas/patch/updatePhone.schema";
+import {DeletePhoneSchema} from "@phone/schemas/delete/deletePhone.schema";
+import {isAdminMiddleware} from "@coreShared/middlewares/isAdmin.middleware";
+import {FindPhoneTypesSchema} from "@phone/schemas/get/findPhoneTypes.schema";
+import {FindPhoneTypeByIdSchema} from "@phone/schemas/get/findPhoneTypeById.schema";
+import {FindPhoneCodesSchema} from "@phone/schemas/get/findPhoneCodes.schema";
+import {FindPhoneCodeByIdSchema} from "@phone/schemas/get/findPhoneCodeById.schema";
+import {FindPhonesSchema} from "@phone/schemas/get/findPhones.schema";
+import {FindPhoneByIdSchema} from "@phone/schemas/get/findPhoneById.schema";
 
 const phoneController: IPhoneController = makePhoneController()
 const router = Router();
@@ -22,24 +28,34 @@ const router = Router();
 router.post(
     "/phoneType/create",
     validateRequest(CreatePhoneTypeSchema),
-    asyncHandler((req, res) => phoneController.createPhoneType(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneTypeController.create(req, res))
 );
 
 router.get(
+    "/phoneType/findById/:id",
+    validateRequest(FindPhoneTypeByIdSchema, "params"),
+    asyncHandler((req, res) => phoneController.phoneTypeController.findById(req, res))
+)
+
+router.get(
     "/phoneType/findAll",
-    asyncHandler((req, res) => phoneController.findPhoneTypes(req, res))
+    validateRequest(FindPhoneTypesSchema, 'query'),
+    asyncHandler((req, res) => phoneController.phoneTypeController.findAll(req, res))
 )
 
 router.patch(
     "/phoneType/update",
     validateRequest(UpdatePhoneTypeSchema),
-    asyncHandler((req, res) => phoneController.updatePhoneType(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneTypeController.update(req, res))
 )
 
 router.delete(
     "/phoneType/delete",
     validateRequest(DeletePhoneTypesSchema, 'query'),
-    asyncHandler((req, res) => phoneController.deletePhoneTypes(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneTypeController.delete(req, res))
 )
 //#endregion
 
@@ -47,24 +63,35 @@ router.delete(
 router.post(
     "/phoneCode/create",
     validateRequest(CreatePhoneCodeSchema),
-    asyncHandler((req, res) => phoneController.createPhoneCode(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneCodeController.create(req, res))
+)
+
+router.get(
+    "/phoneCode/findById/:id",
+    validateRequest(FindPhoneCodeByIdSchema, 'params'),
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneCodeController.findById(req, res))
 )
 
 router.get(
     "/phoneCode/findAll",
-    asyncHandler((req, res) => phoneController.findPhoneCodes(req, res))
+    validateRequest(FindPhoneCodesSchema, 'query'),
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneCodeController.findAll(req, res))
 )
 
 router.patch(
     "/phoneCode/update",
     validateRequest(UpdatePhoneCodeSchema),
-    asyncHandler((req, res) => phoneController.updatePhoneCode(req, res))
+    isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.phoneCodeController.update(req, res))
 )
 
 router.delete(
     "/phoneCode/delete",
     validateRequest(DeletePhoneCodesSchema, 'query'),
-    asyncHandler((req, res) => phoneController.deletePhoneCodes(req, res))
+    asyncHandler((req, res) => phoneController.phoneCodeController.delete(req, res))
 )
 //#endregion
 
@@ -72,28 +99,35 @@ router.delete(
 router.post(
     "/create",
     validateRequest(CreatePhoneSchema),
-    isAbelToAccessMiddleware(),
-    asyncHandler((req, res) => phoneController.createPhone(req, res))
+    asyncHandler((req, res) => phoneController.create(req, res))
+)
+
+router.get(
+    "/findById/:id",
+    validateRequest(FindPhoneByIdSchema, 'params'),
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.findById(req, res))
 )
 
 router.get(
     "/findAll",
-    isAbelToAccessMiddleware(),
-    asyncHandler((req, res) => phoneController.findPhones(req, res))
+    validateRequest(FindPhonesSchema, 'query'),
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.findAll(req, res))
 )
 
 router.patch(
     "/update",
     validateRequest(UpdatePhoneSchema),
-    isAbelToAccessMiddleware(),
-    asyncHandler((req, res) => phoneController.updatePhone(req, res))
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.update(req, res))
 )
 
 router.delete(
     "/delete",
     validateRequest(DeletePhoneSchema, 'query'),
-    isAbelToAccessMiddleware(),
-    asyncHandler((req, res) => phoneController.deletePhone(req, res))
+    // isAdminMiddleware(),
+    asyncHandler((req, res) => phoneController.delete(req, res))
 )
 //#endregion
 

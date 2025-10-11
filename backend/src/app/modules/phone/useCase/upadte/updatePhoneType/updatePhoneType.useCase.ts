@@ -1,6 +1,5 @@
 import {inject, injectable} from "tsyringe";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
-import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
@@ -9,6 +8,7 @@ import {UpdatePhoneTypeDTO, UpdatePhoneTypeResponseDTO} from "@phone/adapters/dt
 import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {IUpdatePhoneTypeUseCase} from "@phone/useCase/upadte/updatePhoneType/IUpdatePhoneType.useCase";
+import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
 export class UpdatePhoneTypeUseCase implements IUpdatePhoneTypeUseCase {
@@ -17,7 +17,7 @@ export class UpdatePhoneTypeUseCase implements IUpdatePhoneTypeUseCase {
     ) {
     }
 
-    @LogExecution()
+    @LogError()
     @Transactional()
     async execute(request: UpdatePhoneTypeDTO, transaction?: Transaction): Promise<ResultType<UpdateResultType<UpdatePhoneTypeResponseDTO>>> {
         if (!transaction) {
