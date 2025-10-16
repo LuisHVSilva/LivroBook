@@ -41,7 +41,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
     declare document?: string;
 
     @AllowNull(false)
-    @DbColumn(DataType.DATE)
+    @DbColumn(DataType.DATEONLY)
     declare birthday: Date;
 
     @AllowNull(false)

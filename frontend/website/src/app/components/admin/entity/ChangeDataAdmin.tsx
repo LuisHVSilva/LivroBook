@@ -46,7 +46,7 @@ const ChangeDataAdmin = ({entityProperties}: changeDataAdminInput) => {
                         <div key={prop.columnName} className="entity-prop">
                             <InputField
                                 name={prop.columnName}
-                                type={type}
+                                dbType={type}
                                 placeHolder={prop.columnName}
                                 required={!prop.allowNull}
                                 disabled={disabled}

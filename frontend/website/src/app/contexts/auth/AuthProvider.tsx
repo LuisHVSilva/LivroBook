@@ -1,13 +1,14 @@
 import {type ReactNode, useEffect, useState} from "react";
 import type {
     LoginRequest,
-    LoginResponse,
-    RegisterAuthRequest,
+    LoginResponse, RegisterAuthRequest,
+    // RegisterAuthRequest,
     UserLocalStorageData
 } from "../../../core/api/types/auth.type.ts";
-import {authApiService} from "../../../core/api/services/auth.api.service.ts";
+import {authApiService} from "../../../core/api/services/auth/auth.api.service.ts";
 import {AuthContext} from "./AuthContext.tsx";
 
+const ADMINISTRATOR: string = "ADMINISTRATOR";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserLocalStorageData | null>(null);
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const isAuthenticated = !!user;
-    const isAdmin: boolean = authApiService.getUserTypeFromToken() === 1;
+    const isAdmin: boolean = authApiService.getUserTypeFromToken() === ADMINISTRATOR;
 
     return (
         <AuthContext.Provider

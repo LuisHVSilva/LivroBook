@@ -1,5 +1,5 @@
 export class ServerUtil {
-    public buildUrlWithParams<T extends Record<string, string>>(baseUrl: string, params?: Partial<T>): string {
+    public buildUrlWithParams<T extends Record<string, unknown>>(baseUrl: string, params?: Partial<T>): string {
         if (!params) return baseUrl;
 
         const query = new URLSearchParams();
@@ -12,6 +12,12 @@ export class ServerUtil {
 
         const queryString = query.toString();
         return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    }
+
+    getErrorMessage(e: unknown): string {
+        if (e instanceof Error) return e.message;
+        if (typeof e === "string") return e;
+        return "Erro desconhecido";
     }
 }
 

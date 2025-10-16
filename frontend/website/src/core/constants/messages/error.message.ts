@@ -18,6 +18,10 @@ export const errorMessage = {
     appError: {
         api: {
             get: 'appError.api.get',
+            patch: {
+                generic: 'appError.api.patch',
+                nothingUpdated: 'appError.api.patch.nothingUpdated',
+            },
         },
         auth: {
             loginError: 'appError.auth.loginError',

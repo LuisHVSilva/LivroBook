@@ -30,7 +30,7 @@ export type CreateUserCredentialRequest = Pick<UserCredentialDTO, "password">;
 //#endRegion
 
 
-export type UserLocalStorageData = Pick<UserDTO, "name" | "email"> & { userTypeId: number; };
+export type UserLocalStorageData = Pick<UserDTO, "name" | "email"> & { userType: string; };
 
 export type LoginRequest = {
     email: string;
@@ -50,5 +50,5 @@ export type RegisterAuthRequest =
 };
 
 export type JwtPayload = {
-    userTypeId: number;
+    userType: string;
 };

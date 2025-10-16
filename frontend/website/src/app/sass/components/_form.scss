@@ -37,6 +37,10 @@ div.form-area {
 }
 
 //Div Label / Input
+.hidden-div {
+  display: none !important;
+}
+
 div.input-field, div.input-field-error {
   display: flex;
   flex-direction: column;

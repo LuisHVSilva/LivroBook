@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 
 import {formUtil} from "../../../core/utils/form.util.ts";
 import {ConflictError, NullFieldError, ValidationError} from "../../../core/errors/generic.error.ts";
-import {authApiService} from "../../../core/api/services/auth.api.service.ts";
+import {authApiService} from "../../../core/api/services/auth/auth.api.service.ts";
 import InputField from "../../components/forms/InputField.tsx";
 import type {RegisterAuthRequest} from "../../../core/api/types/auth.type.ts";
 import {useAuth} from "../../../core/hooks/authHook.ts";
@@ -75,21 +75,21 @@ const RegisterUser = () => {
                 <form id="login-form" action={handleRegister}>
                     <InputField
                         name="name"
-                        type="text"
+                        dbType="text"
                         placeHolder="Nome"
                         required={true}
                     />
 
                     <InputField
                         name="email"
-                        type="email"
+                        dbType="email"
                         placeHolder="E-mail"
                         required={true}
                     />
 
                     <InputField
                         name="password"
-                        type="password"
+                        dbType="password"
                         placeHolder="Senha"
                         required={true}
                         onChangeFunction={validatePassword}
@@ -108,7 +108,7 @@ const RegisterUser = () => {
 
                     <InputField
                         name="confirmPassword"
-                        type="password"
+                        dbType="password"
                         placeHolder="Confirme sua senha"
                         required={true}
                         onChangeFunction={handleConfirmPasswordChange}
@@ -117,7 +117,7 @@ const RegisterUser = () => {
 
                     <InputField
                         name="birthday"
-                        type="date"
+                        dbType="date"
                         placeHolder="Data de nascimento"
                         required={true}
                     />

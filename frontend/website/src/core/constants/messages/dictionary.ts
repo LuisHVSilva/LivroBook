@@ -38,6 +38,8 @@ const portugueseDictionary = (): Record<string, string> => {
 
         //#region AppError
         "appError.api.get": "Erro ao buscar os dados.",
+        "appError.api.patch.generic": "Erro ao atualizar os dados. Tente novamente",
+        "appError.api.patch.nothingUpdated": "Nenhuma propriedade foi atualizada.",
         "appError.auth.loginError": "Usuário ou senha inválido.",
         "appError.auth.sessionExpired": "Sessão expirada, faça login novamente.",
         //#endregion

@@ -26,7 +26,7 @@ export const EntitiesList: Record<string, EntityMap> = {
     },
     Telefone: {
         telefone: EntitiesNamesEnum.Phone,
-        ddd: EntitiesNamesEnum.PhoneCode,
+        codigo_telefone: EntitiesNamesEnum.PhoneCode,
         tipo_telefone: EntitiesNamesEnum.PhoneType,
     },
     Sistema: {
@@ -34,7 +34,7 @@ export const EntitiesList: Record<string, EntityMap> = {
     },
     Usuario: {
         usuario: EntitiesNamesEnum.User,
-        credencial_usuario: EntitiesNamesEnum.UserCredential,
+        // credencial_usuario: EntitiesNamesEnum.UserCredential,
         tipo_credencial_usuario: EntitiesNamesEnum.UserCredentialType,
         tipo_usuario: EntitiesNamesEnum.UserType,
     },

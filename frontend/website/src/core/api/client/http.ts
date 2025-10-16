@@ -1,6 +1,6 @@
 import axios, {AxiosError, type AxiosInstance} from "axios";
 import {AppError} from "../../errors/generic.error.ts";
-import {authApiService} from "../services/auth.api.service.ts";
+import {authApiService} from "../services/auth/auth.api.service.ts";
 import type {ResponseErrorType} from "../types/http.type.ts";
 import {handleHttpResponse} from "./handleHttpResponse.ts";
 import {errorMessage} from "../../constants/messages/error.message.ts";

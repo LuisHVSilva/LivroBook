@@ -8,5 +8,5 @@ export const UpdateDocumentTypeSchema = z.object({
     id: ZodValidator.intInputValue(),
     description: ZodValidator.stringInputValue(DocumentTypeEntity.MIN_DESC, DocumentTypeEntity.MAX_DESC, true),
     country: ZodValidator.intInputValue(CountryEntity.MIN_DESC, CountryEntity.MAX_DESC, true),
-    status: ZodValidator.intInputValue(StatusEntity.MAX_DESC, StatusEntity.MIN_DESC, true),
+    status: ZodValidator.stringInputValue(StatusEntity.MIN_DESC, StatusEntity.MAX_DESC, true),
 }).strict();

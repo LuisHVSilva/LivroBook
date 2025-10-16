@@ -1,32 +1,89 @@
 import {stringUtil} from "../../../core/utils/string.util.ts";
 import React, {useState} from "react";
+import {TableEnum} from "../../../core/enums/table.enum.ts";
 
-type InputValueType = string | number | boolean | undefined;
+
+type InputValueType = string | number | boolean | Date | undefined;
 
 type InputFieldProps = {
     name: string;
-    type: string;
+    dbType?: string;
     placeHolder?: string;
     initialValue?: InputValueType;
     required?: boolean;
     onChangeFunction?: (value: string) => void;
     hasError?: boolean;
     disabled?: boolean;
-}
+    hidden?: boolean;
+};
 
-const InputField = ({name, type, placeHolder, required, onChangeFunction, hasError, disabled, initialValue}: InputFieldProps) => {
-    const [value, setValue] = useState<InputValueType>(initialValue ?? "");
-    const filled: boolean = value !== undefined && value !== null && value.toString().length > 0;
+const InputField = ({
+                        name,
+                        dbType,
+                        placeHolder,
+                        required,
+                        onChangeFunction,
+                        hasError,
+                        disabled,
+                        initialValue,
+                        hidden
+                    }: InputFieldProps) => {
+    const determineInputType = (): string => {
+        if (!dbType) return "text";
+        const type = dbType.toLowerCase();
 
-    const placeHolderCapitalized: string = placeHolder ?
-        stringUtil.capitalizeFirstLetter(placeHolder) :
-        stringUtil.capitalizeFirstLetter(name);
+        if (type === TableEnum.DATE || type === TableEnum.DATEONLY) return "date";
+        if (type === TableEnum.BOOLEAN) return "checkbox";
+        if (type === TableEnum.EMAIL) return "email";
+        return "text";
+    };
 
-    const fieldDescription: string = required ? '* ' + placeHolderCapitalized : placeHolderCapitalized;
+    const inputType = determineInputType();
+
+    const normalizeInitialValue = (value: InputValueType): InputValueType => {
+        if (inputType === "date" && value) {
+            try {
+                const date = new Date(String(value));
+                if (!isNaN(date.getTime())) {
+                    return date.toISOString().split("T")[0];
+                }
+            } catch {
+                if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    return value;
+                }
+            }
+        }
+        if (inputType === "checkbox") {
+            return stringUtil.convertStringToBoolean(String(value));
+        }
+        return value ?? "";
+    };
+
+    const [value, setValue] = useState<InputValueType>(
+        normalizeInitialValue(initialValue)
+    );
+
+    const hideProperty = hidden ?? name === "id";
+    const filled: boolean =
+        value !== undefined && value !== null && value.toString().length > 0;
+
+    const placeHolderCapitalized: string = placeHolder
+        ? stringUtil.capitalizeFirstLetter(placeHolder)
+        : stringUtil.capitalizeFirstLetter(name);
+
+    const fieldDescription: string = required
+        ? "* " + placeHolderCapitalized
+        : placeHolderCapitalized;
+
+    const wrapperClass: string = [
+        "input-field",
+        hasError ? "input-field-error" : "",
+        hideProperty ? "hidden-div" : ""
+    ].filter(Boolean).join(" ");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val: string | number | boolean = e.target.value;
-        if (type === "checkbox") {
+        if (inputType === "checkbox") {
             val = e.target.checked;
         }
         setValue(val);
@@ -34,22 +91,26 @@ const InputField = ({name, type, placeHolder, required, onChangeFunction, hasErr
     };
 
     return (
-        <div className={`input-field ${hasError ? "input-field-error" : ""}`}>
-            <label htmlFor={name} className={filled ? 'filled' : ''}>
+        <div className={wrapperClass}>
+            <label htmlFor={name} className={filled ? "filled" : ""}>
                 {fieldDescription}:
             </label>
             <input
                 name={name}
                 id={name}
-                type={type}
+                type={inputType}
                 placeholder={fieldDescription}
                 onChange={handleChange}
-                disabled={disabled ?? false}
-                checked={type === "checkbox" ? Boolean(value) : undefined}
-                value={type !== "checkbox" ? (value ? String(value) : "") : ""}
+                readOnly={disabled ?? false}
+                checked={
+                    inputType === "checkbox"
+                        ? Boolean(value)
+                        : undefined
+                }
+                value={inputType !== "checkbox" ? String(value ?? "") : ""}
             />
         </div>
-    )
-}
+    );
+};
 
 export default InputField;

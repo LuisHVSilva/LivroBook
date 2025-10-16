@@ -1,16 +1,15 @@
-import axios from "../client/http.ts";
-import {authServiceUrl} from "../../constants/url.constant.ts";
+import axios from "../../client/http.ts";
 import type {
     JwtPayload,
     LoginRequest,
-    LoginResponse,
-    RegisterAuthRequest,
+    LoginResponse, RegisterAuthRequest,
     UserLocalStorageData
-} from "../types/auth.type.ts";
-import {ServiceError} from "../../errors/generic.error.ts";
-import {errorMessage} from "../../constants/messages/error.message.ts";
-import {t} from "../../constants/messages/translations.ts";
+} from "../../types/auth.type.ts";
+import {ServiceError} from "../../../errors/generic.error.ts";
+import {errorMessage} from "../../../constants/messages/error.message.ts";
+import {t} from "../../../constants/messages/translations.ts";
 import {jwtDecode} from "jwt-decode";
+import {authUrl} from "../../../constants/url.constant.ts";
 
 
 class AuthApiService {
@@ -19,7 +18,7 @@ class AuthApiService {
     private readonly USER: string = "USER";
 
     async login(payload: LoginRequest): Promise<LoginResponse> {
-        const {data} = await axios.post(authServiceUrl.login, payload);
+        const {data} = await axios.post(authUrl.login, payload);
         if (!data.success) {
             throw new ServiceError(t(errorMessage.appError.auth.loginError));
         }
@@ -39,7 +38,7 @@ class AuthApiService {
     }
 
     async register(payload: RegisterAuthRequest) {
-        const {data} = await axios.post(authServiceUrl.register, payload);
+        const {data} = await axios.post(authUrl.register, payload);
         return data;
     }
 
@@ -55,7 +54,7 @@ class AuthApiService {
         return localStorage.getItem(this.TOKEN_KEY);
     }
 
-    getUserTypeFromToken(): number | null {
+    getUserTypeFromToken(): string | null {
         try {
             const token: string | null = this.getTokenKey();
             if (!token) {
@@ -63,7 +62,7 @@ class AuthApiService {
             }
 
             const decoded: JwtPayload = jwtDecode<JwtPayload>(token);
-            return decoded.userTypeId;
+            return decoded.userType;
         } catch {
             return null;
         }
