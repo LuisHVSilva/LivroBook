@@ -76,11 +76,11 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
         await this.validateExistence("phoneCode", undefined, {
             ddiCode: data.phoneCode?.ddiCode,
             dddCode: data.phoneCode?.dddCode
-        }, this.phoneCodeService);
-        await Promise.all([
-            this.validateExistence("phoneType", data.phoneType, "description", this.phoneTypeService),
-            this.validateStatusExistence(data.status),
-        ]);
+        }, this.phoneCodeService, true);
+        // await Promise.all([
+        //     this.validateExistence("phoneType", data.phoneType, "description", this.phoneTypeService),
+        //     this.validateStatusExistence(data.status),
+        // ]);
     }
 
     //#endregion

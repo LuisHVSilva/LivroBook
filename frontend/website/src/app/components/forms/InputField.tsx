@@ -1,6 +1,6 @@
-import {stringUtil} from "../../../core/utils/string.util.ts";
+import {stringUtil} from "../../../core/utils/string/string.util.ts";
 import React, {useState} from "react";
-import {TableEnum} from "../../../core/enums/table.enum.ts";
+import {TableEnum} from "../../../core/models/enums/table.enum.ts";
 
 
 type InputValueType = string | number | boolean | Date | undefined;
@@ -8,7 +8,7 @@ type InputValueType = string | number | boolean | Date | undefined;
 type InputFieldProps = {
     name: string;
     dbType?: string;
-    placeHolder?: string;
+    label?: string;
     initialValue?: InputValueType;
     required?: boolean;
     onChangeFunction?: (value: string) => void;
@@ -20,7 +20,7 @@ type InputFieldProps = {
 const InputField = ({
                         name,
                         dbType,
-                        placeHolder,
+                        label,
                         required,
                         onChangeFunction,
                         hasError,
@@ -67,8 +67,8 @@ const InputField = ({
     const filled: boolean =
         value !== undefined && value !== null && value.toString().length > 0;
 
-    const placeHolderCapitalized: string = placeHolder
-        ? stringUtil.capitalizeFirstLetter(placeHolder)
+    const placeHolderCapitalized: string = label
+        ? stringUtil.capitalizeFirstLetter(label)
         : stringUtil.capitalizeFirstLetter(name);
 
     const fieldDescription: string = required

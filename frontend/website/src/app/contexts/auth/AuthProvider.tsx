@@ -2,11 +2,11 @@ import {type ReactNode, useEffect, useState} from "react";
 import type {
     LoginRequest,
     LoginResponse, RegisterAuthRequest,
-    // RegisterAuthRequest,
     UserLocalStorageData
-} from "../../../core/api/types/auth.type.ts";
-import {authApiService} from "../../../core/api/services/auth/auth.api.service.ts";
+} from "../../../core/models/types/auth.type.ts";
+
 import {AuthContext} from "./AuthContext.tsx";
+import {authApiService} from "../../../core/entities/auth/auth.api.service.ts";
 
 const ADMINISTRATOR: string = "ADMINISTRATOR";
 

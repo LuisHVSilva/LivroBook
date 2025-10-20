@@ -1,7 +1,7 @@
 import {useState} from "react";
-import {useAllEntitiesNames} from "../../../core/hooks/admin.hook.ts";
 import {type EntityInfo} from "../../components/admin/entity/AdminEntityListData.tsx";
 import AdminEntityMain from "../../components/admin/entity/AdminEntityMain.tsx";
+import {useAllEntitiesNames} from "../../hooks/admin/adminQueries.hook.ts";
 
 
 const MenuOptions = {

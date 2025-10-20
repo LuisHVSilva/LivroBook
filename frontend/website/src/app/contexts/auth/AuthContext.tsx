@@ -1,6 +1,5 @@
-// src/context/AuthContext.tsx
 import {createContext} from "react";
-import type {LoginRequest, RegisterAuthRequest, UserLocalStorageData} from "../../../core/api/types/auth.type.ts";
+import type {LoginRequest, RegisterAuthRequest, UserLocalStorageData} from "../../../core/models/types/auth.type.ts";
 
 
 type AuthContextType = {

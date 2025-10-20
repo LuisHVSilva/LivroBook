@@ -219,7 +219,7 @@ export abstract class ServiceBase<
         for (const [key, value] of Object.entries(filter)) {
             if (value === undefined || value === null || value === "") {
                 if (acceptUndefined) {
-                    return;
+                    continue;
                 }
                 throw new ServiceError(
                     EntitiesMessage.error.validation.requiredField(key)

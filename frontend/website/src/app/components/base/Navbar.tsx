@@ -1,5 +1,5 @@
 import {NavLink, type NavigateFunction, useNavigate} from "react-router-dom";
-import {useAuth} from "../../../core/hooks/authHook.ts";
+import {useAuth} from "../../hooks/authHook.ts";
 
 
 export const Navbar = () => {

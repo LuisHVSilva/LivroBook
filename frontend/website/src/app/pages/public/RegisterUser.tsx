@@ -1,12 +1,12 @@
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 
-import {formUtil} from "../../../core/utils/form.util.ts";
+import {formUtil} from "../../../core/utils/form/form.util.ts";
 import {ConflictError, NullFieldError, ValidationError} from "../../../core/errors/generic.error.ts";
-import {authApiService} from "../../../core/api/services/auth/auth.api.service.ts";
 import InputField from "../../components/forms/InputField.tsx";
-import type {RegisterAuthRequest} from "../../../core/api/types/auth.type.ts";
-import {useAuth} from "../../../core/hooks/authHook.ts";
+import type {RegisterAuthRequest} from "../../../core/models/types/auth.type.ts";
+import {useAuth} from "../../hooks/authHook.ts";
+import {authApiService} from "../../../core/entities/auth/auth.api.service.ts";
 
 const RegisterUser = () => {
     const {isAuthenticated} = useAuth();
@@ -47,15 +47,13 @@ const RegisterUser = () => {
                 },
             };
 
-            // console.log(payload)
             await authApiService.register(payload);
             navigate("/");
         } catch (e) {
             if (e instanceof NullFieldError || e instanceof ValidationError || e instanceof ConflictError) {
                 setError(e.message);
             }
-            console.clear()
-            console.log(e);
+            console.error(e);
         }
 
     }
@@ -76,21 +74,21 @@ const RegisterUser = () => {
                     <InputField
                         name="name"
                         dbType="text"
-                        placeHolder="Nome"
+                        label="Nome"
                         required={true}
                     />
 
                     <InputField
                         name="email"
                         dbType="email"
-                        placeHolder="E-mail"
+                        label="E-mail"
                         required={true}
                     />
 
                     <InputField
                         name="password"
                         dbType="password"
-                        placeHolder="Senha"
+                        label="Senha"
                         required={true}
                         onChangeFunction={validatePassword}
                     />
@@ -109,7 +107,7 @@ const RegisterUser = () => {
                     <InputField
                         name="confirmPassword"
                         dbType="password"
-                        placeHolder="Confirme sua senha"
+                        label="Confirme sua senha"
                         required={true}
                         onChangeFunction={handleConfirmPasswordChange}
                         hasError={!passwordsMatch}
@@ -118,7 +116,7 @@ const RegisterUser = () => {
                     <InputField
                         name="birthday"
                         dbType="date"
-                        placeHolder="Data de nascimento"
+                        label="Data de nascimento"
                         required={true}
                     />
                     {/*<div className="form-area">

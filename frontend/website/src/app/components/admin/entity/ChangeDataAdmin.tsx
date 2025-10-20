@@ -1,5 +1,5 @@
 import InputField from "../../forms/InputField.tsx";
-import type {EntityProperty, GetAllModelAttributesResponseDTO} from "../../../../core/api/types/admin.type.ts";
+import type {EntityProperty, GetAllModelAttributesResponseDTO} from "../../../../core/models/types/admin.type.ts";
 
 type changeDataAdminInput = {
     entityProperties: GetAllModelAttributesResponseDTO
@@ -47,7 +47,7 @@ const ChangeDataAdmin = ({entityProperties}: changeDataAdminInput) => {
                             <InputField
                                 name={prop.columnName}
                                 dbType={type}
-                                placeHolder={prop.columnName}
+                                label={prop.columnName}
                                 required={!prop.allowNull}
                                 disabled={disabled}
                             />

@@ -1,13 +1,12 @@
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-
 import {useEffect, useState} from "react";
-import {errorMessage} from "../../../core/constants/messages/error.message.ts";
+import {errorMessage} from "../../../core/models/messages/error.message.ts";
 import {Link} from "react-router-dom";
-import {formUtil} from "../../../core/utils/form.util.ts";
+import {formUtil} from "../../../core/utils/form/form.util.ts";
 
-import type {LoginRequest} from "../../../core/api/types/auth.type.ts";
-import {t} from "../../../core/constants/messages/translations.ts";
-import {useAuth} from "../../../core/hooks/authHook.ts";
+import type {LoginRequest} from "../../../core/models/types/auth.type.ts";
+import {t} from "../../../core/models/messages/translations.ts";
+import {useAuth} from "../../hooks/authHook.ts";
 
 const Login = () => {
     const {isAuthenticated, login} = useAuth();

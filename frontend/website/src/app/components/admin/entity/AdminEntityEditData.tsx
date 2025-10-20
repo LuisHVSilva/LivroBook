@@ -1,8 +1,10 @@
+import "reflect-metadata";
 import InputField from "../../forms/InputField.tsx";
 import SelectField from "../../forms/SelectField.tsx";
 import type {EntityInfo} from "./AdminEntityListData.tsx";
-import {formUtil} from "../../../../core/utils/form.util.ts";
-import {useAdminEntityEdit} from "../../../../core/hooks/admin.hook.ts";
+import {formUtil} from "../../../../core/utils/form/form.util.ts";
+import {useState} from "react";
+import {useAdminEntityEdit, useDeleteEntity} from "../../../hooks/admin/adminMutations.hook.ts";
 
 type AdminEntityDataProps = {
     entityId: number;
@@ -10,27 +12,28 @@ type AdminEntityDataProps = {
 };
 
 const AdminEntityEditData = ({entityId, entity}: AdminEntityDataProps) => {
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean | null>(null);
     const {
         entityData,
         preAlterEntityData,
         dbProps,
-        handleAlter,
-        error,
-        success,
-    } = useAdminEntityEdit(entity.selectedEntities, entityId);
+        handleAlter
+    } = useAdminEntityEdit(entity.selectedEntities, entityId, setSuccess, setError);
+    const deleteEntity = useDeleteEntity(setSuccess, setError);
 
     if (!entityData || Object.keys(entityData).length === 0) {
         return <h1>Sem valores cadastrados</h1>;
     }
 
-    const makeInputField = (key: string, value: string) => {
+    const makeInputField = (key: string, label: string, value: string) => {
         const prop = dbProps?.find(x => x.columnName === key);
         return (
             <InputField
                 key={key}
                 name={key}
                 dbType={prop?.dataType}
-                placeHolder={key}
+                label={label}
                 required={false}
                 initialValue={value}
                 disabled={key === "id"}
@@ -38,9 +41,13 @@ const AdminEntityEditData = ({entityId, entity}: AdminEntityDataProps) => {
         );
     };
 
-    const makeSelectField = (key: string, value: string, options: string[]) => (
-        <SelectField key={key} name={key} label={value} options={options}/>
+    const makeSelectField = (key: string, label: string, options: string[], startValue?: string) => (
+        <SelectField key={key} name={key} label={label} options={options} startValue={startValue} />
     );
+
+    const handleOnDelete = () => {
+        deleteEntity.mutate({entityName: entity.selectedEntities, id: entityId});
+    };
 
     return (
         <>
@@ -53,10 +60,15 @@ const AdminEntityEditData = ({entityId, entity}: AdminEntityDataProps) => {
                         ? formUtil.getOptionsValueForArrayObject(preAlterEntityData, key, String(value))
                         : null;
 
-                    return options ? makeSelectField(key, String(value), options) : makeInputField(key, String(value));
+                    const label = value.label ?? key;
+                    const valueInput = value.value ?? undefined;
+
+                    return options ? makeSelectField(key, label, options, valueInput) : makeInputField(key, label, valueInput);
                 })}
                 <button type="submit">Alterar</button>
             </form>
+
+            <button onClick={handleOnDelete}>Excluir</button>
         </>
     );
 };

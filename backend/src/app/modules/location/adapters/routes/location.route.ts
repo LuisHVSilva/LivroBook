@@ -122,7 +122,7 @@ router.patch(
 )
 
 router.delete(
-    "/admin/city/delete",
+    "/city/delete",
     validateRequest(DeleteCitySchema, 'query'),
     isAdminMiddleware(),
     asyncHandler((req, res) => locationController.cityController.delete(req, res))

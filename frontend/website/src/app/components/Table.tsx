@@ -1,4 +1,4 @@
-import {EditableOptionsEnum} from "../../core/enums/editableOptions.enum.ts";
+import {EditableOptionsEnum} from "../../core/models/enums/editableOptions.enum.ts";
 
 export type Renderable = string | number | boolean | null | undefined;
 
@@ -31,27 +31,26 @@ function Table<T extends { id: number } & Record<string, Renderable>, K extends 
             </thead>
             <tbody>
             {rows.map((row, rowIdx) => (
-                <tr key={rowIdx}>
-                    {headers.map((h) => (
-                        <td
-                            key={String(h)}
-                            onClick={() =>
-                                onRowClick({id: row.id, option: EditableOptionsEnum.EDIT})
-                            }
-                        >
-                            {String(row[h])}
-                        </td>
-                    ))}
+                <tr key={rowIdx}
+                    onClick={() =>
+                        onRowClick({id: row.id ?? null, option: EditableOptionsEnum.EDIT})
+                    }
+                >
+                    {Object.values(row).map((value, colIdx) => {
+                        if (typeof value === "object" && value !== null) {
+                            return Object.keys(value).map((key) => (
+                                <td key={`${colIdx}-${key}`}>{String(value[key])}</td>
+                            ));
+                        } else {
+                            return <td key={colIdx}>{String(value)}</td>;
+                        }
+                    })}
                 </tr>
             ))}
             </tbody>
+
         </table>
     );
 }
 
 export default Table;
-// <tr key={rowIdx}>
-//     {headers.map((h) => (
-//         <td key={String(h)}>{row[h]}</td>
-//     ))}
-// </tr>

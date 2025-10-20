@@ -1,7 +1,9 @@
+import "reflect-metadata";
 import {useState} from "react";
-import {useFindAllEntityData} from "../../../../core/hooks/admin.hook.ts";
 import Table, {type onRowClickType} from "../../Table.tsx";
-import type {GetEntityByIdResponseDTO} from "../../../../core/api/types/admin.type.ts";
+import type {FindById} from "../../../../core/models/types/admin.type.ts";
+import {useFindAllEntityData} from "../../../hooks/admin/adminQueries.hook.ts";
+import {EditableOptionsEnum} from "../../../../core/models/enums/editableOptions.enum.ts";
 
 export type EntityInfo = {
     name: string;
@@ -10,28 +12,34 @@ export type EntityInfo = {
 
 type ListEntityDataProps = {
     selectedEntities: EntityInfo;
-    onRowClick: (row: onRowClickType) => void
+    onRowClick: (row: onRowClickType) => void;
+    setSelectedOption: (selectedOption: EditableOptionsEnum) => void;
 };
 
-const AdminEntityListData = ({selectedEntities, onRowClick}: ListEntityDataProps) => {
+const AdminEntityListData = ({selectedEntities, onRowClick, setSelectedOption}: ListEntityDataProps) => {
     const [page, setPage] = useState<number>(1);
     const {data: entityDatas} = useFindAllEntityData(selectedEntities.selectedEntities, page);
-
-    const headers: string[] = entityDatas ? Object.keys(entityDatas.data[0]) : [];
-    const rows: GetEntityByIdResponseDTO[] = entityDatas?.data ?? [];
+    const entity = entityDatas ? entityDatas.data[0] : null;
+    const headers: string[] = entity ? Object.values(Reflect.getMetadata("labels", Object.getPrototypeOf(entity))) || [] : [];
+    const rows: FindById<any>[] = entityDatas?.data ? entityDatas?.data.map(obj => obj.getProps()) : [];
 
     const handleOnChangePage = (action: "next" | "prev") => {
         if (action === "next") {
             setPage((prev) => prev + 1);
         }
         if (action === "prev") {
-            setPage((prev) => Math.max(1, prev - 1)); // evita página 0
+            setPage((prev) => Math.max(1, prev - 1));
         }
     };
+
+    const handleOnInsert = () => {
+        setSelectedOption(EditableOptionsEnum.ADD)
+    }
 
 
     return (
         <>
+            <button onClick={handleOnInsert}>Incluir</button>
             {rows && (
                 <Table
                     headers={headers}

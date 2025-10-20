@@ -37,6 +37,33 @@ export abstract class EntityBase<T extends { id?: unknown }> {
         return new (this.constructor as any)(mergedProps);
     }
 
+    protected deepMerge<U extends Record<string, any>>(target: U, source: Partial<U>): U {
+        const result: Record<string, any> = { ...target };
+
+        for (const [k, v] of Object.entries(source) as [keyof U, any][]) {
+            const key = k as string;
+
+            const value = v;
+
+            const current = result[key];
+
+            if (
+                value &&
+                typeof value === "object" &&
+                !Array.isArray(value) &&
+                current &&
+                typeof current === "object" &&
+                !Array.isArray(current)
+            ) {
+                result[key] = this.deepMerge(current as any, value as any);
+            } else {
+                result[key] = value;
+            }
+        }
+
+        return result as U;
+    }
+
     public isEqual(other: EntityBase<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
         const keys = Object.keys(this.props) as (keyof T)[];
         return keys

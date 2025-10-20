@@ -75,7 +75,8 @@ export class PhoneEntity extends EntityBase<PhoneProps> {
 
     //#region UPDATE
     public update(props: Partial<PhoneProps>): this {
-        return this.cloneWith(props);
+        const override = this.deepMerge(this.props, props);
+        return this.cloneWith(override);
     }
 
     //#endregion
