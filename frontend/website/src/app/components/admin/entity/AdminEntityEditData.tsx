@@ -16,7 +16,7 @@ const AdminEntityEditData = ({entityId, entity}: AdminEntityDataProps) => {
     const [success, setSuccess] = useState<boolean | null>(null);
     const {
         entityData,
-        preAlterEntityData,
+        referenceData,
         dbProps,
         handleAlter
     } = useAdminEntityEdit(entity.selectedEntities, entityId, setSuccess, setError);
@@ -56,8 +56,8 @@ const AdminEntityEditData = ({entityId, entity}: AdminEntityDataProps) => {
 
             <form action={handleAlter}>
                 {Object.entries(entityData).map(([key, value]) => {
-                    const options = preAlterEntityData && key in preAlterEntityData
-                        ? formUtil.getOptionsValueForArrayObject(preAlterEntityData, key, String(value))
+                    const options = referenceData && key in referenceData
+                        ? formUtil.getOptionsValueFromArrayObject(referenceData, key, String(value))
                         : null;
 
                     const label = value.label ?? key;

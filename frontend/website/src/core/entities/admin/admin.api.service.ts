@@ -1,7 +1,7 @@
 import type {
     FindAllType,
     GetAllEntitiesNamesDTO,
-    GetAllModelAttributesResponseDTO, FindByIdAdmin
+    GetAllModelAttributesResponseDTO, FindByIdAdmin, EntityDtoInfos
 } from "../../models/types/admin.type.ts";
 import axios from '../../api/http.ts';
 import {metadataUrl} from "../../api/endpoints.api.ts";
@@ -9,10 +9,13 @@ import {ServiceError} from "../../errors/generic.error.ts";
 import {t} from "../../models/messages/translations.ts";
 import {errorMessage} from "../../models/messages/error.message.ts";
 import type {EntityDomainBase} from "../entity.domain.base.ts";
-import {mapApiService} from "../../mappers/apiServices.mapper.ts";
+import {mapApiEntities, mapApiService} from "../../mappers/apiServices.mapper.ts";
 import {DomainDecoratorUtil} from "../../utils/decorators/domain.decorator.util.ts";
+import {DtoMapper} from "../../mappers/dto.mapper.ts";
 
 class AdminApiService {
+
+    private readonly keyToRemoveToCreateMethod: string = "status";
 
     async getAllEntitiesNames(): Promise<GetAllEntitiesNamesDTO> {
         const {data} = await axios.get(metadataUrl.getAllEntitiesNames);
@@ -53,7 +56,6 @@ class AdminApiService {
         return await service.findAll(undefined, page, limit) as unknown as FindAllType<T>;
     }
 
-
     public async getEntityById<T extends EntityDomainBase<any>>(entityName: string, id: number): Promise<FindByIdAdmin<T> | null> {
         try {
             const service = mapApiService(entityName);
@@ -86,10 +88,16 @@ class AdminApiService {
         }
     }
 
-    public async loadReferenceData(entityName: string): Promise<Record<string, unknown>> {
+    public async loadReferenceData(entityName: string, createMethod?: boolean): Promise<Record<string, unknown>> {
         const service = mapApiService(entityName);
 
-        return service?.loadReferenceData ? await service.loadReferenceData() : {};
+        const referenceData: Record<string, unknown> = service?.loadReferenceData ? await service.loadReferenceData() : {};
+
+        if (createMethod) {
+            return this.removeKey(this.keyToRemoveToCreateMethod, referenceData);
+        }
+
+        return referenceData;
     }
 
     public async alterEntity(entityName: string, payload: Record<string, string>): Promise<boolean> {
@@ -115,6 +123,35 @@ class AdminApiService {
             }
             return false;
         }
+    }
+
+    public async addEntity(entityName: string, payload: Record<string, string>): Promise<boolean> {
+        try {
+            const service = mapApiService(entityName);
+
+            if (!service) {
+                console.error(`Service '${entityName}' not found.`);
+                return false;
+            }
+
+            return await service.add(payload);
+        } catch (e) {
+            if (e instanceof Error) {
+                console.error(`An error occurred while alter entity: ${e}`);
+            }
+            return false;
+        }
+    }
+
+    public entityInfos(entityName: string, createMethod?: boolean): EntityDtoInfos[] {
+        const entity = mapApiEntities(entityName);
+        const fieldsInfos: EntityDtoInfos[] = DtoMapper.fieldsInfos(entity, true);
+
+        if (createMethod) {
+            return this.removeKey(this.keyToRemoveToCreateMethod, fieldsInfos);
+        }
+
+        return fieldsInfos;
     }
 
     private removeDatabaseProps(datas: GetAllModelAttributesResponseDTO): GetAllModelAttributesResponseDTO {
@@ -150,6 +187,20 @@ class AdminApiService {
         return flattened;
     }
 
+    private removeKey<T extends Record<string, unknown> | Record<string, unknown>[]>(
+        key: string,
+        target: T
+    ): T {
+        if (Array.isArray(target)) {
+            return target.filter(obj => !(key in obj)) as T;
+        }
+
+        if (key in target) {
+            delete target[key];
+        }
+
+        return target;
+    }
 }
 
 export const adminApiService = new AdminApiService();

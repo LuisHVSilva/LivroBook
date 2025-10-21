@@ -40,7 +40,7 @@ export abstract class EntityDomainBase<TProps extends BaseEntityType> {
         return new this(props as P);
     }
 
-    public getProps(): Readonly<TProps> {
+    public getProps(): TProps {
         return this.props;
     }
 

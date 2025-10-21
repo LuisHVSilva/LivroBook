@@ -5,6 +5,7 @@ export interface DtoFieldOptions {
     type?: "string" | "number" | "boolean" | "date";
     nested?: boolean;
     pick?: string[];
+    mandatory?: boolean;
 }
 
 // --- Mark a class as Domain ---
@@ -37,6 +38,7 @@ export function DtoField(dtoKey: string, options?: DtoFieldOptions) {
             type: options?.type,
             nested: options?.nested ?? false,
             pick: options?.pick,
+            mandatory: options?.mandatory ?? true,
         };
 
         Reflect.defineMetadata("dtoFields", dtoFields, target as object);

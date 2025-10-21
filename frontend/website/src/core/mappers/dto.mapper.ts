@@ -4,6 +4,8 @@ import {
     EntityDomainBase, type ExtractProps,
 } from "../entities/entity.domain.base.ts";
 import type {DtoFieldOptions} from "../decorators/domain.decorator.ts";
+import {DomainDecoratorUtil} from "../utils/decorators/domain.decorator.util.ts";
+import type {EntityDtoInfos} from "../models/types/admin.type.ts";
 
 type DtoFieldMetadata = { key: string } & DtoFieldOptions;
 type DtoPropMapType = { prop: string, meta: DtoFieldMetadata };
@@ -69,7 +71,7 @@ export class DtoMapper {
 
             if (!field) continue;
 
-            const { prop, meta } = field;
+            const {prop, meta} = field;
             props[prop] = this.convertValue(rawValue, meta.type);
         }
 
@@ -111,6 +113,37 @@ export class DtoMapper {
             }
         }
         return dto as TDTO;
+    }
+
+    static fieldsInfos<TDomain extends EntityDomainBase<unknown & BaseEntityType>>(
+        DomainClass: TDomain,
+        excludeId: boolean = false,
+        includeLabel: boolean = true,
+    ): EntityDtoInfos[] {
+        const labels: Record<string, string> | undefined = includeLabel ? DomainDecoratorUtil.getLabels(DomainClass) : undefined;
+        const dtoFields: DtoFieldOptions = DtoMapper.getDtoFields(DomainClass);
+
+        const entityAllDtoInfos: EntityDtoInfos[] = Object.entries(dtoFields).map(([key, value]) => {
+            const basicResult = {
+                [key]: {
+                    ...value
+                }
+            }
+
+            if (includeLabel) {
+                basicResult[key]["label"] = labels ? labels[key] : key;
+            }
+
+            return basicResult;
+        })
+
+        if (excludeId) {
+            return entityAllDtoInfos
+                .map(item => Object.fromEntries(Object.entries(item).filter(([k]) => k !== 'id')))
+                .filter(item => Object.keys(item).length > 0);
+        }
+
+        return entityAllDtoInfos;
     }
 
     private static typedEntries<T extends object>(obj: T): [keyof T, T[keyof T]][] {

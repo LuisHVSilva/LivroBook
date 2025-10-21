@@ -11,6 +11,17 @@ import {
     UserCredentialTypeServiceEntity
 } from "../entities/user/userCredentialType/userCredentialType.service.entity.ts";
 import {UserServiceEntity} from "../entities/user/user/user.service.entity.ts";
+import {DocumentTypeDomainEntity} from "../entities/document/documentType/documentType.domain.entity.ts";
+import {CountryDomainEntity} from "../entities/location/country/country.domain.entity.ts";
+import {StateDomainEntity} from "../entities/location/state/state.domain.entity.ts";
+import {CityDomainEntity} from "../entities/location/city/city.domain.entity.ts";
+import {PhoneTypeDomainEntity} from "../entities/phone/phoneType/phoneType.domain.entity.ts";
+import {PhoneCodeDomainEntity} from "../entities/phone/phoneCode/phoneCode.domain.entity.ts";
+import {PhoneDomainEntity} from "../entities/phone/phone/phone.domain.entity.ts";
+import {UserTypeDomainEntity} from "../entities/user/userType/userType.domain.entity.ts";
+import {UserCredentialTypeDomainEntity} from "../entities/user/userCredentialType/userCredentialType.domain.entity.ts";
+import {UserDomainEntity} from "../entities/user/user/user.domain.entity.ts";
+import {StatusDomainEntity} from "../entities/status/status.domain.entity.ts";
 
 export const mapApiService = (entity: string) => {
     let service = undefined;
@@ -57,4 +68,51 @@ export const mapApiService = (entity: string) => {
     }
 
     return service;
+}
+
+export const mapApiEntities = (entityName: string) => {
+    let entity = null;
+    switch (entityName) {
+        case "documentType":
+            entity = DocumentTypeDomainEntity.rehydrate({});
+            break;
+        case "country":
+            entity = CountryDomainEntity.rehydrate({});
+            break;
+        case "state":
+            entity = StateDomainEntity.rehydrate({});
+            break;
+        case "city":
+            entity = CityDomainEntity.rehydrate({});
+            break;
+        case "phoneType":
+            entity = PhoneTypeDomainEntity.rehydrate({});
+            break;
+        case "phoneCode":
+            entity = PhoneCodeDomainEntity.rehydrate({});
+            break;
+        case "phone":
+            entity = PhoneDomainEntity.rehydrate({});
+            break;
+        case "userType":
+            entity = UserTypeDomainEntity.rehydrate({});
+            break;
+        case "userCredentialType":
+            entity = UserCredentialTypeDomainEntity.rehydrate({});
+            break;
+        case "user":
+            entity = UserDomainEntity.rehydrate({});
+            break
+        case "status":
+            entity = StatusDomainEntity.rehydrate({});
+            break;
+        default:
+            break;
+    }
+
+    if (!entity) {
+        throw new Error(`Entity '${entityName}' not found.`);
+    }
+
+    return entity;
 }

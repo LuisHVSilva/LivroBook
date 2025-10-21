@@ -1,9 +1,13 @@
 import "reflect-metadata";
-import type {EntityDomainBase} from "../../entities/entity.domain.base.ts";
 
 export class DomainDecoratorUtil {
-    static getLabels(entity: unknown & EntityDomainBase<any>): Record<string, string> {
-        return (Reflect.getMetadata("labels", Object.getPrototypeOf(entity))) ?? {}
-    }
+    static readonly labelMetadataKey: string = 'labels';
 
+    static getLabels(target: object): Record<string, string> {
+        return (
+            Reflect.getMetadata(DomainDecoratorUtil.labelMetadataKey, target) ??
+            Reflect.getMetadata(DomainDecoratorUtil.labelMetadataKey, target.constructor?.prototype) ??
+            {}
+        );
+    }
 }

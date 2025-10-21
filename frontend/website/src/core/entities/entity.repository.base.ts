@@ -58,6 +58,12 @@ export abstract class EntityRepositoryBase<
         return data.result;
     }
 
+    public async create(payload: TProps): Promise<boolean> {
+        const url:string = this.getEndpointPath("post", "create");
+        await axios.post(url, payload);
+        return true;
+    }
+
     /**
      * Partially updates an entity
      */

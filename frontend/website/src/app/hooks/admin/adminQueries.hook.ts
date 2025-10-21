@@ -1,6 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 import type {
-    FindAllType, FindByIdAdmin,
+    FindAllType, FindByIdAdmin, EntityDtoInfos,
     GetAllEntitiesNamesDTO,
     GetAllModelAttributesResponseDTO
 } from "../../../core/models/types/admin.type.ts";
@@ -42,11 +42,18 @@ export function useGetEntityById(entityName: string, id: number) {
     });
 }
 
-export function useLoadReferenceData(entityName: string) {
+export function useLoadReferenceData(entityName: string, createMethod?: boolean) {
     return useQuery<Record<string, unknown>, Error>({
-        queryKey: ["preAlterEntityData", entityName],
-        queryFn: (): Promise<Record<string, unknown>> => adminApiService.loadReferenceData(entityName),
+        queryKey: ["referenceData", entityName],
+        queryFn: (): Promise<Record<string, unknown>> => adminApiService.loadReferenceData(entityName, createMethod),
         staleTime: 1000 * 60,
         retry: 2,
     });
+}
+
+export function useEntityInfos(entityName: string, createMethod?: boolean) {
+    return useQuery<EntityDtoInfos[], Error>({
+        queryKey: ["formBaseData", entityName],
+        queryFn: (): EntityDtoInfos[] => adminApiService.entityInfos(entityName, createMethod),
+    })
 }

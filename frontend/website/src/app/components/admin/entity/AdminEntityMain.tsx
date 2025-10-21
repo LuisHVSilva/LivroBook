@@ -42,7 +42,9 @@ const AdminEntityMain = ({selectedEntities}: AdminEntityMainProps) => {
             )}
 
             {selectedOption === EditableOptionsEnum.ADD && (
-                <AdminEntityAddData />
+                <AdminEntityAddData
+                    selectedEntity={selectedEntities.selectedEntities}
+                />
             )}
         </>
     )

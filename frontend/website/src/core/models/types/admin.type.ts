@@ -1,4 +1,5 @@
 import type {BaseEntityType, EntityDomainBase} from "../../entities/entity.domain.base.ts";
+import type {DtoFieldOptions} from "../../decorators/domain.decorator.ts";
 
 export type GetAllEntitiesNamesDTO = Record<string, Record<string, string>>;
 
@@ -29,3 +30,5 @@ export type FindAllType<TDomain extends EntityDomainBase<any>> = {
 export type FindById<TDomain extends EntityDomainBase<any>> = TDomain;
 
 export type FindByIdAdmin<T = Record<string, unknown>> = Record<keyof T, { value: string; label: string }>
+
+export type EntityDtoInfos = { [p: string]: {label?: string} & DtoFieldOptions };

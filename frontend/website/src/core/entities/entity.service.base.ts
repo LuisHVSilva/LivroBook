@@ -5,7 +5,6 @@ import type {FindAllProps, FindAllType, FindById} from "../models/types/admin.ty
 import {StatusEnum} from "../models/enums/entity.enum.ts";
 import {DtoMapper} from "../mappers/dto.mapper.ts";
 
-
 export abstract class EntityServiceBase<
     TDomain extends EntityDomainBase<any>,
     TRepo extends EntityRepositoryBase<ExtractProps<TDomain>, keyof AllModulesMap>
@@ -49,6 +48,14 @@ export abstract class EntityServiceBase<
             ...propsFounded,
             data: entityFounded
         }
+    }
+
+    async add(payload: Record<string, unknown>): Promise<boolean> {
+        this.validatePayloadByMetadata(payload, true);
+        const newEntity: TDomain = this.mapToDomain(payload as ExtractProps<TDomain>);
+        const dto = DtoMapper.toDTO(this.DomainClass, newEntity.getProps()) as ExtractProps<TDomain>;
+
+        return await this.repository.create(dto);
     }
 
     async alter(payload: Record<string, unknown>): Promise<boolean> {
@@ -113,4 +120,18 @@ export abstract class EntityServiceBase<
         return null;
     }
 
+    private validatePayloadByMetadata(payload: Record<string, unknown>, createMethod?: boolean): payload is ExtractProps<TDomain> {
+        const dtoFields = DtoMapper.getDtoFields(this.DomainClass);
+        const requiredKeys = Object.keys(dtoFields).filter(
+            key => dtoFields[key]?.mandatory && (createMethod && key !== 'status')
+        );
+
+        for (const key of requiredKeys) {
+            if (!(key in payload) || payload[key] === undefined || payload[key] === null) {
+                throw new Error(`Campo obrigatório ausente no payload: ${key}`);
+            }
+        }
+
+        return true;
+    }
 }

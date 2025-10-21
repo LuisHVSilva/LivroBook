@@ -68,7 +68,7 @@ export class FormUtil {
         return column ? !column.allowNull : false;
     }
 
-    public getOptionsValueForArrayObject(array: Record<string, unknown>, key: string, value: string): string[] {
+    public getOptionsValueFromArrayObject(array: Record<string, unknown>, key: string, value: string): string[] {
         const data = array[key] as Record<string, string>[];
 
         return data
@@ -84,13 +84,13 @@ export class FormUtil {
 
     public getError(e: unknown, genericMessage?: string, setError?: (value: string) => void): void {
         if (!(e instanceof Error)) {
-            if(setError){
+            if (setError) {
                 setError(String(e));
             }
             return;
         }
 
-        if (setError && genericMessage){
+        if (setError && genericMessage) {
             setError(t(genericMessage));
         }
 
