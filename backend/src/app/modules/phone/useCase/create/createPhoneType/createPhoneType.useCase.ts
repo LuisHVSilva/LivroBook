@@ -4,7 +4,7 @@ import {CreatePhoneTypeDTO, CreatePhoneTypeResponseDTO} from "@phone/adapters/dt
 import {ResultType} from "@coreShared/types/result.type";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IPhoneTypeService} from "@phone/domain/service/interfaces/IPhoneType.service";
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -29,7 +29,7 @@ export class CreatePhoneTypeUseCase implements ICreatePhoneTypeUseCase {
 
             return ResultType.success(created)
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

@@ -8,7 +8,7 @@ import {RepositoryBase} from "@coreShared/base/repository.base";
 import {RelationMapType} from "@coreShared/types/controller.type";
 import {IStateRepository} from "@location/infrastructure/repositories/interfaces/IState.repository";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 
 
 @injectable()

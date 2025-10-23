@@ -1,7 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
@@ -45,7 +44,7 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
     //#endregion
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: PhoneDtoBaseType["CreateDTO"], status: string): Promise<PhoneEntity> {
         return PhoneEntity.create({
             number: data.number,
@@ -55,7 +54,7 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: PhoneEntity, previousEntity: PhoneEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('number', entity.number, previousEntity);
         if (!isUnique) {
@@ -63,7 +62,7 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
         }
     }
 
-    @LogError()
+
     protected filterTransform(input: PhoneDtoBaseType['FilterDTO']): PhoneDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             phoneType: PhoneTypeTransformer.normalizeDescription,
@@ -71,7 +70,7 @@ export class PhoneService extends ServiceBase<PhoneDtoBaseType, PhoneEntity> imp
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<PhoneDtoBaseType["DTO"]>): Promise<void> {
         await this.validateExistence("phoneCode", undefined, {
             ddiCode: data.phoneCode?.ddiCode,

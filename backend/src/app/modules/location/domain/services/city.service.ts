@@ -4,8 +4,7 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
@@ -44,7 +43,7 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
     //#endregion
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: CityDtoBaseType["CreateDTO"], status: string): Promise<CityEntity> {
         return CityEntity.create({
             description: data.description,
@@ -53,7 +52,7 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: CityEntity, previousEntity?: CityEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
@@ -62,7 +61,7 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
         }
     }
 
-    @LogError()
+
     protected filterTransform(input: CityDtoBaseType['FilterDTO']): CityDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             description: CityTransformer.normalizeDescription,
@@ -71,7 +70,7 @@ export class CityService extends ServiceBase<CityDtoBaseType, CityEntity> implem
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<CityDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
             this.validateExistence("state", data.state, 'description', this.stateService),

@@ -11,7 +11,7 @@ import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 import {IUserTypeService} from "@user/domain/services/interface/IUserType.service";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
 import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
@@ -58,7 +58,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
 
             return ResultType.success(created)
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

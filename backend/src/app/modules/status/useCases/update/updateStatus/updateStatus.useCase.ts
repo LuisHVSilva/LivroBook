@@ -5,7 +5,7 @@ import {Transactional} from "@coreShared/decorators/Transactional";
 import {UpdateStatusDTO, UpdateStatusResponseDTO} from "@status/adapters/dtos/status.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {Transaction} from "sequelize";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -29,7 +29,7 @@ export class UpdateStatusUseCase implements IUpdateStatusUseCase {
 
             return ResultType.success(updatedStatus);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

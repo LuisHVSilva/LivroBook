@@ -3,10 +3,9 @@ import {ServiceBase} from "@coreShared/base/service.base";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
 import {IUserCredentialRepository} from "@user/infrastructure/repositories/interface/IUserCredential.repository";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {LogError} from "@coreShared/decorators/LogError";
 import {UserCredentialDtoBaseType} from "@user/adapters/dtos/userCredential.dto";
 import {UserCredentialEntity, UserCredentialProps} from "@user/domain/entities/userCredential.entity";
-import {NotFoundError, ValidationError} from "@coreShared/errors/domain.error";
+import {NotFoundError, ValidationError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IUserCredentialTypeService} from "@user/domain/services/interface/IUserCredentialType.service";
 import {UserCredentialTypeEnum} from "@user/domain/enums/userCredentialType.enum";
@@ -37,7 +36,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
     }
 
     //#endregion
-    // @LogError()
+    //
     // public async update(newData: UserCredentialDtoBaseType["UpdateDTO"], transaction: Transaction): Promise<UpdateResultType<UserCredentialEntity>> {
     //     if (newData.newPassword) {
     //         if (!newData.password) {
@@ -51,7 +50,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
     //     return super.update(newData, transaction);
     // }
 
-    @LogError()
+
     @Transactional(true)
     public async validateLoginCredential(user: UserEntity, password: string, ip: string, transaction?: Transaction): Promise<ResultType<UserCredentialEntity>> {
         if (!transaction) {
@@ -91,7 +90,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
         return ResultType.success(userCredentialUpdated)
     }
 
-    @LogError()
+
     private async isPasswordValid(userCredentialId: number, password: string): Promise<boolean> {
         const userCredential: UserCredentialEntity = await this.getById(userCredentialId);
         const storagePassword: string | undefined = userCredential.password;
@@ -104,7 +103,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
     }
 
     //#region HELPERS
-    @LogError()
+
     private async updatePassword(id: number, oldPassword: string, newPassword: string): Promise<{
         password: string,
         userTypeId: number
@@ -122,7 +121,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
         return {password, userTypeId};
     }
 
-    @LogError()
+
     protected async createEntity(data: UserCredentialDtoBaseType["CreateDTO"], status: string): Promise<UserCredentialEntity> {
         let userCredentialType: string | undefined;
 
@@ -141,12 +140,12 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(): Promise<void> {
         return;
     }
 
-    @LogError()
+
     protected filterTransform(input: UserCredentialDtoBaseType['FilterDTO']): UserCredentialDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             userCredentialType: UserCredentialTypeTransform.normalizeDescription,
@@ -154,7 +153,7 @@ export class UserCredentialService extends ServiceBase<UserCredentialDtoBaseType
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<UserCredentialDtoBaseType["DTO"]>, transaction?: Transaction): Promise<void> {
         await Promise.all([
             this.validateExistence("userEmail", data.userEmail, 'email', this.userService, false, transaction),

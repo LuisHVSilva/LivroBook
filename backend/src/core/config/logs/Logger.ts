@@ -3,8 +3,8 @@ import * as path from "path";
 import {StatusCodes} from "http-status-codes";
 import {ILogger} from "./ILogger";
 import {LoggerMessages} from "@coreShared/messages/loggerMessages";
-import {LoggerContext} from "@coreShared/logs/LoggerContext";
-import {LogFormatter} from "@coreShared/logs/LogFormatter";
+import {LoggerContext} from "@coreConfig/logs/LoggerContext";
+import {LogFormatter} from "@coreConfig/logs/LogFormatter";
 import * as dotenv from "dotenv";
 
 dotenv.config({path: path.resolve(__dirname, '../../../../.env')});

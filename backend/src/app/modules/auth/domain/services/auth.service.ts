@@ -1,7 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {IAuthService} from "@modules/auth/domain/services/interfaces/IAuth.service";
 import {CreateTokenPayloadDTO, LoginDTO, LoginResponseDTO} from "@modules/auth/adapters/dtos/auth.dto";
-import {LogError} from "@coreShared/decorators/LogError";
 import {IUserService} from "@user/domain/services/interface/IUser.service";
 import {UserEntity} from "@user/domain/entities/user.entity";
 import {IUserCredentialService} from "@user/domain/services/interface/IUserCredential.service";
@@ -27,7 +26,6 @@ export class AuthService implements IAuthService {
     ) {
     }
 
-    @LogError()
     public async login(input: LoginDTO): Promise<ResultType<LoginResponseDTO>> {
         const user: UserEntity = await this.userService.getUserActiveByEmail(input.email);
 

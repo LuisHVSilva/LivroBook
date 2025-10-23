@@ -2,9 +2,9 @@ import {inject, injectable} from "tsyringe";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {DomainError} from "@coreShared/errors/domain.error";
+import {DomainError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
@@ -38,7 +38,7 @@ export class DeleteUserTypeUseCase implements IDeleteUserTypeUseCase {
                 report
             });
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

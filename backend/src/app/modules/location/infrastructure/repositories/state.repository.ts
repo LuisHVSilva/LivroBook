@@ -6,7 +6,7 @@ import {StateModel} from "@location/infrastructure/models/state.model";
 import {StateBaseRepositoryType} from "@location/adapters/dtos/state.dto";
 import {RepositoryBase} from "@coreShared/base/repository.base";
 import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {RelationMapType} from "@coreShared/types/controller.type";
 

@@ -1,5 +1,5 @@
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {ValidationError} from "@coreShared/errors/domain.error";
+import {ValidationError} from "@coreShared/errors/classes.error";
 import {UserTypeEntity} from "@user/domain/entities/userType.entity";
 
 export class UserTypeValidator {

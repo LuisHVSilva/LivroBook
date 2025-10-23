@@ -5,7 +5,7 @@ import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {CreateCityDTO, CreateCityResponseDTO} from "@location/adapters/dtos/city.dto";
 import {CityEntity} from "@location/domain/entities/city.entity";
 import {LogError} from "@coreShared/decorators/LogError";
@@ -29,7 +29,7 @@ export class CreateCityUseCase implements ICreateCityUseCase {
             const result: CityEntity = await this.service.create(input, transaction);
             return ResultType.success(result);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

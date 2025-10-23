@@ -1,11 +1,16 @@
 import {Response} from "express";
 import {StatusCodes} from "http-status-codes";
-import {ConflictError, DomainError, InactiveError, NotFoundError, ValidationError} from "../errors/domain.error";
-import {ControllerError} from "../errors/controller.error";
+import {
+    ConflictError,
+    ControllerError,
+    DomainError, InactiveError,
+    NotFoundError,
+    UseCaseError,
+    ValidationError
+} from "../errors/classes.error";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {ControllersMessage} from "@coreShared/messages/controllers.message";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
-import {UseCaseError} from "@coreShared/errors/useCase.error";
 
 export class ApiResponseUtil {
     static success<T>(res: Response, result: T, status: number = StatusCodes.OK): Response {

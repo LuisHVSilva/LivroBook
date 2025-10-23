@@ -1,4 +1,4 @@
-import {EntityError} from "@coreShared/errors/entityError";
+import {EntityError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 

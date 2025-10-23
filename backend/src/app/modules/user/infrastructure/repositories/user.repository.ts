@@ -13,7 +13,7 @@ import {IUserTypeRepository} from "@user/infrastructure/repositories/interface/I
 import {ICityRepository} from "@location/infrastructure/repositories/interfaces/ICity.repository";
 import {IDocumentTypeRepository} from "@document/infrastructure/repositories/interface/IDocumentType.repository";
 import {IPhoneRepository} from "@phone/infrastructure/repositories/interface/IPhone.repository";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 
 @injectable()
 export class UserRepository extends RepositoryBase<UserBaseRepositoryType> implements IUserRepository {

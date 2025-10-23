@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {FindByIdRequestDTO} from "@coreShared/dtos/operation.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IFindCityByIdUseCase} from "@location/useCases/read/findCityById/IFindCityById.useCase";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
 import {FindByIdCityResponseDto} from "@location/adapters/dtos/city.dto";
@@ -25,7 +25,7 @@ export class FindCityByIdUseCase implements IFindCityByIdUseCase {
 
             return ResultType.success(entity);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

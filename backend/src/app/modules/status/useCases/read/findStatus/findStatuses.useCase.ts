@@ -6,7 +6,7 @@ import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {FindAllType} from "@coreShared/types/findAll.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 
 @injectable()
@@ -43,7 +43,7 @@ export class FindStatusesUseCase implements IFindStatusesUseCase {
 
             return ResultType.success(response);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

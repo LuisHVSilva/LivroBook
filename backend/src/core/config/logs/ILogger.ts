@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import {LoggerContext} from "@coreShared/logs/LoggerContext";
+import {LoggerContext} from "@coreConfig/logs/LoggerContext";
 
 export interface ILogger {
     /**

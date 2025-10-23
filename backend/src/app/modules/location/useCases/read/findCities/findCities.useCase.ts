@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IFindCitiesUseCase} from "@location/useCases/read/findCities/IFindCities.useCase";
 import {CityFilterDTO, FindCitiesRawDTO, FindCitiesResponseDTO} from "@location/adapters/dtos/city.dto";
 import {ICityService} from "@location/domain/services/interfaces/ICity.service";
@@ -41,7 +41,7 @@ export class FindCitiesUseCase implements IFindCitiesUseCase {
 
             return ResultType.success(response);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

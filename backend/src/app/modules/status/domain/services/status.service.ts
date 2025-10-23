@@ -10,13 +10,12 @@ import {
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {Transaction} from "sequelize";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, NotFoundError, ValidationError} from "@coreShared/errors/domain.error";
+import {ConflictError, NotFoundError, ValidationError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {ResultType} from "@coreShared/types/result.type";
-import {ServiceError} from "@coreShared/errors/service.error";
+import {ServiceError} from "@coreShared/errors/classes.error";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {StatusTransformer} from "@status/domain/transformers/Status.transformer";
@@ -48,7 +47,7 @@ export class StatusService implements IStatusService {
     //#endregion
 
     //#region CREATE
-    @LogError()
+
     async create(data: CreateStatusDTO, transaction: Transaction): Promise<StatusEntity> {
         const entity: StatusEntity = StatusEntity.create({description: data.description, active: false});
 
@@ -61,7 +60,7 @@ export class StatusService implements IStatusService {
     //#endregion
 
     //#region READ
-    @LogError()
+
     async getById(id: number): Promise<StatusEntity> {
         const found: ResultType<StatusEntity> = await this.repo.findById(id);
         const entity: StatusEntity | null = found.unwrapOrNull();
@@ -71,7 +70,7 @@ export class StatusService implements IStatusService {
         return entity;
     }
 
-    @LogError()
+
     public async getByDescription(description: string): Promise<StatusEntity> {
         const normalizedDescription: string = StatusTransformer.normalizeDescription(description);
         const result: ResultType<StatusEntity> = await this.repo.findOneByFilter({description: [normalizedDescription]});
@@ -84,7 +83,7 @@ export class StatusService implements IStatusService {
         return entity;
     }
 
-    @LogError()
+
     private async getStausActiveByDescription(description: string): Promise<StatusEntity> {
         const foundedStatus: StatusEntity = await this.getByDescription(description);
         if (!foundedStatus.active) throw new ValidationError(EntitiesMessage.error.retrieval.inactiveStatus);
@@ -92,7 +91,7 @@ export class StatusService implements IStatusService {
         return foundedStatus;
     }
 
-    @LogError()
+
     async findMany(filter: FilterStatusDTO, page?: number, limit?: number): Promise<FindAllType<StatusEntity>> {
         const pageValue: number = page ?? 1;
         const limitValue: number = limit ?? 20;
@@ -115,22 +114,22 @@ export class StatusService implements IStatusService {
         return found.unwrap();
     }
 
-    @LogError()
+
     async getStatusForNewEntities(): Promise<StatusEntity> {
         return this.getStausActiveByDescription(StatusEnum.PENDING_APPROVAL);
     }
 
-    @LogError()
+
     async getStatusForUpdateEntities(): Promise<StatusEntity> {
         return this.getStatusForNewEntities();
     }
 
-    @LogError()
+
     async getStatusForInactiveEntities(): Promise<StatusEntity> {
         return this.getStausActiveByDescription(StatusEnum.INACTIVE);
     }
 
-    @LogError()
+
     async getStatusForActiveEntities(): Promise<StatusEntity> {
         return this.getStausActiveByDescription(StatusEnum.ACTIVE)
     }
@@ -143,7 +142,7 @@ export class StatusService implements IStatusService {
     //#endregion
 
     //#region UPDATE
-    @LogError()
+
     async update(newData: UpdateStatusDTO, transaction: Transaction): Promise<UpdateResultType<UpdateStatusResponseDTO>> {
         const entity: StatusEntity | null = await this.getById(newData.id);
 
@@ -172,7 +171,7 @@ export class StatusService implements IStatusService {
     //#endregion
 
     //#region DELETE
-    @LogError()
+
     async delete(id: number, transaction: Transaction): Promise<DeleteStatusEnum> {
         let entity: StatusEntity;
 
@@ -195,7 +194,7 @@ export class StatusService implements IStatusService {
         return DeleteStatusEnum.DELETED;
     }
 
-    @LogError()
+
     async deleteMany(ids: number[], transaction: Transaction): Promise<DeleteReport> {
         const deleted: number[] = [];
         const alreadyInactive: number[] = [];

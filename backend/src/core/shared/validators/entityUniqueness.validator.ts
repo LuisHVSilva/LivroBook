@@ -1,7 +1,6 @@
 import {injectable, inject} from "tsyringe";
-import {LogError} from "@coreShared/decorators/LogError";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
-import {ValidationError} from "@coreShared/errors/domain.error";
+import {ValidationError} from "@coreShared/errors/classes.error";
 import {ResultType} from "@coreShared/types/result.type";
 import {BaseRepositoryType} from "@coreShared/types/entity.type";
 
@@ -13,7 +12,7 @@ export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, an
     ) {
     }
 
-    @LogError()
+
     async validate(
         fieldName: keyof T["Filter"],
         value: unknown,
@@ -41,7 +40,7 @@ export class EntityUniquenessValidator<T extends BaseRepositoryType<any, any, an
         return !entity || (excludeId != null && entity?.[idField] === excludeId);
     }
 
-    @LogError()
+
     async validateFields(
         filter: Partial<T["Filter"]>,
         previousEntity?: T["Entity"],

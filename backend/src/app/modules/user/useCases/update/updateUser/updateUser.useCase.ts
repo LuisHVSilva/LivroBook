@@ -3,7 +3,7 @@ import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {IUpdateUserUseCase} from "@user/useCases/update/updateUser/IUpdateUser.useCase";
@@ -29,7 +29,7 @@ export class UpdateUserUseCase implements IUpdateUserUseCase {
 
             return ResultType.success(updatedEntity);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

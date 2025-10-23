@@ -1,7 +1,7 @@
-import { container } from "tsyringe";
-import { ILogger } from "@coreShared/logs/ILogger";
-import { LoggerContext } from "@coreShared/logs/LoggerContext";
-import { ResultType } from "@coreShared/types/result.type";
+import {container} from "tsyringe";
+import {ILogger} from "@coreConfig/logs/ILogger";
+import {LoggerContext} from "@coreConfig/logs/LoggerContext";
+import {ResultType} from "@coreShared/types/result.type";
 import util from "util";
 
 function safe(data: any) {
@@ -9,7 +9,7 @@ function safe(data: any) {
         JSON.stringify(data);
         return data;
     } catch {
-        return util.inspect(data, { depth: 2 });
+        return util.inspect(data, {depth: 2});
     }
 }
 
@@ -41,15 +41,14 @@ export function LogExecution(): MethodDecorator {
                             undefined,
                             // { result: safe(result) }
                         );
-                    } else if( result.isNone()) {
+                    } else if (result.isNone()) {
                         await logger.logInfo(
                             context,
                             `✔️ Execução concluída (nenhum resultado) em ${duration}ms`,
                             undefined,
                             // { result: safe(result) }
                         );
-                    }
-                    else {
+                    } else {
                         const error = result.getError();
                         await logger.logWarn(
                             context,
@@ -58,13 +57,13 @@ export function LogExecution(): MethodDecorator {
                             // { error: safe(error), duration }
                         );
                     }
-                } else {
-                    await logger.logInfo(
-                        context,
-                        `✔️ Execução concluída (sem ResultType) em ${duration}ms`,
-                        undefined,
-                        // { result: safe(result) }
-                    );
+                    // } else {
+                    //     await logger.logInfo(
+                    //         context,
+                    //         `✔️ Execução concluída (sem ResultType) em ${duration}ms`,
+                    //         undefined,
+                    //         // { result: safe(result) }
+                    //     );
                 }
 
                 return result;
@@ -74,7 +73,7 @@ export function LogExecution(): MethodDecorator {
                     context,
                     `❌ Erro inesperado: ${error.message ?? error}`,
                     error.stack,
-                    { duration }
+                    {duration}
                 );
                 throw error;
             }

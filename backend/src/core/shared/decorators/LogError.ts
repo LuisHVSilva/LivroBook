@@ -1,6 +1,6 @@
 import { container } from "tsyringe";
-import { ILogger } from "@coreShared/logs/ILogger";
-import { LoggerContext } from "@coreShared/logs/LoggerContext";
+import { ILogger } from "@coreConfig/logs/ILogger";
+import { LoggerContext } from "@coreConfig/logs/LoggerContext";
 import { ResultType } from "@coreShared/types/result.type";
 import util from "util";
 

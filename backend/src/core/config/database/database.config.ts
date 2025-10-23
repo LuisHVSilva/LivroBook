@@ -20,6 +20,8 @@ import {ModelCtor} from "sequelize-typescript/dist/model/model/model";
 import {BookCategoryModel} from "@modules/book/infrastructure/models/bookCategory.model";
 import {AuthorModel} from "@modules/book/infrastructure/models/author.model";
 import {BookModel} from "@modules/book/infrastructure/models/book.model";
+import {STATUS_CASCADE_MAP} from "@coreConfig/database/status/statusCascadeMap.config";
+import {registerStatusCascadeHookDatabase} from "@coreConfig/database/status/registerStatusCascadeHook.database";
 
 dotenv.config({path: path.resolve(__dirname, '../../../.env')});
 
@@ -58,6 +60,8 @@ export class Database {
             port: Number(process.env.DB_PORT),
             models: this.models
         });
+
+        registerStatusCascadeHookDatabase(STATUS_CASCADE_MAP);
 
         return Database.instance;
     }

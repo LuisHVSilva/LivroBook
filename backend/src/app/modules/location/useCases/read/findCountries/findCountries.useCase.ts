@@ -5,7 +5,7 @@ import {CountryFilterDTO, FindCountriesRawDTO, FindCountriesResponseDTO} from "@
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {CountryEntity} from "@location/domain/entities/country.entity";
 import {LogError} from "@coreShared/decorators/LogError";
 
@@ -44,7 +44,7 @@ export class FindCountriesUseCase implements IFindCountriesUseCase {
 
             return ResultType.success(response);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

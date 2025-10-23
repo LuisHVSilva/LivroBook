@@ -7,7 +7,7 @@ import {IStatusService} from "@status/domain/services/interfaces/IStatus.service
 import {PhoneTypeEntity} from "@phone/domain/entities/phoneType.entity";
 import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
 import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ServiceBase} from "@coreShared/base/service.base";
 import {PhoneTypeTransformer} from "@phone/domain/transformers/phoneType.transform";
@@ -38,7 +38,7 @@ export class PhoneTypeService extends ServiceBase<PhoneTypeDtoBaseType, PhoneTyp
 
     //#endregion
 
-    @LogError()
+
     protected async createEntity(data: PhoneTypeDtoBaseType["CreateDTO"], status: string): Promise<PhoneTypeEntity> {
         return PhoneTypeEntity.create({
             description: data.description,

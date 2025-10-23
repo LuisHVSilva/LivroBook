@@ -7,8 +7,7 @@ import {
 } from "@phone/adapters/dtos/phoneCode.dto";
 import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
@@ -33,7 +32,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
 
     //#endregion
 
-    @LogError()
+
     protected async createEntity(data: PhoneCodeDtoBaseType["CreateDTO"], status: string): Promise<PhoneCodeEntity> {
         return PhoneCodeEntity.create({
             ddiCode: data.ddiCode,
@@ -43,7 +42,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: PhoneCodeEntity): Promise<void> {
         const filter: PhoneCodeFilterDTO = {
             ddiCode: StringUtil.parseCsvFilter(entity.ddiCode?.toString(), Number),
@@ -59,7 +58,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
         }
     }
 
-    @LogError()
+
     protected filterTransform(input: PhoneCodeDtoBaseType['FilterDTO']): PhoneCodeDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             state: StateTransformer.normalizeDescription,
@@ -67,7 +66,7 @@ export class PhoneCodeService extends ServiceBase<PhoneCodeDtoBaseType, PhoneCod
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<PhoneCodeDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
             this.validateExistence("state", data.state, 'description', this.stateService),

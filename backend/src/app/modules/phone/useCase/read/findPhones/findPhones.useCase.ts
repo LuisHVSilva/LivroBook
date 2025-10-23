@@ -4,7 +4,7 @@ import {IPhoneService} from "@phone/domain/service/interfaces/IPhone.service";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {FindPhonesRawDTO, FindPhonesResponseDTO, PhoneDTO, PhoneFilterDTO} from "@phone/adapters/dtos/phone.dto";
 import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 
@@ -31,7 +31,7 @@ export class FindPhonesUseCase implements IFindPhonesUseCase {
                 data: phones.entities
             })
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 

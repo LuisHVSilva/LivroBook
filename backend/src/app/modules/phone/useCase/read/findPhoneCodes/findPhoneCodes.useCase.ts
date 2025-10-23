@@ -7,7 +7,7 @@ import {
     PhoneCodeFilterDTO
 } from "@phone/adapters/dtos/phoneCode.dto";
 import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {LogError} from "@coreShared/decorators/LogError";
@@ -37,7 +37,7 @@ export class FindPhoneCodesUseCase implements IFindPhoneCodesUseCase {
             });
 
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 

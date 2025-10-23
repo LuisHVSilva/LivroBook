@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {IGetAllEntitiesNamesUseCase} from "@modules/metadata/useCase/getAllEntitiesNames/IGetAllEntitiesNames.useCase";
 import {IMetadataService} from "@modules/metadata/domain/services/interfaces/IMetadata.service";
 import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {GetAllEntitiesNamesDTO} from "@modules/metadata/adapters/dtos/metadata.dto";
 import {LogError} from "@coreShared/decorators/LogError";
 
@@ -19,7 +19,7 @@ export class GetAllEntitiesNamesUseCase implements IGetAllEntitiesNamesUseCase {
             const entitiesNames: GetAllEntitiesNamesDTO = this.service.getAllEntitiesNames();
             return ResultType.success(entitiesNames);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

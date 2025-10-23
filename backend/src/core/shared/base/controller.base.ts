@@ -6,6 +6,7 @@ import {IUseCase} from "@coreShared/interfaces/IUseCase";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindByIdRequestDTO} from "@coreShared/dtos/operation.dto";
 import {AbstractControllerBaseType} from "@coreShared/types/controller.type";
+import {LogExecution} from "@coreShared/decorators/LogExecution";
 
 export abstract class ControllerBase<T extends AbstractControllerBaseType<any, any, any, any, any, any, any, any>> implements IControllerBase {
 
@@ -18,7 +19,8 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
 
 
     ) {}
-    
+
+    @LogExecution()
     async create(req: Request, res: Response): Promise<Response> {
         const input: T["TCreateReq"] = req.body;
         const result: ResultType<T["TCreateRes"]> = await this.createUseCase.execute(input);
@@ -29,6 +31,7 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
+    @LogExecution()
     async findById(req: Request, res: Response): Promise<Response> {
         const input: FindByIdRequestDTO = req.params as unknown as T["TFindByIdReq"];
         const result: ResultType<T["TFindByIdRes"]> = await this.findByIdUseCase.execute(input);
@@ -42,6 +45,7 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
+    @LogExecution()
     async findAll(req: Request, res: Response): Promise<Response> {
         const input: T["TFindAllReq"] = req.query as unknown as T["TFindAllReq"];
         const result: ResultType<T["TFindAllRes"]> = await this.findAllUseCase.execute(input);
@@ -55,6 +59,7 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
         return ApiResponseUtil.handleResultError(res, result.getError());
     }
 
+    @LogExecution()
     async update(req: Request, res: Response): Promise<Response> {
         const input: T["TUpdateReq"] = req.body;
         const result: ResultType<T["TUpdateReq"]> = await this.updateUseCase.execute(input);
@@ -65,6 +70,7 @@ export abstract class ControllerBase<T extends AbstractControllerBaseType<any, a
         return ApiResponseUtil.handleUpdateResult<T["TEntity"]>(res, result.unwrap());
     }
 
+    @LogExecution()
     async delete(req: Request, res: Response): Promise<Response> {
         const input: T["TDeleteReq"] = req.query as unknown as T["TDeleteReq"];
         const result: ResultType<T["TDeleteRes"]> = await this.deleteUseCase.execute(input);

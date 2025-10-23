@@ -1,14 +1,14 @@
+import {ResultType} from "@coreShared/types/result.type";
 import {
     ConflictError,
     DomainError,
-    ValidationError,
-    NotFoundError,
-    InactiveError
-} from "@coreShared/errors/domain.error";
-import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseError} from "@coreShared/errors/useCase.error";
+    InactiveError,
+    NotFoundError, UseCaseError,
+    ValidationError
+} from "@coreShared/errors/classes.error";
 
-export class UseCaseResponseUtil {
+
+export class UseCaseResponseError {
     static handleResultError<T>(error: unknown): ResultType<T> {
         const knownErrors = [
             ConflictError,

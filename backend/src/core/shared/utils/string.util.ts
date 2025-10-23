@@ -1,4 +1,4 @@
-import {DomainError} from "@coreShared/errors/domain.error";
+import {DomainError} from "@coreShared/errors/classes.error";
 
 export type TransformerFn = (value: string) => string;
 export type TransformerMap<T> = Partial<Record<keyof T, TransformerFn>>;

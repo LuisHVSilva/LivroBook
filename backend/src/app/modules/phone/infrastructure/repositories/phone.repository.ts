@@ -9,7 +9,7 @@ import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepo
 import {RelationMapType} from "@coreShared/types/controller.type";
 import {IPhoneCodeRepository} from "@phone/infrastructure/repositories/interface/IPhoneCode.repository";
 import {IPhoneTypeRepository} from "@phone/infrastructure/repositories/interface/IPhoneType.repository";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 
 @injectable()
 export class PhoneRepository extends RepositoryBase<PhoneBaseRepositoryType> implements IPhoneRepository {

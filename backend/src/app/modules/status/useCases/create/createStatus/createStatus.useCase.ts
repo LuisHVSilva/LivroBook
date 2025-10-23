@@ -6,7 +6,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {CreateStatusDTO, CreateStatusResponseDTO} from "@status/adapters/dtos/status.dto";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {StatusEntity} from "@status/domain/entities/status.entity";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -34,7 +34,7 @@ export class CreateStatusUseCase implements ICreateStatusUseCase {
                 active: result.active,
             });
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

@@ -2,8 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, InactiveError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError, InactiveError, NotFoundError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ServiceBase} from "@coreShared/base/service.base";
@@ -72,7 +71,7 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
     }
 
 
-    @LogError()
+
     protected async createEntity(data: UserDtoBaseType["CreateDTO"], status: string): Promise<UserEntity> {
         return UserEntity.create({
             ...data,
@@ -80,7 +79,7 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: UserEntity, previousEntity?: UserEntity): Promise<void> {
         const isUniqueEmail: boolean = await this.uniquenessValidator.validate('email', entity.email, previousEntity);
 
@@ -97,7 +96,7 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
         }
     }
 
-    @LogError()
+
     protected filterTransform(input: UserDtoBaseType['FilterDTO']): UserDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             userType: UserTypeTransform.normalizeDescription,
@@ -107,7 +106,7 @@ export class UserService extends ServiceBase<UserDtoBaseType, UserEntity> implem
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<UserDtoBaseType["DTO"]>, transaction?: Transaction): Promise<void> {
         await Promise.all([
             this.validateExistence("phone", data.phone, "number", this.phoneService, true, transaction),

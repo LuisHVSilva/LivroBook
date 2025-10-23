@@ -6,7 +6,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
 import {StateEntity} from "@location/domain/entities/state.entity";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {LogError} from "@coreShared/decorators/LogError";
 
 
@@ -34,7 +34,7 @@ export class FindStatesUseCase implements IFindStatesUseCase {
 
             return ResultType.success(response);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 

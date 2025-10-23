@@ -5,9 +5,8 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {LogError} from "@coreShared/decorators/LogError";
 import {DocumentTypeTransform} from "@document/domain/transformers/documentType.transform";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
@@ -44,7 +43,7 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
     //#endregion
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: DocumentTypeDtoBaseType["CreateDTO"], status: string): Promise<DocumentTypeEntity> {
         return DocumentTypeEntity.create({
             description: data.description,
@@ -53,14 +52,14 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: DocumentTypeEntity, previousEntity?: DocumentTypeEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.DOCUMENT_TYPE, 'description'));
     }
 
-    @LogError()
+
     protected filterTransform(input: DocumentTypeDtoBaseType["FilterDTO"]): DocumentTypeDtoBaseType["FilterDTO"] {
         return StringUtil.applyFilterTransform(input, {
             description: DocumentTypeTransform.normalizeDescription,
@@ -69,7 +68,7 @@ export class DocumentTypeService extends ServiceBase<DocumentTypeDtoBaseType, Do
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<DocumentTypeDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
             this.validateExistence("country", data.country, 'description', this.countryService),

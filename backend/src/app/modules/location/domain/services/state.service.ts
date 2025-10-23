@@ -4,8 +4,7 @@ import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniq
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {StateEntity} from "@location/domain/entities/state.entity";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
@@ -43,7 +42,7 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
     //#endregion
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: StateDtoBaseType["CreateDTO"], status: string): Promise<StateEntity> {
         return StateEntity.create({
             description: data.description,
@@ -52,14 +51,14 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: StateEntity, previousEntity?: StateEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.STATE, 'description'));
     }
 
-    @LogError()
+
     protected filterTransform(input: StateDtoBaseType['FilterDTO']): StateDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             description: CountryTransformer.normalizeDescription,
@@ -68,7 +67,7 @@ export class StateService extends ServiceBase<StateDtoBaseType, StateEntity> imp
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<StateDtoBaseType["DTO"]>): Promise<void> {
         await Promise.all([
             this.validateExistence("country", data.country, 'description', this.countryService),

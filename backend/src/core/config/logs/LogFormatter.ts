@@ -21,7 +21,6 @@ export class LogFormatter {
                   httpStatus?: StatusCodes, info?: any): string {
         const statusPart = httpStatus ? `Status: ${httpStatus} - ` : "";
         const infoPart = info ? `Info: ${util.inspect(info, { depth: null })} - ` : "";
-        return `[${this.getCurrentTimestamp()}] ${level} | Class: ${className} | Method: ${method} | 
-        ${statusPart}${infoPart}Message: ${message}\n`;
+        return `[${this.getCurrentTimestamp()}] ${level} | Class: ${className} | Method: ${method} | ${statusPart}${infoPart}Message: ${message}\n`;
     }
 }

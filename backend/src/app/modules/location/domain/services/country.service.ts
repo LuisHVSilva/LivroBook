@@ -4,8 +4,7 @@ import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniq
 import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness.validator";
 import {CountryEntity} from "@location/domain/entities/country.entity";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError} from "@coreShared/errors/domain.error";
+import {ConflictError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {ICountryService} from "@location/domain/services/interfaces/ICountry.service";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
@@ -41,7 +40,7 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
     //#endregion
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: CountryDtoBaseType["CreateDTO"], status: string): Promise<CountryEntity> {
         return CountryEntity.create({
             description: data.description,
@@ -49,14 +48,14 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: CountryEntity, previousEntity?: CountryEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(this.COUNTRY, 'description'));
     }
 
-    @LogError()
+
     protected filterTransform(input: CountryDtoBaseType['FilterDTO']): CountryDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             description: CountryTransformer.normalizeDescription,
@@ -64,7 +63,7 @@ export class CountryService extends ServiceBase<CountryDtoBaseType, CountryEntit
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<CountryDtoBaseType["DTO"]>): Promise<void> {
         await this.validateStatusExistence(data.status);
     }

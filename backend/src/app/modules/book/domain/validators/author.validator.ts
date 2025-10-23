@@ -1,6 +1,6 @@
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
-import {ValidationError} from "@coreShared/errors/domain.error";
 import {AuthorEntity} from "@modules/book/domain/entities/author.entity";
+import {ValidationError} from "@coreShared/errors/classes.error";
 
 export class AuthorValidator {
     static validateNameLength(description: string, min: number, max: number): void {

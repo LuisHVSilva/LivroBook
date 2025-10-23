@@ -4,7 +4,7 @@ import {IDocumentTypeService} from "@document/domain/services/interfaces/IDocume
 import {Transaction} from "sequelize";
 import {CreateDocumentTypeDTO, CreateDocumentTypeResponseDTO} from "@document/adapters/dto/documentType.dto";
 import {ResultType} from "@coreShared/types/result.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
@@ -29,7 +29,7 @@ export class CreateDocumentTypeUseCase implements ICreateDocumentTypeUseCase {
             const created: DocumentTypeEntity = await this.documentTypeService.create(input, transaction);
             return ResultType.success(created)
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

@@ -8,7 +8,7 @@ import {
     PhoneTypeDTO,
     PhoneTypeFilterDTO
 } from "@phone/adapters/dtos/phoneType.dto";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {FindAllType} from "@coreShared/types/findAll.type";
@@ -36,7 +36,7 @@ export class FindPhoneTypesUseCase implements IFindPhoneTypesUseCase {
                 data: phoneTypes.entities
             });
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 

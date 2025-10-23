@@ -4,8 +4,7 @@ import {EntityUniquenessValidator} from "@coreShared/validators/entityUniqueness
 import {EntityUniquenessValidatorFactory} from "@coreShared/factories/entityUniquenessValidator.factory";
 import {IRepositoryBase} from "@coreShared/base/interfaces/IRepositoryBase";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {LogError} from "@coreShared/decorators/LogError";
-import {ConflictError, NotFoundError} from "@coreShared/errors/domain.error";
+import {ConflictError, NotFoundError} from "@coreShared/errors/classes.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {
     UserCredentialTypeBaseRepositoryType,
@@ -50,7 +49,7 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
     }
 
     //#region HELPERS
-    @LogError()
+
     protected async createEntity(data: UserCredentialTypeDtoBaseType["CreateDTO"], status: string): Promise<UserCredentialTypeEntity> {
         return UserCredentialTypeEntity.create({
             description: data.description,
@@ -58,14 +57,14 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
         });
     }
 
-    @LogError()
+
     protected async uniquenessValidatorEntity(entity: UserCredentialTypeEntity, previousEntity?: UserCredentialTypeEntity): Promise<void> {
         const isUnique: boolean = await this.uniquenessValidator.validate('description', entity.description, previousEntity);
 
         if (!isUnique) throw new ConflictError(EntitiesMessage.error.conflict.duplicateValue(UserCredentialTypeEntity.name, 'description'));
     }
 
-    @LogError()
+
     protected filterTransform(input: UserCredentialTypeDtoBaseType['FilterDTO']): UserCredentialTypeDtoBaseType['FilterDTO'] {
         return StringUtil.applyFilterTransform(input, {
             description: UserCredentialTypeTransform.normalizeDescription,
@@ -73,7 +72,7 @@ export class UserCredentialTypeService extends ServiceBase<UserCredentialTypeDto
         });
     }
 
-    @LogError()
+
     protected async validateForeignKeys(data: Partial<UserCredentialTypeDtoBaseType["DTO"]>): Promise<void> {
         await this.validateStatusExistence(data.status);
     }

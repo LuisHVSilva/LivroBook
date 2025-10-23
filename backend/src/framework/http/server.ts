@@ -3,9 +3,10 @@ import cors from "cors";
 import helmet from "helmet";
 import {router} from "./router";
 import morgan from "morgan";
-import {Database} from "@coreConfig/database.config";
+import {Database} from "@coreConfig/database/database.config";
 import {ErrorHandler} from "@coreShared/middlewares/errorHandler";
 import '../../core/config/zod.config';
+import {LogExecution} from "@coreShared/decorators/LogExecution";
 
 class Server {
     private readonly app: Application;
@@ -34,6 +35,7 @@ class Server {
         this.app.use(ErrorHandler.handleError);
     };
 
+    @LogExecution()
     public async start(): Promise<void> {
         try {
             await Database.connect();

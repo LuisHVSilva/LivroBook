@@ -5,7 +5,7 @@ import {LogExecution} from "@coreShared/decorators/LogExecution";
 import {ModelAttributeRequestDto} from "@modules/metadata/adapters/dtos/metadata.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {SimplifiedMetadataAttribute} from "@coreShared/types/metadata.type";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {EntitiesNamesEnum} from "@coreShared/enums/entitiesNamesEnum";
 
 @injectable()
@@ -23,7 +23,7 @@ export class GetModelAttributesUseCase implements IGetModelAttributesUseCase {
 
             return ResultType.success(modelAttributes);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

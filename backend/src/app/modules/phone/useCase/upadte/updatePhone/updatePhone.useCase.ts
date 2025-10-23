@@ -6,7 +6,7 @@ import {UpdatePhoneDTO, UpdatePhoneResponseDTO} from "@phone/adapters/dtos/phone
 import {ResultType} from "@coreShared/types/result.type";
 import {Transaction} from "sequelize";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {UpdateResultType} from "@coreShared/types/crudResult.type";
 import {LogError} from "@coreShared/decorators/LogError";
 
@@ -29,7 +29,7 @@ export class UpdatePhoneUseCase implements IUpdatePhoneUseCase {
 
             return ResultType.success(updated);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

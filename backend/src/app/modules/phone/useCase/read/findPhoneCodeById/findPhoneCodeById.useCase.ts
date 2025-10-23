@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {FindByIdRequestDTO} from "@coreShared/dtos/operation.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {LogError} from "@coreShared/decorators/LogError";
 import {IPhoneCodeService} from "@phone/domain/service/interfaces/IPhoneCode.service";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
@@ -25,7 +25,7 @@ export class FindPhoneCodeByIdUseCase implements IFindPhoneCodeByIdUseCase {
 
             return ResultType.success(entity);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

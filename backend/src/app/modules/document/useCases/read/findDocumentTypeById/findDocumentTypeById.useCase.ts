@@ -6,7 +6,7 @@ import {ResultType} from "@coreShared/types/result.type";
 import {FindByIdDocumentTypeResponseDTO} from "@document/adapters/dto/documentType.dto";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {LogError} from "@coreShared/decorators/LogError";
 
 @injectable()
@@ -24,7 +24,7 @@ export class FindDocumentTypeByIdUseCase implements IFindDocumentTypeByIdUseCase
 
             return ResultType.success(entity);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

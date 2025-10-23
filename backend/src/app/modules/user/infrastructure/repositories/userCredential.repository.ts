@@ -15,7 +15,7 @@ import {
 import {IUserRepository} from "@user/infrastructure/repositories/interface/IUser.repository";
 import {RelationMapType} from "@coreShared/types/controller.type";
 import {UserCredentialTypeModel} from "@user/infrastructure/models/userCredentialType.model";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 
 
 @injectable()

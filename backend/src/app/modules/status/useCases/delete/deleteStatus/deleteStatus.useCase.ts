@@ -5,10 +5,10 @@ import {Transactional} from "@coreShared/decorators/Transactional";
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {EntitiesMessage} from "@coreShared/messages/entities.message";
 import {IStatusService} from "@status/domain/services/interfaces/IStatus.service";
-import {DomainError} from "@coreShared/errors/domain.error";
+import {DomainError} from "@coreShared/errors/classes.error";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
 import {DeleteReport} from "@coreShared/utils/operationReport.util";
 import {DeleteRequestDTO, DeleteResponseDTO} from "@coreShared/dtos/operation.dto";
@@ -37,7 +37,7 @@ export class DeleteStatusUseCase implements IDeleteStatusUseCase {
                 report
             });
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

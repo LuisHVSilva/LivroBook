@@ -1,6 +1,6 @@
 import {inject, injectable} from "tsyringe";
 import {LogExecution} from "@coreShared/decorators/LogExecution";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {StringUtil} from "@coreShared/utils/string.util";
 import {ResultType} from "@coreShared/types/result.type";
 import {FindAllType} from "@coreShared/types/findAll.type";
@@ -36,7 +36,7 @@ export class FindUserCredentialTypesUseCase implements IFindUserCredentialTypesU
             });
 
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 

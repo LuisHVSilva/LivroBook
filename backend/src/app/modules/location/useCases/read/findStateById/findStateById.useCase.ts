@@ -2,7 +2,7 @@ import {inject, injectable} from "tsyringe";
 import {FindByIdRequestDTO} from "@coreShared/dtos/operation.dto";
 import {ResultType} from "@coreShared/types/result.type";
 import {StringUtil} from "@coreShared/utils/string.util";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {IFindStateByIdUseCase} from "@location/useCases/read/findStateById/IFindStateById.useCase";
 import {FindByIdStateResponseDTO} from "@location/adapters/dtos/state.dto";
 import {IStateService} from "@location/domain/services/interfaces/IState.service";
@@ -24,7 +24,7 @@ export class FindStateByIdUseCase implements IFindStateByIdUseCase {
 
             return ResultType.success(entity);
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

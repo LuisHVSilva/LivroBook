@@ -5,7 +5,7 @@ import {CreatePhoneCodeDTO, CreatePhoneCodeResponseDTO} from "@phone/adapters/dt
 import {Transaction} from "sequelize";
 import {ResultType} from "@coreShared/types/result.type";
 import {ErrorMessages} from "@coreShared/messages/errorMessages";
-import {UseCaseResponseUtil} from "@coreShared/utils/useCaseResponse.util";
+import {UseCaseResponseError} from "@coreShared/errors/useCaseResponse.error";
 import {PhoneCodeEntity} from "@phone/domain/entities/phoneCode.entity";
 import {Transactional} from "@coreShared/decorators/Transactional";
 import {LogError} from "@coreShared/decorators/LogError";
@@ -29,7 +29,7 @@ export class CreatePhoneCodeUseCase implements ICreatePhoneCodeUseCase {
 
             return ResultType.success(created)
         } catch (error) {
-            return UseCaseResponseUtil.handleResultError(error);
+            return UseCaseResponseError.handleResultError(error);
         }
     }
 }

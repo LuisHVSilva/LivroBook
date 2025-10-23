@@ -8,7 +8,7 @@ import {DocumentTypeEntity} from "@document/domain/entities/documentType.entity"
 import {RelationMapType} from "@coreShared/types/controller.type";
 import {IStatusRepository} from "@status/infrastructure/repositories/IStatusRepository";
 import {ICountryRepository} from "@location/infrastructure/repositories/interfaces/ICountry.repository";
-import {NotFoundError} from "@coreShared/errors/domain.error";
+import {NotFoundError} from "@coreShared/errors/classes.error";
 
 @injectable()
 export class DocumentTypeRepository extends RepositoryBase<DocumentTypeBaseRepositoryType> implements IDocumentTypeRepository {

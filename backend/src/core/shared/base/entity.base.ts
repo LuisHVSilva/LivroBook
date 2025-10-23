@@ -1,4 +1,5 @@
-import {ValidationError} from "@coreShared/errors/domain.error";
+import {ValidationError} from "@coreShared/errors/classes.error";
+
 
 export abstract class EntityBase<T extends { id?: unknown }> {
     protected readonly props: T;
@@ -6,6 +7,8 @@ export abstract class EntityBase<T extends { id?: unknown }> {
     protected constructor(props: T) {
         this.props = Object.freeze({...props}); // Protege contra mutação
     }
+
+    abstract update(props: Partial<T>): this;
 
     public getProps(): T {
         return this.props;
@@ -19,9 +22,28 @@ export abstract class EntityBase<T extends { id?: unknown }> {
         return this.toObject();
     }
 
+    public isEqual(other: EntityBase<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
+        const keys = Object.keys(this.props) as (keyof T)[];
+        return keys
+            .filter(key => !excludeKeys.includes(key))
+            .every(key => this.props[key] === other.props[key]);
+    }
+
+    public hasDifferencesExceptStatus(other: EntityBase<T>): boolean {
+        const keys = Object.keys(this.props) as (keyof T)[];
+        return keys
+            .filter(key => key !== "status")
+            .some(key => {
+                if (key === "id") {
+                    return this.props[key] != other.props[key]
+                }
+                return this.props[key] !== other.props[key]
+            });
+    }
+
     protected validateRequiredFields(fields: (keyof T)[]): void {
         for (const field of fields) {
-            const value = this.getProps()[field]; // <-- pegando dos props corretos
+            const value = this.getProps()[field];
 
             const isEmptyString = typeof value === 'string' && value.trim() === '';
             const isNullOrUndefined = value === null || value === undefined;
@@ -63,25 +85,4 @@ export abstract class EntityBase<T extends { id?: unknown }> {
 
         return result as U;
     }
-
-    public isEqual(other: EntityBase<T>, excludeKeys: (keyof T)[] = ["id"]): boolean {
-        const keys = Object.keys(this.props) as (keyof T)[];
-        return keys
-            .filter(key => !excludeKeys.includes(key))
-            .every(key => this.props[key] === other.props[key]);
-    }
-
-    public hasDifferencesExceptStatus(other: EntityBase<T>): boolean {
-        const keys = Object.keys(this.props) as (keyof T)[];
-        return keys
-            .filter(key => key !== "status")
-            .some(key => {
-                if (key === "id") {
-                    return this.props[key] != other.props[key]
-                }
-                return this.props[key] !== other.props[key]
-            });
-    }
-
-    abstract update(props: Partial<T>): this;
 }
